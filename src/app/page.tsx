@@ -11,7 +11,7 @@ export default function HomePage() {
     <div className="relative flex min-h-dvh w-full flex-col items-center bg-background">
       <Navbar />
 
-      <section className="container mt-12">
+      <section className="container mt-12 px-4">
         <div className="grid gap-12 md:grid-cols-2">
           <div className="flex flex-col justify-center space-y-4">
             <h2 className="font-heading text-3xl font-bold sm:text-4xl md:text-5xl">
@@ -36,14 +36,14 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="container mt-12">
+      <section className="container mt-12 px-4">
         <div className="grid gap-12 md:grid-cols-2">
           <Iphone15Pro />
           <Safari />
         </div>
       </section>
 
-      <section className="container mt-12">
+      <section className="container mt-12 px-4">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           <Card>
             <CardContent className="flex flex-col items-center space-y-4 p-6">
