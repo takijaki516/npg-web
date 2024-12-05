@@ -1,36 +1,15 @@
-import Link from "next/link";
 import Image from "next/image";
-import {
-  Brain,
-  Camera,
-  Dumbbell,
-  Home,
-  PieChart,
-  Sparkles,
-} from "lucide-react";
+import { Brain, Camera, Dumbbell, PieChart, Sparkles } from "lucide-react";
 
-import { RainbowButton } from "@/components/ui/rainbow-button";
-import { ThemeToggle } from "@/components/theme-toggle";
 import Iphone15Pro from "@/components/ui/iphone-15-pro";
 import Safari from "@/components/ui/safari";
 import { Card, CardContent } from "@/components/ui/card";
+import { Navbar } from "@/components/navbar";
 
 export default function HomePage() {
   return (
-    <main className="relative flex min-h-dvh w-full flex-col items-center bg-background">
-      <nav className="sticky top-0 flex w-full justify-center bg-background/80 py-4 backdrop-blur-lg">
-        <div className="container flex items-center justify-between">
-          <Link href="/">
-            <Home />
-          </Link>
-
-          <div className="flex items-center gap-4">
-            <RainbowButton>로그인</RainbowButton>
-
-            <ThemeToggle />
-          </div>
-        </div>
-      </nav>
+    <div className="relative flex min-h-dvh w-full flex-col items-center bg-background">
+      <Navbar />
 
       <section className="container mt-12">
         <div className="grid gap-12 md:grid-cols-2">
@@ -117,6 +96,6 @@ export default function HomePage() {
           </Card>
         </div>
       </section>
-    </main>
+    </div>
   );
 }
