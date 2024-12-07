@@ -1,17 +1,13 @@
 import { Home } from "lucide-react";
 import Link from "next/link";
 
-import { supabaseServerClient } from "@/supabase-clients/server";
 import { ThemeToggle } from "./theme-toggle";
 import { UserDropdown } from "./user-dropdown";
 import { Button } from "./ui/button";
+import { getProfile } from "@/supabase-utils/server-queries";
 
 export async function Navbar() {
-  const supabase = await supabaseServerClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const profile = await getProfile();
 
   return (
     <nav className="sticky top-0 flex w-full justify-center bg-background/80 py-4 backdrop-blur-lg">
@@ -21,8 +17,8 @@ export async function Navbar() {
         </Link>
 
         <div className="flex items-center gap-4">
-          {user ? (
-            <UserDropdown align="end" />
+          {profile ? (
+            <UserDropdown align="end" profile={profile} />
           ) : (
             <Button variant={"outline"} asChild>
               <Link href="/login">로그인</Link>

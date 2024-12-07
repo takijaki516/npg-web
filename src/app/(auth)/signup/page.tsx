@@ -24,7 +24,7 @@ import {
   FormItem,
   FormField,
 } from "@/components/ui/form";
-import { supabaseClient } from "@/supabase-clients/client";
+import { supabaseClient } from "@/supabase-utils/client";
 import { authSchema } from "@/lib/schema/auth";
 import { useSessionStore } from "@/zustand/session-store";
 import { toast } from "sonner";
@@ -33,6 +33,7 @@ import { Loader2 } from "lucide-react";
 export default function SignupPage() {
   const { session, setSession } = useSessionStore();
   const router = useRouter();
+  const supabase = supabaseClient();
 
   const form = useForm<z.infer<typeof authSchema>>({
     resolver: zodResolver(authSchema),
@@ -50,24 +51,34 @@ export default function SignupPage() {
   }, [session, router]);
 
   const onSubmit = async (values: z.infer<typeof authSchema>) => {
-    const supabase = supabaseClient();
-
-    const { data, error } = await supabase.auth.signUp({
+    const signupRes = await supabase.auth.signUp({
       email: values.email,
       password: values.password,
-      options: {
-        emailRedirectTo: "http://localhost:3000",
-      },
     });
 
-    if (error) {
+    if (signupRes.error) {
       toast.error("회원가입에 실패하였습니다.");
       return;
     }
 
-    setSession(data.session);
+    // NOTE: this is when email confirmation is disable.
+    const signInRes = await supabase.auth.signInWithPassword({
+      email: values.email,
+      password: values.password,
+    });
+
+    setSession(signInRes.data.session);
     router.push("/");
   };
+
+  function handleLoginWithGoogle() {
+    supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: "http://localhost:3000/api/auth/callback",
+      },
+    });
+  }
 
   return (
     <main className="container mt-20 flex w-full flex-1 flex-col items-center px-4">
@@ -109,7 +120,7 @@ export default function SignupPage() {
 
               <Button
                 type="submit"
-                className="w-full mt-8"
+                className="mt-8 w-full"
                 disabled={form.formState.isLoading}
               >
                 {form.formState.isLoading ? (
@@ -120,6 +131,14 @@ export default function SignupPage() {
               </Button>
             </form>
           </Form>
+
+          <Button
+            onClick={handleLoginWithGoogle}
+            type="button"
+            className="mt-2 w-full"
+          >
+            Login with Google
+          </Button>
         </CardContent>
 
         <CardFooter className="flex flex-col items-center">

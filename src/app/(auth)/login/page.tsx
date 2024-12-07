@@ -6,6 +6,8 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
+import { Loader2 } from "lucide-react";
+import { FcGoogle } from "react-icons/fc";
 
 import {
   Card,
@@ -26,13 +28,11 @@ import {
   FormField,
 } from "@/components/ui/form";
 import { authSchema } from "@/lib/schema/auth";
-import { supabaseClient } from "@/supabase-clients/client";
-import { useSessionStore } from "@/zustand/session-store";
-import { Loader2 } from "lucide-react";
+import { supabaseClient } from "@/supabase-utils/client";
 
 export default function SignupPage() {
   const router = useRouter();
-  const { session, setSession } = useSessionStore();
+  const supabase = supabaseClient();
 
   const form = useForm<z.infer<typeof authSchema>>({
     resolver: zodResolver(authSchema),
@@ -42,29 +42,37 @@ export default function SignupPage() {
     },
   });
 
-  // REVIEW:
-  React.useEffect(() => {
-    if (session) {
-      router.push("/");
-    }
-  }, [session, router]);
-
   const onSubmit = async (values: z.infer<typeof authSchema>) => {
-    const supabase = supabaseClient();
-
-    const { data, error } = await supabase.auth.signInWithPassword({
+    const { error } = await supabase.auth.signInWithPassword({
       email: values.email,
       password: values.password,
     });
 
     if (error) {
-      toast.error("로그인에 실패하였습니다.");
+      toast.error(
+        "로그인에 실패하였습니다.\n" +
+          "이메일 또는 비밀번호를 확인해주세요.\n" +
+          "회원가입을 진행하지 않았다면 회원가입을 진행해주세요.\n",
+        {
+          style: {
+            whiteSpace: "pre-line",
+          },
+        },
+      );
       return;
     }
 
-    setSession(data.session);
     router.push("/");
   };
+
+  async function handleLoginWithGoogle() {
+    await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: "http://localhost:3000/api/auth/callback",
+      },
+    });
+  }
 
   return (
     <main className="container mt-20 flex w-full flex-1 flex-col items-center px-4">
@@ -73,9 +81,9 @@ export default function SignupPage() {
           <CardTitle className="text-2xl font-bold">로그인</CardTitle>
         </CardHeader>
 
-        <CardContent>
+        <CardContent className="flex flex-col items-center">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="w-full">
               <FormField
                 control={form.control}
                 name="email"
@@ -116,6 +124,15 @@ export default function SignupPage() {
                 )}
               </Button>
             </form>
+
+            <Button
+              onClick={handleLoginWithGoogle}
+              type="button"
+              className="mt-2 flex w-full items-center justify-center"
+            >
+              <FcGoogle className="mr-2" />
+              Login with Google
+            </Button>
           </Form>
         </CardContent>
 

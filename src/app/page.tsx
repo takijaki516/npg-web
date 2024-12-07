@@ -6,7 +6,7 @@ import Safari from "@/components/ui/safari";
 import { Card, CardContent } from "@/components/ui/card";
 import { Navbar } from "@/components/navbar";
 
-export default function HomePage() {
+export default async function HomePage() {
   return (
     <div className="relative flex min-h-dvh w-full flex-col items-center bg-background">
       <Navbar />
@@ -36,12 +36,12 @@ export default function HomePage() {
         </div>
       </section>
 
-      <section className="container mt-12 px-4">
+      {/* <section className="container mt-12 px-4">
         <div className="grid gap-12 md:grid-cols-2">
           <Iphone15Pro />
           <Safari />
         </div>
-      </section>
+      </section> */}
 
       <section className="container mt-12 px-4">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">

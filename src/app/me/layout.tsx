@@ -1,33 +1,22 @@
-"use client";
+import { AppSidebar } from "@/components/my-sidebar";
+import { getProfile } from "@/supabase-utils/server-queries";
 
-import * as React from "react";
+export default async function MeLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const profile = await getProfile();
 
-import { useSessionStore } from "@/zustand/session-store";
-import { supabaseClient } from "@/supabase";
-
-export default function MeLayout({ children }: { children: React.ReactNode }) {
-  const [isLoading, setIsLoading] = React.useState(true);
-  const { session, setSession } = useSessionStore();
-
-  React.useEffect(() => {
-    supabaseClient.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setIsLoading(false);
-    });
-
-    const {
-      data: { subscription },
-    } = supabaseClient.auth.onAuthStateChange((_event, session) => {
-      setSession(session);
-      setIsLoading(false);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+  if (!profile) {
+    return null;
+  }
 
   return (
-    <div className="h-screen">
-      {isLoading ? "loading..." : session ? children : "로그인이 필요합니다."}
+    <div className="flex">
+      <AppSidebar profile={profile} />
+
+      {children}
     </div>
   );
 }

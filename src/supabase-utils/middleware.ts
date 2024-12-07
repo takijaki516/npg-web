@@ -16,12 +16,14 @@ export async function updateSession(request: NextRequest) {
         },
         setAll(cookiesToSet) {
           // send cookies to server component
-          cookiesToSet.forEach(({ name, value, _ }) =>
+          cookiesToSet.forEach(({ name, value }) =>
             request.cookies.set(name, value),
           );
+
           supabaseResponse = NextResponse.next({
             request,
           });
+
           // set cookies to browser
           cookiesToSet.forEach(({ name, value, options }) =>
             supabaseResponse.cookies.set(name, value, options),
@@ -54,7 +56,7 @@ export async function updateSession(request: NextRequest) {
     (request.nextUrl.pathname === "/login" ||
       request.nextUrl.pathname === "/signup")
   ) {
-    return NextResponse.redirect(request.nextUrl);
+    return NextResponse.redirect(request.nextUrl.origin);
   }
 
   return supabaseResponse;

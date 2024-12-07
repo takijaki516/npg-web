@@ -4,6 +4,7 @@ import "./globals.css";
 
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
+import { TailwindIndicator } from "@/components/tailwind-indicator";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -39,7 +40,9 @@ export default function RootLayout({
         >
           {children}
 
-          <Toaster />
+          <Toaster richColors />
+
+          <TailwindIndicator />
         </ThemeProvider>
       </body>
     </html>

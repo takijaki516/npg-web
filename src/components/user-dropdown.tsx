@@ -1,5 +1,7 @@
-import { User2 } from "lucide-react";
+import { User2, Settings } from "lucide-react";
+import Link from "next/link";
 
+import type { Database } from "@/lib/types/database.types";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,14 +11,14 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
-import type { User } from "@supabase/supabase-js";
+import { UserSignoutButton } from "./user-signout-button";
 
 interface UserDropdownProps {
-  user?: User;
   align: "start" | "center" | "end";
+  profile: Database["public"]["Tables"]["profiles"]["Row"];
 }
 
-export function UserDropdown({ align }: UserDropdownProps) {
+export function UserDropdown({ align, profile }: UserDropdownProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -25,13 +27,28 @@ export function UserDropdown({ align }: UserDropdownProps) {
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align={align}>
-        <DropdownMenuLabel>Appearance</DropdownMenuLabel>
+      <DropdownMenuContent align={align} className="space-y-1">
+        <DropdownMenuLabel>Hello, {profile.username}</DropdownMenuLabel>
+
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem>Status Bar</DropdownMenuItem>
-        <DropdownMenuItem>Activity Bar</DropdownMenuItem>
-        <DropdownMenuItem>Panel</DropdownMenuItem>
+        <DropdownMenuItem>
+          <Link href={"/me"} className="flex items-center gap-2">
+            <User2 className="size-4" />
+            My Page
+          </Link>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem>
+          <Link href="/settings" className="flex items-center gap-2">
+            <Settings className="size-4" />
+            Settings
+          </Link>
+        </DropdownMenuItem>
+
+        <DropdownMenuItem className="bg-destructive/50 focus:bg-destructive">
+          <UserSignoutButton />
+        </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
   );
