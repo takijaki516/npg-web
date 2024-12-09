@@ -13,7 +13,7 @@ export default async function MeLayout({
   }
 
   return (
-    <div className="flex">
+    <div className="relative flex">
       <AppSidebar profile={profile} />
 
       {children}

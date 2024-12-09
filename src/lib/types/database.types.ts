@@ -38,64 +38,65 @@ export type Database = {
         Row: {
           comments: string | null;
           created_at: string;
+          date: string;
           id: string;
           updated_at: string;
           user_email: string;
+          user_id: string | null;
         };
         Insert: {
           comments?: string | null;
           created_at?: string;
+          date: string;
           id?: string;
           updated_at?: string;
           user_email: string;
+          user_id?: string | null;
         };
         Update: {
           comments?: string | null;
           created_at?: string;
+          date?: string;
           id?: string;
           updated_at?: string;
           user_email?: string;
+          user_id?: string | null;
         };
-        Relationships: [
-          {
-            foreignKeyName: "daily_tracker_user_email_fkey";
-            columns: ["user_email"];
-            isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["user_email"];
-          },
-        ];
+        Relationships: [];
       };
       exercises: {
         Row: {
           created_at: string;
           daily_tracker_id: string;
-          description: string | null;
-          end_time: string | null;
-          exercise_type: string | null;
+          difficulty: string | null;
+          end_time: string;
+          exercise_detail: Json | null;
           id: string;
-          start_time: string | null;
+          start_time: string;
           user_email: string;
+          user_id: string | null;
         };
         Insert: {
           created_at?: string;
           daily_tracker_id: string;
-          description?: string | null;
-          end_time?: string | null;
-          exercise_type?: string | null;
+          difficulty?: string | null;
+          end_time: string;
+          exercise_detail?: Json | null;
           id?: string;
-          start_time?: string | null;
+          start_time: string;
           user_email: string;
+          user_id?: string | null;
         };
         Update: {
           created_at?: string;
           daily_tracker_id?: string;
-          description?: string | null;
-          end_time?: string | null;
-          exercise_type?: string | null;
+          difficulty?: string | null;
+          end_time?: string;
+          exercise_detail?: Json | null;
           id?: string;
-          start_time?: string | null;
+          start_time?: string;
           user_email?: string;
+          user_id?: string | null;
         };
         Relationships: [
           {
@@ -105,13 +106,6 @@ export type Database = {
             referencedRelation: "daily_trackings";
             referencedColumns: ["id"];
           },
-          {
-            foreignKeyName: "exercise_user_email_fkey";
-            columns: ["user_email"];
-            isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["user_email"];
-          },
         ];
       };
       foods: {
@@ -119,16 +113,22 @@ export type Database = {
           food_info: Json | null;
           id: string;
           meal_id: string;
+          user_email: string;
+          user_id: string | null;
         };
         Insert: {
           food_info?: Json | null;
           id?: string;
           meal_id: string;
+          user_email: string;
+          user_id?: string | null;
         };
         Update: {
           food_info?: Json | null;
           id?: string;
           meal_id?: string;
+          user_email?: string;
+          user_id?: string | null;
         };
         Relationships: [
           {
@@ -147,6 +147,7 @@ export type Database = {
           date: string;
           id: string;
           user_email: string;
+          user_id: string | null;
         };
         Insert: {
           created_at?: string;
@@ -154,6 +155,7 @@ export type Database = {
           date: string;
           id?: string;
           user_email: string;
+          user_id?: string | null;
         };
         Update: {
           created_at?: string;
@@ -161,15 +163,9 @@ export type Database = {
           date?: string;
           id?: string;
           user_email?: string;
+          user_id?: string | null;
         };
         Relationships: [
-          {
-            foreignKeyName: "meal_user_email_fkey";
-            columns: ["user_email"];
-            isOneToOne: false;
-            referencedRelation: "profiles";
-            referencedColumns: ["user_email"];
-          },
           {
             foreignKeyName: "meals_daily_tracker_id_fkey";
             columns: ["daily_tracker_id"];

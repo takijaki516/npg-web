@@ -6,6 +6,8 @@ import type { Database } from "@/lib/types/database.types";
 import Link from "next/link";
 
 import { NavUser } from "./nav-user";
+import { cn } from "@/lib/utils";
+import { buttonVariants } from "./ui/button";
 
 const NAVS = [
   {
@@ -39,9 +41,14 @@ export function AppSidebar({ profile }: AppSidebarProps) {
   return (
     <div className="sticky top-0 hidden h-dvh w-[90px] flex-col items-center justify-between overflow-hidden bg-sidebar py-4 md:flex">
       <div className="flex w-full flex-col items-center px-2">
-        <Home />
+        <Link
+          href="/me"
+          className="flex w-full cursor-pointer items-center justify-center rounded-xl py-4 hover:bg-sidebar-accent"
+        >
+          <Home />
+        </Link>
 
-        <ul className="flex w-full flex-col items-center space-y-2 pt-12">
+        <ul className="flex w-full flex-col items-center space-y-2 pt-6">
           {NAVS.map((nav) => (
             <li
               key={nav.title}
