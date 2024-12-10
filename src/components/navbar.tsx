@@ -4,7 +4,7 @@ import Link from "next/link";
 import { ThemeToggle } from "./theme-toggle";
 import { UserDropdown } from "./user-dropdown";
 import { Button } from "./ui/button";
-import { getProfile } from "@/supabase-utils/server-queries";
+import { getProfile } from "@/supabase-utils/server-queries/auth";
 
 export async function Navbar() {
   const profile = await getProfile();

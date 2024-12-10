@@ -2,7 +2,8 @@
 
 import * as React from "react";
 import { Check, ChevronDown, Plus, X, UnfoldVertical } from "lucide-react";
-import { UseFormReturn, useFieldArray } from "react-hook-form";
+import { UseFormReturn, useFieldArray, useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 
 import {
@@ -21,7 +22,6 @@ import {
 import {
   TOTAL_WEIGHT_WORKOUTS,
   CommonWorkoutName,
-  type WeightExercise,
 } from "@/lib/types/exercise.types";
 import {
   Popover,
@@ -29,39 +29,22 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { cn } from "@/lib/utils";
-import { addExerciseSchema } from "@/lib/schema/exercise";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { insertDailyWeightsExerciseSchema } from "@/lib/schema/exercise.schema";
 
-interface WeightsFormProps {
-  form: UseFormReturn<z.infer<typeof addExerciseSchema>>;
-}
+// interface WeightsFormProps {
+//   form: UseFormReturn<z.infer<typeof addExerciseSchema>>;
+// }
 
-export function WeightsForm({ form }: WeightsFormProps) {
-  const { fields, append, remove } = useFieldArray({
-    control: form.control,
-    name: "exercise_detail.weights_exercises",
+export function WeightsForm() {
+  const form = useForm<z.infer<typeof insertDailyWeightsExerciseSchema>>({
+    resolver: zodResolver(insertDailyWeightsExerciseSchema),
+    defaultValues: {},
   });
 
-  // Update these functions
-  function handleAddWeightExercise(e: React.MouseEvent<HTMLButtonElement>) {
-    e.preventDefault();
-
-    append({
-      name: {
-        ko: "",
-        en: "",
-      },
-      set_infos: [],
-    });
-  }
-
-  function handleRemoveWeightExercise(index: number) {
-    remove(index);
-  }
-
   return (
-    <>
+    <div>
       <div className="flex min-h-[280px] flex-col gap-4">
         {fields.map((field, index) => (
           <WeightExerciseComponent
@@ -80,7 +63,7 @@ export function WeightsForm({ form }: WeightsFormProps) {
       >
         종목 추가
       </Button>
-    </>
+    </div>
   );
 }
 

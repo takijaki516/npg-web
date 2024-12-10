@@ -1,6 +1,7 @@
 import { MeHeader } from "@/components/me-header";
-import { getProfile } from "@/supabase-utils/server-queries";
+import { getProfile } from "@/supabase-utils/server-queries/auth";
 import { ExerciseForm } from "./exercise-form";
+import { CoachIcon } from "@/components/logo";
 
 export default async function NewExercisePage() {
   const profile = await getProfile();
@@ -16,7 +17,7 @@ export default async function NewExercisePage() {
         <main className="flex flex-col border border-red-600 lg:w-full lg:items-center">
           <h1 className="w-full text-start text-3xl font-bold">운동 추가</h1>
 
-          <ExerciseForm profile={profile} />
+          {/* <ExerciseForm profile={profile} /> */}
         </main>
       </div>
     </div>

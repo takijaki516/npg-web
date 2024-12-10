@@ -1,34 +1,44 @@
 "use client";
 
 import * as React from "react";
-import { Bike, CalendarDays, Home, Settings2, Utensils } from "lucide-react";
+import {
+  Bot,
+  Bike,
+  CalendarDays,
+  Home,
+  Settings2,
+  Utensils,
+} from "lucide-react";
 import type { Database } from "@/lib/types/database.types";
 import Link from "next/link";
 
-import { NavUser } from "./nav-user";
-import { cn } from "@/lib/utils";
-import { buttonVariants } from "./ui/button";
+import { NavUser } from "../../components/nav-user";
 
 const NAVS = [
   {
+    title: "코치",
+    url: "/me/coach",
+    icon: Bot,
+  },
+  {
     title: "운동",
-    url: "/workout",
+    url: "/me/exercises",
     icon: Bike,
     isActive: true,
   },
   {
     title: "식단",
-    url: "/diet",
+    url: "/me/meals",
     icon: Utensils,
   },
   {
     title: "일정",
-    url: "/schedule",
+    url: "/me/schedule",
     icon: CalendarDays,
   },
   {
     title: "설정",
-    url: "/settings",
+    url: "/me/settings",
     icon: Settings2,
   },
 ];
@@ -52,7 +62,7 @@ export function AppSidebar({ profile }: AppSidebarProps) {
           {NAVS.map((nav) => (
             <li
               key={nav.title}
-              className="flex w-full cursor-pointer items-center justify-center rounded-xl py-4 hover:bg-sidebar-accent"
+              className="flex w-full cursor-pointer items-center justify-center rounded-xl py-2 hover:bg-sidebar-accent"
             >
               <Link href={nav.url}>
                 <nav.icon />

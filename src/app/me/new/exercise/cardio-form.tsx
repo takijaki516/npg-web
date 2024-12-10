@@ -5,7 +5,6 @@ import { Check, ChevronDown, X } from "lucide-react";
 import { z } from "zod";
 import { useFieldArray, UseFormReturn } from "react-hook-form";
 
-import { addExerciseSchema } from "@/lib/schema/exercise";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import {
@@ -32,11 +31,11 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-interface CardioFormProps {
-  form: UseFormReturn<z.infer<typeof addExerciseSchema>>;
-}
+// interface CardioFormProps {
+//   form: UseFormReturn<z.infer<typeof addExerciseSchema>>;
+// }
 
-export function CardioForm({ form }: CardioFormProps) {
+export function CardioForm() {
   const { fields, append, remove } = useFieldArray({
     control: form.control,
     name: "exercise_detail.cardio_exercises",

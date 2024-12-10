@@ -25,7 +25,7 @@ import {
   FormField,
 } from "@/components/ui/form";
 import { supabaseClient } from "@/supabase-utils/client";
-import { authSchema } from "@/lib/schema/auth";
+import { authSchema } from "@/lib/schema/auth.schema";
 import { useSessionStore } from "@/zustand/session-store";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";

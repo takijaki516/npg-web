@@ -5,7 +5,6 @@ import {
   type ExerciseDetail,
   type WeightExercise,
 } from "@/lib/types/exercise.types";
-import type { Database } from "@/lib/types/database.types";
 
 const weightExerciseSchema = z
   .object({
@@ -58,4 +57,4 @@ export const addExerciseSchema = z
     user_email: z.string().email(),
     user_id: z.string().uuid(),
   })
-  .strict()
+  .strict();

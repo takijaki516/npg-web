@@ -27,7 +27,7 @@ import {
   FormItem,
   FormField,
 } from "@/components/ui/form";
-import { authSchema } from "@/lib/schema/auth";
+import { authSchema } from "@/lib/schema/auth.schema";
 import { supabaseClient } from "@/supabase-utils/client";
 
 export default function SignupPage() {

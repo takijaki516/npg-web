@@ -1,7 +1,8 @@
-import { AppSidebar } from "@/components/my-sidebar";
-import { getProfile } from "@/supabase-utils/server-queries";
+import { AppSidebar } from "@/app/me/my-sidebar";
+import { getProfile } from "@/supabase-utils/server-queries/auth";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
-export default async function MeLayout({
+export default async function MeDateLayout({
   children,
 }: {
   children: React.ReactNode;
@@ -14,9 +15,10 @@ export default async function MeLayout({
 
   return (
     <div className="relative flex">
-      <AppSidebar profile={profile} />
-
-      {children}
+      <TooltipProvider>
+        <AppSidebar profile={profile} />
+        {children}
+      </TooltipProvider>
     </div>
   );
 }
