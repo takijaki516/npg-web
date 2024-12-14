@@ -199,23 +199,29 @@ export type Database = {
       };
       foods: {
         Row: {
-          food_info: Json | null;
+          calorie: number | null;
           id: string;
           meal_id: string;
+          name: string | null;
+          pic_url: string | null;
           user_email: string;
           user_id: string | null;
         };
         Insert: {
-          food_info?: Json | null;
+          calorie?: number | null;
           id?: string;
           meal_id: string;
+          name?: string | null;
+          pic_url?: string | null;
           user_email: string;
           user_id?: string | null;
         };
         Update: {
-          food_info?: Json | null;
+          calorie?: number | null;
           id?: string;
           meal_id?: string;
+          name?: string | null;
+          pic_url?: string | null;
           user_email?: string;
           user_id?: string | null;
         };
@@ -302,21 +308,27 @@ export type Database = {
         Row: {
           created_at: string;
           id: string;
+          meal_description: string | null;
           meal_time: string;
+          total_calories: number | null;
           user_email: string;
           user_id: string | null;
         };
         Insert: {
           created_at?: string;
           id?: string;
+          meal_description?: string | null;
           meal_time: string;
+          total_calories?: number | null;
           user_email: string;
           user_id?: string | null;
         };
         Update: {
           created_at?: string;
           id?: string;
+          meal_description?: string | null;
           meal_time?: string;
+          total_calories?: number | null;
           user_email?: string;
           user_id?: string | null;
         };

@@ -4,8 +4,8 @@ import {
   type DailyWeightsExercisesWithAllInfos,
 } from "@/supabase-utils/server-queries";
 import { BentoGrid, BentoGridItem } from "@/components/bento-grid";
-import { DailyExercisesCard } from "./daily-exercises-card";
-import { DailyMealsCard } from "./daily-meals-card";
+import { DailyExercisesCard } from "./daily-exercises";
+import { DailyMealsCard } from "./daily-meals";
 
 interface BentoDashboardProps {
   displayDate: string;
@@ -40,7 +40,11 @@ export function BentoDashboard({
       </BentoGridItem>
 
       <BentoGridItem className="hidden rounded-xl p-4 md:inline-block">
-        <DailyMealsCard dailyMealsData={dailyMealsData} />
+        <DailyMealsCard
+          localDate={displayDate}
+          dailyMealsData={dailyMealsData}
+          profile={profile}
+        />
       </BentoGridItem>
 
       <BentoGridItem className="md:hidden">MobileBottomGrid</BentoGridItem>

@@ -4,6 +4,7 @@ import * as React from "react";
 import { z } from "zod";
 import { useFieldArray, useForm } from "react-hook-form";
 import { Plus } from "lucide-react";
+import { DateTime } from "luxon";
 
 import {
   Dialog,
@@ -14,7 +15,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { supabaseClient } from "@/supabase-utils/client";
 import { Database } from "@/lib/types/database.types";
-import { DateTime } from "luxon";
 import { insertDailyWeightsExerciseSchema } from "@/lib/schema/exercise.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { WeightWorkoutForm } from "./add-workout-weights";
