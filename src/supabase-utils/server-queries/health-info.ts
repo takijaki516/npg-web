@@ -13,10 +13,5 @@ export const getLatestHealthInfo = React.cache(async (email: string) => {
     .limit(1)
     .single();
 
-  // console.log(
-  //   "🚀 ~ file: health-info.ts:15 ~ getLatestHealthInfo ~ data:",
-  //   data,
-  // );
-
   return data;
 });

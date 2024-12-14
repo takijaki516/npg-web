@@ -34,13 +34,38 @@ export type Database = {
   };
   public: {
     Tables: {
+      chats: {
+        Row: {
+          chat_id: string;
+          created_at: string;
+          id: string;
+          updated_at: string;
+          user_email: string;
+          user_id: string | null;
+        };
+        Insert: {
+          chat_id: string;
+          created_at?: string;
+          id?: string;
+          updated_at?: string;
+          user_email: string;
+          user_id?: string | null;
+        };
+        Update: {
+          chat_id?: string;
+          created_at?: string;
+          id?: string;
+          updated_at?: string;
+          user_email?: string;
+          user_id?: string | null;
+        };
+        Relationships: [];
+      };
       daily_cardio_exercises: {
         Row: {
-          calories_burned: number;
           cardio_name: string;
           created_at: string;
-          distance: number | null;
-          duration: number;
+          duration_minutes: number;
           end_time: string;
           id: string;
           start_time: string;
@@ -48,11 +73,9 @@ export type Database = {
           user_id: string | null;
         };
         Insert: {
-          calories_burned: number;
           cardio_name: string;
           created_at?: string;
-          distance?: number | null;
-          duration: number;
+          duration_minutes: number;
           end_time: string;
           id?: string;
           start_time: string;
@@ -60,11 +83,9 @@ export type Database = {
           user_id?: string | null;
         };
         Update: {
-          calories_burned?: number;
           cardio_name?: string;
           created_at?: string;
-          distance?: number | null;
-          duration?: number;
+          duration_minutes?: number;
           end_time?: string;
           id?: string;
           start_time?: string;
@@ -75,34 +96,25 @@ export type Database = {
       };
       daily_weights_exercises: {
         Row: {
-          calories_burned: number;
           created_at: string;
-          duration: number;
-          end_time: string;
+          end_time: string | null;
           id: string;
-          part: string;
           start_time: string;
           user_email: string;
           user_id: string | null;
         };
         Insert: {
-          calories_burned: number;
           created_at?: string;
-          duration: number;
-          end_time: string;
+          end_time?: string | null;
           id?: string;
-          part: string;
           start_time: string;
           user_email: string;
           user_id?: string | null;
         };
         Update: {
-          calories_burned?: number;
           created_at?: string;
-          duration?: number;
-          end_time?: string;
+          end_time?: string | null;
           id?: string;
-          part?: string;
           start_time?: string;
           user_email?: string;
           user_id?: string | null;
@@ -111,8 +123,7 @@ export type Database = {
       };
       each_weights_exercises: {
         Row: {
-          created_at: string;
-          duration: number;
+          body_part: string;
           id: string;
           user_email: string;
           user_id: string | null;
@@ -120,8 +131,7 @@ export type Database = {
           workout_name: string;
         };
         Insert: {
-          created_at?: string;
-          duration: number;
+          body_part: string;
           id?: string;
           user_email: string;
           user_id?: string | null;
@@ -129,8 +139,7 @@ export type Database = {
           workout_name: string;
         };
         Update: {
-          created_at?: string;
-          duration?: number;
+          body_part?: string;
           id?: string;
           user_email?: string;
           user_id?: string | null;
@@ -154,6 +163,7 @@ export type Database = {
           id: string;
           kg: number;
           reps: number;
+          set_number: number;
           user_email: string;
           user_id: string | null;
         };
@@ -163,6 +173,7 @@ export type Database = {
           id?: string;
           kg: number;
           reps: number;
+          set_number: number;
           user_email: string;
           user_id?: string | null;
         };
@@ -172,6 +183,7 @@ export type Database = {
           id?: string;
           kg?: number;
           reps?: number;
+          set_number?: number;
           user_email?: string;
           user_id?: string | null;
         };
@@ -220,63 +232,66 @@ export type Database = {
       health_info: {
         Row: {
           age: number;
-          body_fat_mass: number | null;
+          body_fat_mass_kg: number | null;
           created_at: string;
-          date: string;
-          height: number;
+          height_cm: number;
           id: string;
-          skeletal_muscle_mass: number | null;
+          measured_date: string;
+          skeletal_muscle_mass_kg: number | null;
           updated_at: string;
           user_email: string;
           user_id: string | null;
-          weight: number;
+          weight_kg: number;
         };
         Insert: {
           age: number;
-          body_fat_mass?: number | null;
+          body_fat_mass_kg?: number | null;
           created_at?: string;
-          date: string;
-          height: number;
+          height_cm: number;
           id?: string;
-          skeletal_muscle_mass?: number | null;
+          measured_date: string;
+          skeletal_muscle_mass_kg?: number | null;
           updated_at?: string;
           user_email: string;
           user_id?: string | null;
-          weight: number;
+          weight_kg: number;
         };
         Update: {
           age?: number;
-          body_fat_mass?: number | null;
+          body_fat_mass_kg?: number | null;
           created_at?: string;
-          date?: string;
-          height?: number;
+          height_cm?: number;
           id?: string;
-          skeletal_muscle_mass?: number | null;
+          measured_date?: string;
+          skeletal_muscle_mass_kg?: number | null;
           updated_at?: string;
           user_email?: string;
           user_id?: string | null;
-          weight?: number;
+          weight_kg?: number;
         };
         Relationships: [];
       };
       llm_daily_exercies: {
         Row: {
           created_at: string;
-          exercise_detail: Json | null;
+          exercise_date: string;
+          exercise_detail: Json[] | null;
           id: string;
           user_email: string;
           user_id: string | null;
         };
         Insert: {
           created_at?: string;
-          exercise_detail?: Json | null;
+          exercise_date: string;
+          exercise_detail?: Json[] | null;
           id?: string;
           user_email: string;
           user_id?: string | null;
         };
         Update: {
           created_at?: string;
-          exercise_detail?: Json | null;
+          exercise_date?: string;
+          exercise_detail?: Json[] | null;
           id?: string;
           user_email?: string;
           user_id?: string | null;
@@ -286,26 +301,61 @@ export type Database = {
       meals: {
         Row: {
           created_at: string;
-          date: string;
           id: string;
+          meal_time: string;
           user_email: string;
           user_id: string | null;
         };
         Insert: {
           created_at?: string;
-          date: string;
           id?: string;
+          meal_time: string;
           user_email: string;
           user_id?: string | null;
         };
         Update: {
           created_at?: string;
-          date?: string;
           id?: string;
+          meal_time?: string;
           user_email?: string;
           user_id?: string | null;
         };
         Relationships: [];
+      };
+      messages: {
+        Row: {
+          chat_id: string;
+          created_at: string;
+          id: string;
+          message_id: string;
+          user_email: string;
+          user_id: string | null;
+        };
+        Insert: {
+          chat_id: string;
+          created_at?: string;
+          id?: string;
+          message_id: string;
+          user_email: string;
+          user_id?: string | null;
+        };
+        Update: {
+          chat_id?: string;
+          created_at?: string;
+          id?: string;
+          message_id?: string;
+          user_email?: string;
+          user_id?: string | null;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "messages_chat_id_fkey";
+            columns: ["chat_id"];
+            isOneToOne: false;
+            referencedRelation: "chats";
+            referencedColumns: ["chat_id"];
+          },
+        ];
       };
       profiles: {
         Row: {
@@ -337,72 +387,42 @@ export type Database = {
         };
         Relationships: [];
       };
-      today_info: {
-        Row: {
-          ai_comment: string | null;
-          created_at: string;
-          current_date: string;
-          id: string;
-          updated_at: string;
-          user_email: string;
-          user_id: string | null;
-        };
-        Insert: {
-          ai_comment?: string | null;
-          created_at?: string;
-          current_date: string;
-          id?: string;
-          updated_at?: string;
-          user_email: string;
-          user_id?: string | null;
-        };
-        Update: {
-          ai_comment?: string | null;
-          created_at?: string;
-          current_date?: string;
-          id?: string;
-          updated_at?: string;
-          user_email?: string;
-          user_id?: string | null;
-        };
-        Relationships: [];
-      };
       user_goals: {
         Row: {
-          body_fat_mass: number | null;
+          body_fat_mass_kg: number | null;
           created_at: string;
-          height: number | null;
+          goal_description: string | null;
+          height_cm: number | null;
           id: string;
-          pledge: string | null;
-          skeletal_muscle_mass: number | null;
+          skeletal_muscle_mass_kg: number | null;
           updated_at: string;
           user_email: string;
           user_id: string | null;
-          weight: number | null;
+          weight_kg: number | null;
         };
         Insert: {
-          body_fat_mass?: number | null;
+          body_fat_mass_kg?: number | null;
           created_at?: string;
-          height?: number | null;
+          goal_description?: string | null;
+          height_cm?: number | null;
           id?: string;
-          pledge?: string | null;
-          skeletal_muscle_mass?: number | null;
+          skeletal_muscle_mass_kg?: number | null;
           updated_at?: string;
           user_email: string;
           user_id?: string | null;
-          weight?: number | null;
+          weight_kg?: number | null;
         };
         Update: {
-          body_fat_mass?: number | null;
+          body_fat_mass_kg?: number | null;
           created_at?: string;
-          height?: number | null;
+          goal_description?: string | null;
+          height_cm?: number | null;
           id?: string;
-          pledge?: string | null;
-          skeletal_muscle_mass?: number | null;
+          skeletal_muscle_mass_kg?: number | null;
           updated_at?: string;
           user_email?: string;
           user_id?: string | null;
-          weight?: number | null;
+          weight_kg?: number | null;
         };
         Relationships: [];
       };
@@ -411,7 +431,12 @@ export type Database = {
       [_ in never]: never;
     };
     Functions: {
-      [_ in never]: never;
+      add_daily_workouts: {
+        Args: {
+          body: Json;
+        };
+        Returns: undefined;
+      };
     };
     Enums: {
       [_ in never]: never;

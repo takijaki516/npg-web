@@ -1,60 +1,50 @@
 import { z } from "zod";
+
 import {
-  CARDIO_DIFFICULTY_LEVELS,
-  type CardioExercise,
-  type ExerciseDetail,
-  type WeightExercise,
+  CARDIO_WORKOUT_NAMES,
+  TOTAL_WEIGHT_WORKOUTS,
+  WEIGHT_BODY_PARTS,
 } from "@/lib/types/exercise.types";
 
-const weightExerciseSchema = z
-  .object({
-    name: z.object({
-      ko: z.string(),
-      en: z.string(),
-    }),
-    set_infos: z.array(
+export const LLMStructureWeightsExercisesSetInfoSchema = z.object({
+  reps: z.number().describe("number of reps for each set"),
+  kg: z.number().describe("weight in kg for each set"),
+});
+
+export const LLMStructureWeightsExercisesSchema = z.object({
+  workout_name: z
+    .enum(TOTAL_WEIGHT_WORKOUTS)
+    .describe("name of the weights workout"),
+  body_part: z
+    .enum(WEIGHT_BODY_PARTS)
+    .describe("body part of the weights workout"),
+
+  weights_exercises_set_info: z
+    .array(LLMStructureWeightsExercisesSetInfoSchema)
+    .describe("sets info for this weights workout"),
+});
+
+export const LLMStructureDailyCardioExerciseSchema = z.object({
+  duration_minutes: z
+    .number()
+    .describe("duration of the cardio workout in minutes"),
+  cardio_name: z
+    .enum(CARDIO_WORKOUT_NAMES)
+    .describe("name of the cardio workout"),
+});
+
+export const LLMStructureDailyExerciseDetailSchema = z.object({
+  exercise_date: z.string().datetime(),
+  exercise_detail: z.array(
+    z.discriminatedUnion("exercise_type", [
       z.object({
-        set_number: z.number(),
-        reps: z.number(),
-        weight: z.number(),
+        exercise_type: z.literal("weights"),
+        weights_exercises: z.array(LLMStructureWeightsExercisesSchema),
       }),
-    ),
-  })
-  .strict() satisfies z.ZodType<WeightExercise>;
-
-const cardioExerciseSchema = z
-  .object({
-    name: z.object({
-      ko: z.string(),
-      en: z.string(),
-    }),
-    difficulty: z.enum(CARDIO_DIFFICULTY_LEVELS),
-  })
-  .strict() satisfies z.ZodType<CardioExercise>;
-
-const exerciseDetailSchema = z.discriminatedUnion("exercise_type", [
-  z
-    .object({
-      exercise_type: z.literal("weights"),
-      weights_exercises: z.array(weightExerciseSchema),
-    })
-    .strict(),
-  z
-    .object({
-      exercise_type: z.literal("cardio"),
-      cardio_exercises: z.array(cardioExerciseSchema),
-    })
-    .strict(),
-]) satisfies z.ZodType<ExerciseDetail>;
-
-export const addExerciseSchema = z
-  .object({
-    daily_tracker_id: z.string().uuid(),
-    difficulty: z.string().nullable().optional(),
-    end_time: z.string(),
-    start_time: z.string(),
-    exercise_detail: exerciseDetailSchema,
-    user_email: z.string().email(),
-    user_id: z.string().uuid(),
-  })
-  .strict();
+      z.object({
+        exercise_type: z.literal("cardio"),
+        cardio_exercises: LLMStructureDailyCardioExerciseSchema,
+      }),
+    ]),
+  ),
+});

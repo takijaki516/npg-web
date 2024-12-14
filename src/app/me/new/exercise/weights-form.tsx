@@ -1,7 +1,6 @@
 "use client";
 
 import * as React from "react";
-import { Check, ChevronDown, Plus, X, UnfoldVertical } from "lucide-react";
 import { UseFormReturn, useFieldArray, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
@@ -11,31 +10,10 @@ import {
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
-import {
-  TOTAL_WEIGHT_WORKOUTS,
-  CommonWorkoutName,
-} from "@/lib/types/exercise.types";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import { cn } from "@/lib/utils";
+
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { insertDailyWeightsExerciseSchema } from "@/lib/schema/exercise.schema";
-
-// interface WeightsFormProps {
-//   form: UseFormReturn<z.infer<typeof addExerciseSchema>>;
-// }
 
 export function WeightsForm() {
   const form = useForm<z.infer<typeof insertDailyWeightsExerciseSchema>>({
@@ -96,79 +74,6 @@ function WeightExerciseComponent({
         <WeightExerciseSetsComponent form={form} index={index} />
       </div>
     </div>
-  );
-}
-
-interface WeightExerciseNameComboboxProps {
-  form: UseFormReturn<z.infer<typeof addExerciseSchema>>;
-  index: number;
-}
-
-function WeightExerciseNameCombobox({
-  form,
-  index,
-}: WeightExerciseNameComboboxProps) {
-  const [open, setOpen] = React.useState(false);
-  const [value, setValue] = React.useState<CommonWorkoutName | null>(null);
-
-  return (
-    <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger asChild>
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={open}
-          className="w-[200px] justify-between"
-        >
-          {value ? `${value.ko}` : "운동 선택"}
-          <ChevronDown className="ml-2 h-4 w-4" />
-        </Button>
-      </PopoverTrigger>
-
-      <PopoverContent className="w-[200px] p-0">
-        <Command className="max-h-[200px] overflow-y-auto">
-          <CommandInput placeholder="운동 검색" />
-          <CommandList>
-            <CommandEmpty>운동을 찾을 수 없습니다.</CommandEmpty>
-            {TOTAL_WEIGHT_WORKOUTS.map((PART_WORKOUTS) => {
-              return (
-                <CommandGroup
-                  key={PART_WORKOUTS.part}
-                  heading={PART_WORKOUTS.part}
-                >
-                  {PART_WORKOUTS.workout.map((workout) => {
-                    return (
-                      <CommandItem
-                        key={workout.ko}
-                        value={workout.ko}
-                        onSelect={() => {
-                          form.setValue(
-                            `exercise_detail.weights_exercises.${index}.name`,
-                            workout,
-                          );
-                          setValue(workout);
-                          setOpen(false);
-                        }}
-                      >
-                        {workout.ko}
-                        <Check
-                          className={cn(
-                            "ml-auto",
-                            value?.ko === workout.ko
-                              ? "opacity-100"
-                              : "opacity-0",
-                          )}
-                        />
-                      </CommandItem>
-                    );
-                  })}
-                </CommandGroup>
-              );
-            })}
-          </CommandList>
-        </Command>
-      </PopoverContent>
-    </Popover>
   );
 }
 

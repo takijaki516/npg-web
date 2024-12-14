@@ -19,9 +19,26 @@ export const getOrCreateGoal = React.cache(
         .select("*")
         .single();
 
+      // TODO: 에러 처리
+      if (!newGoalData) {
+        throw new Error("Failed to create user goal");
+      }
+
       return newGoalData;
     }
 
     return data;
   },
 );
+
+export const getGoal = React.cache(async (email: string) => {
+  const supabase = await supabaseServerClient<Database>();
+  const { data } = await supabase
+    .from("user_goals")
+    .select("*")
+    .eq("user_email", email)
+    .limit(1)
+    .single();
+
+  return data;
+});

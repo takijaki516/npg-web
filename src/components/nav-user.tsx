@@ -1,8 +1,9 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
-import type { Database } from "@/lib/types/database.types";
 
+import type { Database } from "@/lib/types/database.types";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -12,12 +13,21 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { supabaseClient } from "@/supabase-utils/client";
 
 interface NavUserProps {
   profile: Database["public"]["Tables"]["profiles"]["Row"];
 }
 
 export function NavUser({ profile }: NavUserProps) {
+  const router = useRouter();
+
+  async function handleSignout() {
+    const supabase = supabaseClient();
+    await supabase.auth.signOut();
+    router.push("/");
+  }
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -54,7 +64,10 @@ export function NavUser({ profile }: NavUserProps) {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem>
+        <DropdownMenuItem
+          className="cursor-pointer bg-red-500 hover:bg-red-600 focus:bg-red-600"
+          onClick={handleSignout}
+        >
           <LogOut />
           Log out
         </DropdownMenuItem>

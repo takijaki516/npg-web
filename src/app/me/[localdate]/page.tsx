@@ -4,22 +4,28 @@ import {
   getDailyWeightsExerciseWithAllInfos,
   getProfile,
 } from "@/supabase-utils/server-queries";
-
-import { MeHeader } from "@/components/me-header";
-import { BentoDashboard } from "./bento-dashboard";
 import { convertToRangeOfDayInUTCTime } from "@/lib/utils";
+import { MeHeader } from "@/components/me-header";
+import { BentoDashboard } from "../bento-dashboard";
 
-export default async function MePage() {
+export default async function MePage({
+  params,
+}: {
+  params: Promise<{ localdate: string }>;
+}) {
   const profile = await getProfile();
 
   if (!profile || !profile.user_id) {
     return null;
   }
 
+  const paramsObj = await params;
+
+  const userDateTime = paramsObj.localdate.replace(
+    /(\d{4})(\d{2})(\d{2})/,
+    "$1-$2-$3",
+  );
   const userTimeZone = "Asia/Seoul";
-  const userDateTime = new Date().toLocaleDateString("sv-SE", {
-    timeZone: userTimeZone,
-  });
 
   const { startTimeOfDay, endTimeOfDay } = convertToRangeOfDayInUTCTime({
     localDate: userDateTime,
@@ -30,7 +36,6 @@ export default async function MePage() {
     return null;
   }
 
-  //
   const userGoal = await getOrCreateGoal(profile.user_email, profile.user_id);
   const dailyExercisesData = await getDailyWeightsExerciseWithAllInfos(
     startTimeOfDay,
@@ -40,6 +45,10 @@ export default async function MePage() {
     startTimeOfDay,
     endTimeOfDay,
   );
+
+  if (!dailyExercisesData || !dailyMealsData) {
+    return null;
+  }
 
   if (!dailyExercisesData || !dailyMealsData) {
     return null;
@@ -56,7 +65,6 @@ export default async function MePage() {
             userGoal={userGoal}
             dailyExercisesData={dailyExercisesData}
             dailyMealsData={dailyMealsData}
-            profile={profile}
           />
         </main>
       </div>

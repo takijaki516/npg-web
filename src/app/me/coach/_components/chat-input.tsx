@@ -1,91 +1,136 @@
 "use client";
 
 import * as React from "react";
+import { ArrowUpIcon, StopCircle } from "lucide-react";
 import { useChat } from "ai/react";
-import { SendHorizontal } from "lucide-react";
+import { Message, type ChatRequestOptions } from "ai";
+import { toast } from "sonner";
+import type { Database } from "@/lib/types/database.types";
 
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
+import { UserInfoStatusButton } from "./user-info-status";
 
-export function ChatInput() {
-  const { messages, input, setInput, handleSubmit } = useChat({
-    api: "/api/coach/chat",
-  });
+interface ChatInputProps extends Partial<ReturnType<typeof useChat>> {
+  chatId?: string;
+  handleSubmit: (
+    event?: {
+      preventDefault?: () => void;
+    },
+    chatRequestOptions?: ChatRequestOptions,
+  ) => void;
+  input: string;
+  setInput: React.Dispatch<React.SetStateAction<string>>;
+  isLoading: boolean;
+  messages: Message[];
+  setMessages: (
+    messages: Message[] | ((messages: Message[]) => Message[]),
+  ) => void;
+
+  userGoal: Database["public"]["Tables"]["user_goals"]["Row"];
+  latestHealthInfo: Database["public"]["Tables"]["health_info"]["Row"];
+}
+
+export function ChatInput({
+  messages,
+  input,
+  setInput,
+  handleSubmit,
+  isLoading,
+  chatId,
+  setMessages,
+  userGoal,
+  latestHealthInfo,
+}: ChatInputProps) {
+  function submitForm() {
+    window.history.replaceState(null, "", `/me/coach/${chatId}`);
+    handleSubmit();
+  }
 
   return (
-    <div className="absolute bottom-0 left-0 right-0 bg-background">
-      {messages.map((message) => {
-        // data that LLM is based on
-        if (message.role === "system") {
-        }
+    <div className="mx-auto flex w-full max-w-3xl flex-col gap-2 rounded-xl bg-muted px-2 py-2">
+      <Textarea
+        id="main-input"
+        value={input}
+        onChange={(e) => setInput(e.target.value)}
+        placeholder="안녕하세요"
+        className="max-h-[calc(75dvh)] min-h-[80px] resize-none border-0 !text-base focus:ring-0 focus-visible:ring-0"
+        rows={1}
+        onKeyDown={(event) => {
+          if (event.key === "Enter" && !event.shiftKey) {
+            event.preventDefault();
 
-        return (
-          <div key={message.id}>
-            <div>{message.role}</div>
-            <div>{message.content}</div>
+            if (isLoading) {
+              toast.error("Please wait for the model to finish its response!");
+            } else {
+              submitForm();
+            }
+          }
+        }}
+      />
 
-            <div>
-              {message.toolInvocations?.map((toolInvocation) => {
-                console.log(
-                  "🚀 ~ file: chat-input.tsx:34 ~ {message.toolInvocations?.map ~ toolInvocation:",
-                  toolInvocation,
-                );
+      <div className="relative flex items-center gap-2 self-end">
+        <UserInfoStatusButton
+          userGoal={userGoal}
+          latestHealthInfo={latestHealthInfo}
+        />
 
-                const { toolName, toolCallId, state } = toolInvocation;
-
-                if (toolName === "gen_workout") {
-                  if (state === "result") {
-                    const { result } = toolInvocation;
-                    // TODO: create a component for workout plan
-                    return (
-                      <div key={toolCallId}>
-                        <div>운동 계획</div>
-                        {result.workout_plans.map((workoutPlan) => {
-                          return (
-                            <div key={workoutPlan.id}>{workoutPlan.name}</div>
-                          );
-                        })}
-                      </div>
-                    );
-                  } else {
-                    return <div key={toolCallId}>loading...</div>;
-                  }
-                }
-              })}
-            </div>
-          </div>
-        );
-      })}
-
-      <div className="flex flex-col">
-        <div
-          id="sub-input"
-          className="mx-4 flex items-center gap-4 rounded-t-xl border border-b-0 px-4 py-[2px]"
-        >
-          <button className="rounded-md px-2 hover:bg-muted">
-            <span>운동 루틴 생성</span>
-          </button>
-        </div>
-
-        <form
-          id="main-input"
-          className="flex items-end gap-4 rounded-lg border p-4"
-          onSubmit={handleSubmit}
-        >
-          <Textarea
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="안녕하세요"
-            className="resize-none"
-            rows={1}
-          />
-
-          <Button type="submit" size="icon" disabled={!input.trim()}>
-            <SendHorizontal className="h-4 w-4" />
-            <span className="sr-only">Send message</span>
-          </Button>
-        </form>
+        {isLoading ? (
+          <StopButton stop={stop} setMessages={setMessages} />
+        ) : (
+          <SendButton input={input} submitForm={submitForm} />
+        )}
       </div>
     </div>
   );
 }
+function PureStopButton({
+  stop,
+  setMessages,
+}: {
+  stop: () => void;
+  setMessages: React.Dispatch<React.SetStateAction<Array<Message>>>;
+}) {
+  return (
+    <Button
+      className="h-fit rounded-full border p-1.5 dark:border-zinc-600"
+      onClick={(event) => {
+        event.preventDefault();
+        stop();
+        setMessages((messages) => messages);
+      }}
+    >
+      <StopCircle size={14} />
+    </Button>
+  );
+}
+
+const StopButton = React.memo(PureStopButton);
+
+function PureSendButton({
+  submitForm,
+  input,
+}: {
+  submitForm: () => void;
+  input: string;
+}) {
+  return (
+    <Button
+      className="h-fit rounded-full border p-1.5 dark:border-zinc-600"
+      onClick={(event) => {
+        event.preventDefault();
+        submitForm();
+      }}
+      disabled={input.length === 0}
+    >
+      <ArrowUpIcon size={14} />
+    </Button>
+  );
+}
+
+const SendButton = React.memo(PureSendButton, (prevProps, nextProps) => {
+  // if (prevProps.uploadQueue.length !== nextProps.uploadQueue.length)
+  //   return false;
+  if (!prevProps.input !== !nextProps.input) return false;
+  return true;
+});
