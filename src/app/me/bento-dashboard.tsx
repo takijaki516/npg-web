@@ -5,7 +5,7 @@ import {
 } from "@/supabase-utils/server-queries";
 import { BentoGrid, BentoGridItem } from "@/components/bento-grid";
 import { DailyExercisesCard } from "./daily-exercises";
-import { DailyMealsCard } from "./daily-meals";
+import { DailyMealsCard } from "../../components/daily-meals/daily-meals";
 
 interface BentoDashboardProps {
   displayDate: string;

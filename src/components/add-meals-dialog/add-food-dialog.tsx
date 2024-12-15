@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Plus, ImageUp, X, Bot, Check } from "lucide-react";
+import { RotateCw, Plus, ImageUp, X, Bot, Check } from "lucide-react";
 import { useDropzone } from "react-dropzone";
 import { useFieldArray, type UseFormReturn } from "react-hook-form";
 import { z } from "zod";
@@ -17,7 +17,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { insertMealSchema } from "@/lib/schema/meal.schema";
-import { llmCalorieResponseSchema } from "../api/calories/route";
+import { llmCalorieResponseSchema } from "@/app/api/calories/route";
 
 interface AddFoodDialogProps {
   mealForm: UseFormReturn<z.infer<typeof insertMealSchema>>;
@@ -26,6 +26,7 @@ interface AddFoodDialogProps {
 export function AddFoodDialog({ mealForm }: AddFoodDialogProps) {
   const [isFoodDialogOpen, setIsFoodDialogOpen] = React.useState(false);
   const [foodImageFile, setFoodImageFile] = React.useState<File>();
+  const [isLLMLoading, setIsLLMLoading] = React.useState(false);
 
   //
   const [foodName, setFoodName] = React.useState("");
@@ -73,7 +74,6 @@ export function AddFoodDialog({ mealForm }: AddFoodDialogProps) {
       pic_file: foodImageFile,
     });
 
-
     // reset
     setFoodName("");
     setFoodCalories(0);
@@ -82,12 +82,13 @@ export function AddFoodDialog({ mealForm }: AddFoodDialogProps) {
     setFoodFats(0);
     setFoodImageFile(undefined);
 
-
+    // close dialog
     setIsFoodDialogOpen(false);
   }
 
   async function onLLMCalorieQuerySubmit() {
     if (!foodImageFile) return;
+    setIsLLMLoading(true);
 
     const formData = new FormData();
     formData.append("image", foodImageFile);
@@ -99,6 +100,7 @@ export function AddFoodDialog({ mealForm }: AddFoodDialogProps) {
 
     const data: z.infer<typeof llmCalorieResponseSchema> = await res.json();
 
+    setIsLLMLoading(false);
     setFoodName(data.foodName);
     setFoodCalories(data.calories);
     setFoodCarbohydrates(data.carbohydrate);
@@ -118,7 +120,7 @@ export function AddFoodDialog({ mealForm }: AddFoodDialogProps) {
       <DialogContent
         onPointerDownOutside={(e) => e.preventDefault()}
         onInteractOutside={(e) => e.preventDefault()}
-        className="flex max-h-dvh w-full max-w-xl flex-col overflow-y-auto"
+        className="flex max-h-[calc(100dvh-80px)] w-full max-w-xl flex-col gap-4 overflow-y-auto"
       >
         <DialogTitle>음식 추가</DialogTitle>
 
@@ -144,7 +146,11 @@ export function AddFoodDialog({ mealForm }: AddFoodDialogProps) {
                 variant={"secondary"}
                 onClick={onLLMCalorieQuerySubmit}
               >
-                <Bot size={50} />
+                {isLLMLoading ? (
+                  <RotateCw className="animate-spin" />
+                ) : (
+                  <Bot size={50} />
+                )}
               </Button>
             </div>
           ) : (
