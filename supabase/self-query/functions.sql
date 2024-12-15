@@ -51,3 +51,58 @@ end;
 $$;
 
 
+
+
+create or replace function add_meals(body json)
+returns void
+language plpgsql
+as $$
+declare
+  user_email varchar(255);
+  user_id uuid;
+
+  meal_time timestamptz;
+  total_calories float4;
+  total_carbohydrate float4;
+  total_fat float4;
+  total_protein float4;
+
+  inserted_meal_id uuid;
+  food json;
+
+  food_name text;
+  pic_url text;
+  calories float4;
+  protein float4;
+  fat float4;
+  carbohydrate float4;
+begin
+  -- extract
+  user_email := (body->>'user_email')::varchar(255);
+  user_id := (body->>'user_id')::uuid;
+  meal_time := (body->>'meal_time')::timestamptz;
+  total_calories := (body->>'total_calories')::float4;
+  total_carbohydrate := (body->>'total_carbohydrate')::float4;
+  total_fat := (body->>'total_fat')::float4;
+  total_protein := (body->>'total_protein')::float4;
+
+  -- insert
+  insert into meals (user_email, user_id, meal_time, total_calories, total_carbohydrate, total_fat, total_protein)
+  values (user_email, user_id, meal_time, total_calories, total_carbohydrate, total_fat, total_protein)
+  returning id into inserted_meal_id;
+
+  -- Loop through the 'weights_workouts' array
+  for food in select json_array_elements(body->'foods')
+  loop
+    food_name := (food->>'food_name')::text;
+    pic_url := (food->>'pic_url')::text; -- when casting null to text, null remains null
+    calories := (food->>'calories')::float4;
+    protein := (food->>'protein')::float4;
+    fat := (food->>'fat')::float4;
+    carbohydrate := (food->>'carbohydrate')::float4;
+
+    insert into foods(user_email, user_id, meal_id, food_name, pic_url, calories, protein, fat, carbohydrate)
+    values (user_email, user_id, inserted_meal_id, food_name, pic_url, calories, protein, fat, carbohydrate);
+  end loop;
+end;
+$$;

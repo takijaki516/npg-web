@@ -10,12 +10,15 @@ export const googleWithProxy = createGoogleGenerativeAI({
 
 export async function POST(request: Request) {
   const formData = await request.formData();
-  // const usersLanguage = "KOREAN";
-
-  // Access form data values
   const image = formData.get("image") as File;
-  const userRequest = formData.get("userRequest") as string;
+
+  // const usersLanguage = "KOREAN";
   // const userLanguage = formData.get("userLanguage") as string;
+
+  let userRequest =
+    "ko" === "ko"
+      ? "이미지에 있는 음식의 이름, 칼로리, 단백질, 지방, 탄수화물을 계산해줘"
+      : "Calculate the name, calories, protein, fat, and carbohydrate of the foods in the image";
 
   console.log(image);
 

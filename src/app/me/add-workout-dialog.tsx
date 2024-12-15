@@ -72,14 +72,11 @@ export function AddWorkoutDialog({
     const utcStartTime = startTime.toUTC().toFormat("yyyy-MM-dd HH:mm:ss");
     data.start_time = utcStartTime;
 
-    console.log(data);
-
     const supabase = supabaseClient<Database>();
     const res = await supabase.rpc("add_daily_workouts", {
       body: data,
     });
 
-    console.log("🚀 ~ file: add-workout-dialog.tsx:81 ~ res:", res);
     setIsDialogOpen(false);
   }
 

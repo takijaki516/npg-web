@@ -199,29 +199,38 @@ export type Database = {
       };
       foods: {
         Row: {
-          calorie: number | null;
+          calories: number | null;
+          carbohydrate: number | null;
+          fat: number | null;
+          food_name: string | null;
           id: string;
           meal_id: string;
-          name: string | null;
           pic_url: string | null;
+          protein: number | null;
           user_email: string;
           user_id: string | null;
         };
         Insert: {
-          calorie?: number | null;
+          calories?: number | null;
+          carbohydrate?: number | null;
+          fat?: number | null;
+          food_name?: string | null;
           id?: string;
           meal_id: string;
-          name?: string | null;
           pic_url?: string | null;
+          protein?: number | null;
           user_email: string;
           user_id?: string | null;
         };
         Update: {
-          calorie?: number | null;
+          calories?: number | null;
+          carbohydrate?: number | null;
+          fat?: number | null;
+          food_name?: string | null;
           id?: string;
           meal_id?: string;
-          name?: string | null;
           pic_url?: string | null;
+          protein?: number | null;
           user_email?: string;
           user_id?: string | null;
         };
@@ -308,27 +317,33 @@ export type Database = {
         Row: {
           created_at: string;
           id: string;
-          meal_description: string | null;
           meal_time: string;
           total_calories: number | null;
+          total_carbohydrate: number | null;
+          total_fat: number | null;
+          total_protein: number | null;
           user_email: string;
           user_id: string | null;
         };
         Insert: {
           created_at?: string;
           id?: string;
-          meal_description?: string | null;
           meal_time: string;
           total_calories?: number | null;
+          total_carbohydrate?: number | null;
+          total_fat?: number | null;
+          total_protein?: number | null;
           user_email: string;
           user_id?: string | null;
         };
         Update: {
           created_at?: string;
           id?: string;
-          meal_description?: string | null;
           meal_time?: string;
           total_calories?: number | null;
+          total_carbohydrate?: number | null;
+          total_fat?: number | null;
+          total_protein?: number | null;
           user_email?: string;
           user_id?: string | null;
         };
@@ -444,6 +459,12 @@ export type Database = {
     };
     Functions: {
       add_daily_workouts: {
+        Args: {
+          body: Json;
+        };
+        Returns: undefined;
+      };
+      add_meals: {
         Args: {
           body: Json;
         };
