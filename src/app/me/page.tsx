@@ -16,14 +16,13 @@ export default async function MePage() {
     return null;
   }
 
-  const userTimeZone = "Asia/Seoul";
   const userDateTime = new Date().toLocaleDateString("sv-SE", {
-    timeZone: userTimeZone,
+    timeZone: profile.timezone,
   });
 
   const { startTimeOfDay, endTimeOfDay } = convertToRangeOfDayInUTCTime({
     localDate: userDateTime,
-    timeZone: userTimeZone,
+    timeZone: profile.timezone,
   });
 
   if (!startTimeOfDay || !endTimeOfDay) {
@@ -47,7 +46,7 @@ export default async function MePage() {
 
   return (
     <div className="flex min-h-dvh flex-1 flex-col items-center">
-      <MeHeader currentPageTitle={`${profile.username}님`} />
+      <MeHeader currentPageTitle={`${profile.username}`} />
 
       <div className="flex w-full max-w-3xl flex-col p-4 pb-[100px] md:pt-6">
         <main className="flex flex-col lg:w-full lg:items-center">

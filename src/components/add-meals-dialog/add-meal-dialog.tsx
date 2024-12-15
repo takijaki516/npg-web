@@ -7,6 +7,7 @@ import { z } from "zod";
 import { DateTime } from "luxon";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -33,16 +34,18 @@ interface AddMealDialogProps {
 }
 
 export function AddMealDialog({ className, profile }: AddMealDialogProps) {
-  const currentLocalTime = DateTime.now();
+  const currentLocalTime = DateTime.now().setZone(profile.timezone);
   const localDate = currentLocalTime.toFormat("yyyy-MM-dd");
 
+  const router = useRouter();
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const [selectedHour, setSelectedHour] = React.useState(
-    currentLocalTime.hour.toString(),
+    currentLocalTime.hour.toString().padStart(2, "0"),
   );
   const [selectedMinute, setSelectedMinute] = React.useState(
-    currentLocalTime.minute.toString(),
+    currentLocalTime.minute.toString().padStart(2, "0"),
   );
+
   const [isTimePickerOpen, setIsTimePickerOpen] = React.useState(false);
 
   const mealForm = useForm<z.infer<typeof insertMealSchema>>({
@@ -59,6 +62,13 @@ export function AddMealDialog({ className, profile }: AddMealDialogProps) {
       foods: [],
     },
   });
+
+  function handleNowClick() {
+    const currentLocalTime = DateTime.now().setZone(profile.timezone);
+    setSelectedHour(currentLocalTime.hour.toString().padStart(2, "0"));
+    setSelectedMinute(currentLocalTime.minute.toString().padStart(2, "0"));
+    setIsTimePickerOpen(false);
+  }
 
   async function mealSubmitHandler(values: z.infer<typeof insertMealSchema>) {
     // loop through foods and add image
@@ -108,7 +118,7 @@ export function AddMealDialog({ className, profile }: AddMealDialogProps) {
       values.meal_time,
       "yyyy-MM-dd HH:mm:ss",
       {
-        zone: "Asia/Seoul",
+        zone: profile.timezone,
       },
     )
       .toUTC()
@@ -124,6 +134,11 @@ export function AddMealDialog({ className, profile }: AddMealDialogProps) {
     const valuesWithoutPic = insertMealWithoutPicSchema.safeParse(values);
 
     if (!valuesWithoutPic.success) {
+      toast.error(
+        profile.language === "ko"
+          ? "모든 정보를 입력해주세요."
+          : "Please fill in all information.",
+      );
       // TODO: proper error handle
       return;
     }
@@ -138,8 +153,11 @@ export function AddMealDialog({ className, profile }: AddMealDialogProps) {
       return;
     }
 
+    router.refresh();
     mealForm.reset();
-    toast.success("식단 추가 완료");
+    toast.success(
+      profile.language === "ko" ? "식단 추가 완료" : "Meal added successfully",
+    );
     setIsDialogOpen(false);
   }
 
@@ -190,15 +208,13 @@ export function AddMealDialog({ className, profile }: AddMealDialogProps) {
         </DialogTitle>
 
         <div className="xs:grid-cols-2 grid grid-cols-1 gap-2">
-          <div className="group flex cursor-pointer items-center gap-1 rounded-lg bg-muted/50 px-3 py-1">
-            <span className="flex items-center gap-1">
-              <Clock className="h-4 w-4 text-gray-400" />
-              <span className="whitespace-nowrap text-muted-foreground">
-                식사 시간
-              </span>
+          <div className="flex cursor-pointer items-center gap-1 rounded-lg bg-muted/50 px-3 py-1">
+            <span className="peer flex items-center gap-1 whitespace-nowrap text-muted-foreground">
+              {profile.language === "ko" ? "식사 시간" : "Meal Time"}
             </span>
 
             <TimePicker
+              userLanguage={profile.language}
               selectedHour={selectedHour}
               selectedMinute={selectedMinute}
               setSelectedHour={setSelectedHour}
@@ -206,31 +222,38 @@ export function AddMealDialog({ className, profile }: AddMealDialogProps) {
               isTimePickerOpen={isTimePickerOpen}
               setIsTimePickerOpen={setIsTimePickerOpen}
             />
+
+            <button
+              className="rounded-md p-1 text-muted-foreground hover:bg-background/80"
+              onClick={handleNowClick}
+            >
+              <Clock className="h-4 w-4 text-gray-400" />
+            </button>
           </div>
 
           <InfoField
-            label="총 칼로리"
+            label={profile.language === "ko" ? "총 칼로리" : "Total Calories"}
             value={mealForm.watch("total_calories").toFixed().toString()}
           />
 
           <InfoField
-            label="총 탄수화물"
+            label={profile.language === "ko" ? "총 탄수화물" : "Total Carbs"}
             value={mealForm.watch("total_carbohydrate").toFixed().toString()}
           />
 
           <InfoField
-            label="총 지방"
+            label={profile.language === "ko" ? "총 지방" : "Total Fat"}
             value={mealForm.watch("total_fat").toFixed().toString()}
           />
 
           <InfoField
-            label="총 단백질"
+            label={profile.language === "ko" ? "총 단백질" : "Total Protein"}
             value={mealForm.watch("total_protein").toFixed().toString()}
           />
         </div>
 
         <div className="flex flex-1 flex-col gap-4 rounded-md border p-4">
-          <AddFoodDialog mealForm={mealForm} />
+          <AddFoodDialog mealForm={mealForm} profile={profile} />
 
           <div className="flex max-h-[300px] flex-col gap-4 overflow-y-auto">
             {mealForm.getValues("foods").length > 0 &&
@@ -240,6 +263,7 @@ export function AddMealDialog({ className, profile }: AddMealDialogProps) {
                     key={foodItem.food_name}
                     food={foodItem}
                     mealForm={mealForm}
+                    profile={profile}
                   />
                 );
               })}
@@ -248,9 +272,11 @@ export function AddMealDialog({ className, profile }: AddMealDialogProps) {
 
         <div className="flex justify-end gap-2">
           <Button onClick={mealForm.handleSubmit(mealSubmitHandler)}>
-            추가
+            {profile.language === "ko" ? "추가" : "Add"}
           </Button>
-          <Button onClick={() => setIsDialogOpen(false)}>취소</Button>
+          <Button onClick={() => setIsDialogOpen(false)}>
+            {profile.language === "ko" ? "취소" : "Cancel"}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

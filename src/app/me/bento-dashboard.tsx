@@ -4,8 +4,9 @@ import {
   type DailyWeightsExercisesWithAllInfos,
 } from "@/supabase-utils/server-queries";
 import { BentoGrid, BentoGridItem } from "@/components/bento-grid";
-import { DailyExercisesCard } from "../../components/daily-exercises/daily-exercises";
-import { DailyMealsCard } from "../../components/daily-meals/daily-meals";
+import { DailyExercisesCard } from "@/components/daily-exercises/daily-exercises";
+import { DailyMealsCard } from "@/components/daily-meals/daily-meals";
+import { DailyUserStat } from "@/components/daily-user-stat/daily-user-stat";
 
 interface BentoDashboardProps {
   displayDate: string;
@@ -24,27 +25,19 @@ export function BentoDashboard({
 }: BentoDashboardProps) {
   return (
     <BentoGrid className="grid w-full gap-4 md:grid-cols-2">
-      <BentoGridItem className="rounded-xl md:col-span-full">
-        <div className="flex flex-col gap-4 p-4">
-          <div className="flex items-center justify-between">{displayDate}</div>
-          <div>{userGoal.user_email}</div>
-        </div>
+      <BentoGridItem className="rounded-xl p-4 md:col-span-full">
+        <DailyUserStat profile={profile} date={displayDate} />
       </BentoGridItem>
 
       <BentoGridItem className="hidden rounded-xl p-4 md:inline-block">
         <DailyExercisesCard
-          localWorkoutDate={displayDate}
           dailyExercisesData={dailyExercisesData}
           profile={profile}
         />
       </BentoGridItem>
 
       <BentoGridItem className="hidden rounded-xl p-4 md:inline-block">
-        <DailyMealsCard
-          localDate={displayDate}
-          dailyMealsData={dailyMealsData}
-          profile={profile}
-        />
+        <DailyMealsCard dailyMealsData={dailyMealsData} profile={profile} />
       </BentoGridItem>
 
       <BentoGridItem className="md:hidden">MobileBottomGrid</BentoGridItem>

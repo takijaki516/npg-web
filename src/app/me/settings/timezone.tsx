@@ -53,7 +53,11 @@ export default function TimeZone({ profile }: TimeZoneProps) {
   }
 
   return (
-    <div className="flex w-52 gap-2">
+    <div className="flex w-52 items-center gap-2">
+      <div className="whitespace-nowrap">
+        {profile.language === "ko" ? "시간대" : "Timezone"}
+      </div>
+
       <Select value={timeZone} onValueChange={setTimeZone}>
         <SelectTrigger>
           {profile.language === "ko"

@@ -12,12 +12,14 @@ import {
 import { FoodImage } from "../food/food-image";
 import { FoodDetail } from "../food/food-detail";
 import { S3GetObjPresignResponse } from "@/app/api/s3-get-presign/route";
+import { type Database } from "@/lib/types/database.types";
 
 interface DailyFoodProps {
   food: DailyMealsWithFoods[number]["foods"][number];
+  profile: Database["public"]["Tables"]["profiles"]["Row"];
 }
 
-export function DailyFood({ food }: DailyFoodProps) {
+export function DailyFood({ food, profile }: DailyFoodProps) {
   const [isCollapsibleOpen, setIsCollapsibleOpen] = React.useState(false);
   const [imageUrl, setImageUrl] = React.useState(food.pic_url ?? "");
 
@@ -35,10 +37,6 @@ export function DailyFood({ food }: DailyFoodProps) {
         });
 
         const data: S3GetObjPresignResponse = await res.json();
-        console.log(
-          "🚀 ~ file: daily-food.tsx:38 ~ getPresignedUrl ~ data:",
-          data,
-        );
 
         setImageUrl(data.url);
       }
@@ -62,6 +60,7 @@ export function DailyFood({ food }: DailyFoodProps) {
         </div>
 
         <FoodDetail
+          profile={profile}
           name={food.food_name ?? ""}
           calories={food.calories ?? 0}
           carbohydrate={food.carbohydrate ?? 0}

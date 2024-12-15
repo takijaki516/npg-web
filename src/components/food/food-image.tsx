@@ -14,10 +14,10 @@ export function FoodImage({ className, src }: FoodImageProps) {
         className,
       )}
     >
-      {src ? (
-        <img src={src} alt="food" className="object-cover" />
-      ) : (
+      {!src || src === "" ? (
         <Soup size={48} className="text-muted-foreground" />
+      ) : (
+        <img src={src} alt="food" className="object-cover" />
       )}
     </div>
   );

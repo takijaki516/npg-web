@@ -14,13 +14,15 @@ import { foodSchema, insertMealSchema } from "@/lib/schema/meal.schema";
 import { FoodImage } from "../food/food-image";
 import { FoodDetail } from "../food/food-detail";
 import { DeleteButton } from "../delete-button";
+import { type Database } from "@/lib/types/database.types";
 
 interface SingleFoodProps {
   food: z.infer<typeof foodSchema>;
   mealForm: UseFormReturn<z.infer<typeof insertMealSchema>>;
+  profile: Database["public"]["Tables"]["profiles"]["Row"];
 }
 
-export function SingleFood({ food, mealForm }: SingleFoodProps) {
+export function SingleFood({ food, mealForm, profile }: SingleFoodProps) {
   const [isCollapsibleOpen, setIsCollapsibleOpen] = React.useState(false);
 
   function onRemoveFood() {
@@ -50,6 +52,7 @@ export function SingleFood({ food, mealForm }: SingleFoodProps) {
         </div>
 
         <FoodDetail
+          profile={profile}
           name={food.food_name ?? ""}
           calories={food.calories ?? 0}
           carbohydrate={food.carbohydrate ?? 0}

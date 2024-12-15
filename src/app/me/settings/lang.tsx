@@ -14,7 +14,6 @@ import {
 import { Button } from "@/components/ui/button";
 import { type Database } from "@/lib/types/database.types";
 import { supabaseClient } from "@/supabase-utils/client";
-
 interface LangProps {
   profile: Database["public"]["Tables"]["profiles"]["Row"];
 }
@@ -52,7 +51,11 @@ export default function Lang({ profile }: LangProps) {
   }
 
   return (
-    <div className="flex w-52 gap-2">
+    <div className="flex w-52 items-center gap-2">
+      <div className="whitespace-nowrap">
+        {profile.language === "ko" ? "언어" : "Language"}
+      </div>
+
       <Select value={lang} onValueChange={setLang}>
         <SelectTrigger>{lang === "ko" ? "한국어" : "English"}</SelectTrigger>
         <SelectContent>

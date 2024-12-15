@@ -1,7 +1,9 @@
 "use client";
 
-import { cn } from "@/lib/utils";
 import { useRef, useEffect } from "react";
+
+import { cn } from "@/lib/utils";
+import { Check } from "lucide-react";
 
 interface TimePickerProps {
   selectedHour: string;
@@ -10,10 +12,12 @@ interface TimePickerProps {
   setSelectedMinute: (minute: string) => void;
   isTimePickerOpen: boolean;
   setIsTimePickerOpen: (open: boolean) => void;
+  userLanguage: string;
   className?: string;
 }
 
 export default function TimePicker({
+  userLanguage,
   selectedHour,
   selectedMinute,
   setSelectedHour,
@@ -45,12 +49,6 @@ export default function TimePicker({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleNowClick = () => {
-    const now = new Date();
-    setSelectedHour(now.getHours().toString().padStart(2, "0"));
-    setSelectedMinute(now.getMinutes().toString().padStart(2, "0"));
-  };
-
   const formatDisplay = () => {
     return `${selectedHour}:${selectedMinute}`;
   };
@@ -58,7 +56,7 @@ export default function TimePicker({
   return (
     <div
       className={cn(
-        "relative flex items-center rounded-lg bg-muted/50 px-1 hover:cursor-pointer group-hover:bg-background/50",
+        "relative flex items-center rounded-lg bg-muted/50 px-1 hover:cursor-pointer hover:bg-background/50 peer-hover:bg-background/50",
         className,
       )}
       ref={dropdownRef}
@@ -79,8 +77,12 @@ export default function TimePicker({
       {isTimePickerOpen && (
         <div className="absolute left-0 top-8 z-50 mt-1 rounded-lg bg-muted">
           <div className="flex px-2 py-1 text-muted-foreground">
-            <div className="flex-1">시</div>
-            <div className="flex-1">분</div>
+            <div className="flex-1">
+              {userLanguage === "ko" ? "시" : "Hour"}
+            </div>
+            <div className="flex-1">
+              {userLanguage === "ko" ? "분" : "Minute"}
+            </div>
           </div>
 
           <div className="flex h-48">
@@ -119,17 +121,10 @@ export default function TimePicker({
 
           <div className="flex w-36 items-center justify-between border-t border-background px-[2px] py-[2px]">
             <button
-              className="flex-1 rounded-md py-1 text-muted-foreground hover:bg-background/80"
-              onClick={handleNowClick}
-            >
-              현재시간
-            </button>
-
-            <button
-              className="flex-1 rounded-md py-1 text-muted-foreground hover:bg-background/80"
+              className="flex flex-1 justify-center rounded-md py-1 text-muted-foreground hover:bg-background/80"
               onClick={() => setIsTimePickerOpen(false)}
             >
-              확인
+              <Check className="h-4 w-4" />
             </button>
           </div>
         </div>

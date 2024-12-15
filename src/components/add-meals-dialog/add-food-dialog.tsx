@@ -18,12 +18,14 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { insertMealSchema } from "@/lib/schema/meal.schema";
 import { llmCalorieResponseSchema } from "@/app/api/calories/route";
+import { type Database } from "@/lib/types/database.types";
 
 interface AddFoodDialogProps {
   mealForm: UseFormReturn<z.infer<typeof insertMealSchema>>;
+  profile: Database["public"]["Tables"]["profiles"]["Row"];
 }
 
-export function AddFoodDialog({ mealForm }: AddFoodDialogProps) {
+export function AddFoodDialog({ mealForm, profile }: AddFoodDialogProps) {
   const [isFoodDialogOpen, setIsFoodDialogOpen] = React.useState(false);
   const [foodImageFile, setFoodImageFile] = React.useState<File>();
   const [isLLMLoading, setIsLLMLoading] = React.useState(false);
@@ -60,7 +62,9 @@ export function AddFoodDialog({ mealForm }: AddFoodDialogProps) {
       !foodFats
     ) {
       toast.error(
-        "모든 정보를 입력해주세요. AI를 활용해 보세요 편리하게 추가할 수 있어요",
+        profile.language === "ko"
+          ? "모든 정보를 입력해주세요. AI를 활용해 보세요 편리하게 추가할 수 있어요"
+          : "Please fill in all information. You can easily add it using AI",
       );
       return;
     }
@@ -113,7 +117,7 @@ export function AddFoodDialog({ mealForm }: AddFoodDialogProps) {
       <DialogTrigger asChild>
         <Button variant={"outline"} className="flex items-center">
           <Plus className="h-9 w-9" />
-          음식 추가
+          {profile.language === "ko" ? "음식 추가" : "Add Food"}
         </Button>
       </DialogTrigger>
 
@@ -122,7 +126,9 @@ export function AddFoodDialog({ mealForm }: AddFoodDialogProps) {
         onInteractOutside={(e) => e.preventDefault()}
         className="flex max-h-[calc(100dvh-80px)] w-full max-w-xl flex-col gap-4 overflow-y-auto"
       >
-        <DialogTitle>음식 추가</DialogTitle>
+        <DialogTitle>
+          {profile.language === "ko" ? "음식 추가" : "Add Food"}
+        </DialogTitle>
 
         <div className="flex w-full flex-col items-center gap-2">
           {foodImageFile ? (
@@ -165,7 +171,9 @@ export function AddFoodDialog({ mealForm }: AddFoodDialogProps) {
 
           <div className="grid w-full max-w-lg grid-cols-1 gap-2 py-2 sm:grid-cols-2">
             <div className="flex items-center gap-1">
-              <Label className="w-16 break-keep text-center">이름</Label>
+              <Label className="w-16 break-keep text-center">
+                {profile.language === "ko" ? "이름" : "Name"}
+              </Label>
               <Input
                 value={foodName}
                 onChange={(e) => setFoodName(e.target.value)}
@@ -173,7 +181,9 @@ export function AddFoodDialog({ mealForm }: AddFoodDialogProps) {
             </div>
 
             <div className="flex items-center gap-1">
-              <Label className="w-16 break-keep text-center">칼로리</Label>
+              <Label className="w-16 break-keep text-center">
+                {profile.language === "ko" ? "칼로리" : "Calories"}
+              </Label>
               <Input
                 value={foodCalories}
                 onChange={(e) => setFoodCalories(Number(e.target.value))}
@@ -181,7 +191,9 @@ export function AddFoodDialog({ mealForm }: AddFoodDialogProps) {
             </div>
 
             <div className="flex items-center gap-1">
-              <Label className="w-16 break-keep text-center">탄수화물</Label>
+              <Label className="w-16 break-keep text-center">
+                {profile.language === "ko" ? "탄수화물" : "Carbs"}
+              </Label>
               <Input
                 value={foodCarbohydrates}
                 onChange={(e) => setFoodCarbohydrates(Number(e.target.value))}
@@ -189,7 +201,9 @@ export function AddFoodDialog({ mealForm }: AddFoodDialogProps) {
             </div>
 
             <div className="flex items-center gap-1">
-              <Label className="w-16 break-keep text-center">단백질</Label>
+              <Label className="w-16 break-keep text-center">
+                {profile.language === "ko" ? "단백질" : "Protein"}
+              </Label>
               <Input
                 value={foodProteins}
                 onChange={(e) => setFoodProteins(Number(e.target.value))}
@@ -197,7 +211,9 @@ export function AddFoodDialog({ mealForm }: AddFoodDialogProps) {
             </div>
 
             <div className="flex items-center gap-1">
-              <Label className="w-16 break-keep text-center">지방</Label>
+              <Label className="w-16 break-keep text-center">
+                {profile.language === "ko" ? "지방" : "Fat"}
+              </Label>
               <Input
                 value={foodFats}
                 onChange={(e) => setFoodFats(Number(e.target.value))}
