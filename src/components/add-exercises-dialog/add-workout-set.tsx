@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button";
 import { insertDailyWeightsExerciseSchema } from "@/lib/schema/exercise.schema";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { DeleteButton } from "../delete-button";
 
 interface WeightsWorkoutSetFormProps {
   workoutIdx: number;
@@ -24,18 +25,18 @@ export function WeightsWorkoutSetForm({
   removeWorkoutSet,
 }: WeightsWorkoutSetFormProps) {
   return (
-    <div className="flex w-fit items-center gap-2">
-      <div className="break-keep">
+    <div className="flex w-fit items-center gap-1 overflow-x-auto">
+      <span>
         #
         {form.getValues(
           `weights_workouts.${workoutIdx}.weights_workouts_sets.${setIdx}.set_number`,
         )}
-      </div>
+      </span>
 
       <div className="flex items-center gap-1">
         <Label className="break-keep">횟수</Label>
-        <Input
-          className="w-fit"
+        <input
+          className="w-10 rounded-md px-1"
           type="number"
           {...form.register(
             `weights_workouts.${workoutIdx}.weights_workouts_sets.${setIdx}.reps`,
@@ -48,8 +49,8 @@ export function WeightsWorkoutSetForm({
 
       <div className="flex items-center gap-1">
         <Label className="break-keep">무게</Label>
-        <Input
-          className="w-fit"
+        <input
+          className="w-14 rounded-md px-1"
           type="number"
           {...form.register(
             `weights_workouts.${workoutIdx}.weights_workouts_sets.${setIdx}.reps`,
@@ -60,14 +61,10 @@ export function WeightsWorkoutSetForm({
         />
       </div>
 
-      <Button
-        size="sm"
-        variant={"ghost"}
+      <DeleteButton
         onClick={() => removeWorkoutSet(setIdx)}
-        className="cursor-pointer text-red-500 hover:bg-red-500"
-      >
-        <X />
-      </Button>
+        className="h-6 w-6"
+      />
     </div>
   );
 }

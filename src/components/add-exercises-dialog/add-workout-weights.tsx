@@ -25,6 +25,7 @@ import {
   type WORKOUT_OPTIONS,
 } from "@/lib/types/exercise.types";
 import { WeightsWorkoutSetForm } from "./add-workout-set";
+import { DeleteButton } from "../delete-button";
 
 interface WeightWorkoutFormProps {
   workoutIdx: number;
@@ -64,7 +65,11 @@ export function WeightWorkoutForm({
     name: `weights_workouts.${workoutIdx}.weights_workouts_sets`,
   });
 
+  console.log();
+
   function handleAddWorkoutSet() {
+    setIsCollapsibleOpen(true);
+
     weightsWorkoutSetSArrForm.append({
       user_email: profile.user_email,
       user_id: profile.user_id!,
@@ -81,7 +86,7 @@ export function WeightWorkoutForm({
   return (
     <div className="flex flex-col gap-4 rounded-md border p-2">
       <div className="flex justify-between gap-2">
-        <div className="flex gap-4">
+        <div className="flex w-full flex-col gap-1 overflow-x-auto sm:flex-row">
           <Combobox
             placeholder="운동부위"
             options={{
@@ -101,12 +106,10 @@ export function WeightWorkoutForm({
           />
         </div>
 
-        <Button
-          variant={"destructive"}
+        <DeleteButton
           onClick={() => handleRemoveWorkout(workoutIdx)}
-        >
-          <X />
-        </Button>
+          className="h-8 w-8"
+        />
       </div>
 
       <Collapsible
@@ -122,6 +125,17 @@ export function WeightWorkoutForm({
           <Button variant={"outline"} onClick={() => handleAddWorkoutSet()}>
             세트 추가
           </Button>
+
+          <span className="text-muted-foreground">
+            <span>
+              {
+                form.watch(
+                  `weights_workouts.${workoutIdx}.weights_workouts_sets`,
+                ).length
+              }
+            </span>
+            <span className="pl-1">세트 추가됨</span>
+          </span>
         </div>
 
         <CollapsibleContent>

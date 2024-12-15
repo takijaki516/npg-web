@@ -13,11 +13,11 @@ export function DeleteButton({ onClick, className }: DeleteButtonProps) {
     <button
       onClick={onClick}
       className={cn(
-        "rounded-full transition-colors hover:bg-red-500/80",
+        "group flex items-center justify-center rounded-full transition-colors hover:bg-red-500/80",
         className,
       )}
     >
-      <X className="text-red-500/80 transition-colors hover:text-white/80" />
+      <X className="text-red-500/80 transition-colors group-hover:text-white/80" />
     </button>
   );
 }

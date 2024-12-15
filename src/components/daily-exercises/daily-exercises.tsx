@@ -1,7 +1,7 @@
 "use client";
 
 import { type DailyWeightsExercisesWithAllInfos } from "@/supabase-utils/server-queries";
-import { AddWorkoutDialog } from "./add-workout-dialog";
+import { AddWorkoutDialog } from "../add-exercises-dialog/add-workout-dialog";
 import { type Database } from "@/lib/types/database.types";
 import { DailyExercise } from "./daily-exercise";
 import { Expand } from "lucide-react";
@@ -28,10 +28,7 @@ export function DailyExercisesCard({
             <Expand />
           </Button>
 
-          <AddWorkoutDialog
-            localWorkoutDate={localWorkoutDate}
-            profile={profile}
-          />
+          <AddWorkoutDialog profile={profile} />
         </div>
       </div>
 

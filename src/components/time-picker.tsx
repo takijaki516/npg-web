@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { cn } from "@/lib/utils";
+import { useRef, useEffect } from "react";
 
 interface TimePickerProps {
   selectedHour: string;
@@ -9,6 +10,7 @@ interface TimePickerProps {
   setSelectedMinute: (minute: string) => void;
   isTimePickerOpen: boolean;
   setIsTimePickerOpen: (open: boolean) => void;
+  className?: string;
 }
 
 export default function TimePicker({
@@ -18,6 +20,7 @@ export default function TimePicker({
   setSelectedMinute,
   isTimePickerOpen,
   setIsTimePickerOpen,
+  className,
 }: TimePickerProps) {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -54,11 +57,14 @@ export default function TimePicker({
 
   return (
     <div
-      className="relative flex items-center rounded-lg bg-muted/50 px-1 group-hover:bg-background/50"
+      className={cn(
+        "relative flex items-center rounded-lg bg-muted/50 px-1 hover:cursor-pointer group-hover:bg-background/50",
+        className,
+      )}
       ref={dropdownRef}
     >
       <div
-        className="flex cursor-pointer items-center gap-2"
+        className="flex items-center gap-2"
         onClick={() => setIsTimePickerOpen(!isTimePickerOpen)}
       >
         <input
@@ -66,7 +72,7 @@ export default function TimePicker({
           readOnly
           value={formatDisplay()}
           placeholder="hh:mm"
-          className="w-12 bg-transparent text-center text-gray-200 outline-none"
+          className="w-12 cursor-pointer bg-transparent text-center text-gray-200 outline-none"
         />
       </div>
 

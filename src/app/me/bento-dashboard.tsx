@@ -4,7 +4,7 @@ import {
   type DailyWeightsExercisesWithAllInfos,
 } from "@/supabase-utils/server-queries";
 import { BentoGrid, BentoGridItem } from "@/components/bento-grid";
-import { DailyExercisesCard } from "./daily-exercises";
+import { DailyExercisesCard } from "../../components/daily-exercises/daily-exercises";
 import { DailyMealsCard } from "../../components/daily-meals/daily-meals";
 
 interface BentoDashboardProps {

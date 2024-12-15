@@ -388,7 +388,9 @@ export type Database = {
         Row: {
           created_at: string;
           id: string;
+          language: string;
           main_image: string | null;
+          timezone: string;
           updated_at: string;
           user_email: string;
           user_id: string | null;
@@ -397,7 +399,9 @@ export type Database = {
         Insert: {
           created_at?: string;
           id?: string;
+          language?: string;
           main_image?: string | null;
+          timezone?: string;
           updated_at?: string;
           user_email?: string;
           user_id?: string | null;
@@ -406,7 +410,9 @@ export type Database = {
         Update: {
           created_at?: string;
           id?: string;
+          language?: string;
           main_image?: string | null;
+          timezone?: string;
           updated_at?: string;
           user_email?: string;
           user_id?: string | null;
