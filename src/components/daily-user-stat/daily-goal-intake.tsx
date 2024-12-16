@@ -4,6 +4,8 @@ import * as React from "react";
 import { Bot, RotateCw, Star, X } from "lucide-react";
 import { z } from "zod";
 import { DateTime } from "luxon";
+import { toast } from "sonner";
+import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 
 import { supabaseClient } from "@/supabase-utils/client";
 import { llmTargetSchema } from "@/app/api/day-target-intake/route";
@@ -22,106 +24,155 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { type Database } from "@/lib/types/database.types";
-import { cn } from "@/lib/utils";
+import { cn, convertToRangeOfDayUTCTime } from "@/lib/utils";
 import { InfoField } from "./daily-user-stat";
 import { insertDailyGoalIntakeSchema } from "@/lib/schema/intake.schema";
-import { toast } from "sonner";
+
+export interface DailyGoalIntakeData {
+  llmDescription: string;
+  goalCalories: number;
+  goalCarbohydrate: number;
+  goalFat: number;
+  goalProtein: number;
+}
 
 interface DailyTargetIntakeProps {
   profile: Database["public"]["Tables"]["profiles"]["Row"];
   currentDate: string;
   className?: string;
+  dailyGoalIntakeData: DailyGoalIntakeData;
 }
 
 export function DailyGoalIntake({
   profile,
   currentDate,
   className,
+  dailyGoalIntakeData,
 }: DailyTargetIntakeProps) {
-  const [isAIGenerating, setIsAIGenerating] = React.useState(false);
+  const queryClient = useQueryClient();
+
   const [isAIDescriptionOpen, setIsAIDescriptionOpen] = React.useState(false);
-  const [description, setDescription] = React.useState<string>("");
 
-  const [targetIntake, setTargetIntake] = React.useState<Omit<
-    z.infer<typeof llmTargetSchema>,
-    "description"
-  > | null>(null);
+  const intakeGoalQuery = useQuery<DailyGoalIntakeData>({
+    queryKey: ["daily-goal-intake", currentDate],
+    initialData: dailyGoalIntakeData,
+    queryFn: async () => {
+      const { startTimeOfDay, endTimeOfDay } = convertToRangeOfDayUTCTime({
+        localDate: currentDate,
+        timeZone: profile.timezone,
+      });
 
-  async function handleAIGen() {
-    setIsAIGenerating(true);
+      const supabase = supabaseClient<Database>();
+      const { data, error } = await supabase
+        .from("daily_intakes")
+        .select(
+          `
+        llm_description,
+        goal_calories_kcal,
+        goal_carbohydrate_g,
+        goal_fat_g,
+        goal_protein_g
+        `,
+        )
+        .eq("user_email", profile.user_email)
+        .gte("date", startTimeOfDay)
+        .lt("date", endTimeOfDay)
+        .limit(1)
+        .single();
 
-    const body: DayTargetIntakeBody = {
-      current_date: currentDate,
-    };
+      if (error) {
+        throw error;
+      }
 
-    const res = await fetch("/api/day-target-intake", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
+      return {
+        llmDescription: data.llm_description,
+        goalCalories: data.goal_calories_kcal,
+        goalCarbohydrate: data.goal_carbohydrate_g,
+        goalFat: data.goal_fat_g,
+        goalProtein: data.goal_protein_g,
+      };
+    },
+  });
 
-    if (!res.ok) {
-      toast.error("Failed to generate target intake");
-      return;
-    }
+  const intakeGoalMutation = useMutation({
+    mutationFn: async () => {
+      const body: DayTargetIntakeBody = {
+        current_date: currentDate,
+      };
 
-    const {
-      calories_for_today,
-      carbohydrate_for_today,
-      fat_for_today,
-      protein_for_today,
-      description,
-    }: z.infer<typeof llmTargetSchema> = await res.json();
+      const res = await fetch("/api/day-target-intake", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
 
-    const currentUTCDate = DateTime.fromFormat(currentDate, "yyyy-MM-dd")
-      .setZone(profile.timezone)
-      .toUTC()
-      .toSQL();
+      if (!res.ok) {
+        throw new Error("Failed to generate target intake");
+      }
 
-    const validatedData = insertDailyGoalIntakeSchema.safeParse({
-      user_id: profile.user_id,
-      user_email: profile.user_email,
-      date: currentUTCDate,
+      const {
+        calories_for_today,
+        carbohydrate_for_today,
+        fat_for_today,
+        protein_for_today,
+        description,
+      }: z.infer<typeof llmTargetSchema> = await res.json();
 
-      goal_calories: calories_for_today,
-      goal_carbohydrate_g: carbohydrate_for_today,
-      goal_fat_g: fat_for_today,
-      goal_protein_g: protein_for_today,
+      const currentUTCDate = DateTime.fromFormat(currentDate, "yyyy-MM-dd")
+        .setZone(profile.timezone)
+        .toUTC()
+        .toSQL();
 
-      llm_description: description,
-    });
+      const validatedData = insertDailyGoalIntakeSchema.safeParse({
+        user_id: profile.user_id,
+        user_email: profile.user_email,
+        date: currentUTCDate,
 
-    if (!validatedData.success) {
-      toast.error("fail to parse data");
-      return;
-    }
+        goal_calories_kcal: calories_for_today,
+        goal_carbohydrate_g: carbohydrate_for_today,
+        goal_fat_g: fat_for_today,
+        goal_protein_g: protein_for_today,
 
-    const supabase = supabaseClient<Database>();
-    const { error } = await supabase
-      .from("daily_intakes")
-      .insert(validatedData.data);
+        llm_description: description,
+      });
 
-    if (error) {
-      toast.error("failed to add to supabase");
-      return;
-    }
+      if (!validatedData.success) {
+        throw new Error("fail to parse data");
+      }
 
-    setTargetIntake({
-      calories_for_today,
-      carbohydrate_for_today,
-      fat_for_today,
-      protein_for_today,
-    });
+      const supabase = supabaseClient<Database>();
+      const { error } = await supabase
+        .from("daily_intakes")
+        .insert(validatedData.data);
 
-    setDescription(description);
-    setIsAIDescriptionOpen(true);
-    setIsAIGenerating(false);
-  }
+      if (error) {
+        throw error;
+      }
+
+      const data = {
+        llmDescription: validatedData.data.llm_description,
+        goalCalories: validatedData.data.goal_calories_kcal,
+        goalCarbohydrate: validatedData.data.goal_carbohydrate_g,
+        goalFat: validatedData.data.goal_fat_g,
+        goalProtein: validatedData.data.goal_protein_g,
+      } satisfies DailyGoalIntakeData;
+
+      return data;
+    },
+    onMutate: () => {
+      setIsAIDescriptionOpen(true);
+    },
+    onSuccess: (newData) => {
+      queryClient.setQueryData(["daily-goal-intake", currentDate], newData);
+    },
+    onError: () => {
+      toast.error("something went wrong");
+    },
+  });
 
   function handleCloseDescription() {
-    setDescription("");
     setIsAIDescriptionOpen(false);
   }
 
@@ -136,7 +187,16 @@ export function DailyGoalIntake({
             <AlertDialogTitle>
               <Bot />
             </AlertDialogTitle>
-            <AlertDialogDescription>{description}</AlertDialogDescription>
+            <AlertDialogDescription>
+              {intakeGoalQuery.isLoading || !intakeGoalQuery.data ? (
+                <div className="flex items-center gap-2">
+                  <RotateCw className="animate-spin" size={22} />
+                  <span>Loading...</span>
+                </div>
+              ) : (
+                <span>{intakeGoalQuery.data.llmDescription}</span>
+              )}
+            </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel onClick={handleCloseDescription}>
@@ -157,9 +217,9 @@ export function DailyGoalIntake({
           <TooltipTrigger asChild>
             <button
               className="ml-4 flex size-8 items-center justify-center rounded-lg border transition-colors hover:bg-muted"
-              onClick={handleAIGen}
+              onClick={() => intakeGoalMutation.mutate()}
             >
-              {isAIGenerating ? (
+              {intakeGoalMutation.isPending ? (
                 <RotateCw className="animate-spin" size={22} />
               ) : (
                 <Bot size={22} />
@@ -175,22 +235,22 @@ export function DailyGoalIntake({
 
       <InfoField
         label={profile.language === "ko" ? "칼로리" : "Calories"}
-        value={targetIntake?.calories_for_today?.toString() ?? "0"}
+        value={`${intakeGoalQuery.data?.goalCalories.toString()}kcal`}
         className="h-9"
       />
       <InfoField
         label={profile.language === "ko" ? "탄수화물" : "Carbohydrate"}
-        value={targetIntake?.carbohydrate_for_today?.toString() ?? "0"}
+        value={`${intakeGoalQuery.data?.goalCarbohydrate.toString()}g`}
         className="h-9"
       />
       <InfoField
         label={profile.language === "ko" ? "단백질" : "Protein"}
-        value={targetIntake?.protein_for_today?.toString() ?? "0"}
+        value={`${intakeGoalQuery.data?.goalProtein.toString()}g`}
         className="h-9"
       />
       <InfoField
         label={profile.language === "ko" ? "지방" : "Fat"}
-        value={targetIntake?.fat_for_today?.toString() ?? "0"}
+        value={`${intakeGoalQuery.data?.goalFat.toString()}g`}
         className="h-9"
       />
     </div>
