@@ -3,6 +3,7 @@
 import * as React from "react";
 import { Bot, RotateCw, Star, X } from "lucide-react";
 import { z } from "zod";
+import { DateTime } from "luxon";
 
 import { supabaseClient } from "@/supabase-utils/client";
 import { llmTargetSchema } from "@/app/api/day-target-intake/route";
@@ -74,10 +75,15 @@ export function DailyGoalIntake({
       description,
     }: z.infer<typeof llmTargetSchema> = await res.json();
 
+    const currentUTCDate = DateTime.fromFormat(currentDate, "yyyy-MM-dd")
+      .setZone(profile.timezone)
+      .toUTC()
+      .toSQL();
+
     const validatedData = insertDailyGoalIntakeSchema.safeParse({
       user_id: profile.user_id,
       user_email: profile.user_email,
-      date: currentDate,
+      date: currentUTCDate,
 
       goal_calories: calories_for_today,
       goal_carbohydrate_g: carbohydrate_for_today,
