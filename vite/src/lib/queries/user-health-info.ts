@@ -1,9 +1,11 @@
 import { supabase } from "@/lib/supabase";
 
-export async function getProfile() {
+export const getLatestHealthInfo = async ({ email }: { email: string }) => {
   const { data, error } = await supabase
-    .from("profiles")
+    .from("health_info")
     .select("*")
+    .eq("user_email", email)
+    .order("measured_date", { ascending: false })
     .limit(1)
     .single();
 
@@ -11,9 +13,5 @@ export async function getProfile() {
     throw new Error(error.message);
   }
 
-  if (!data) {
-    throw new Error("User not found");
-  }
-
   return data;
-}
+};
