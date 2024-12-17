@@ -1,19 +1,30 @@
 import * as React from "react";
-import { createRootRoute, Link } from "@tanstack/react-router";
+import { Outlet, createRootRouteWithContext } from "@tanstack/react-router";
+import { type QueryClient } from "@tanstack/react-query";
 
 import { TanStackRouterDevtools } from "@/components/tanstack-router-devtool";
+import { type AuthContext } from "@/auth";
+import { supabase } from "@/lib/supabase";
 
-export const Route = createRootRoute({
+interface RootRouteContext {
+  auth: AuthContext;
+  queryClient: QueryClient;
+}
+
+export const Route = createRootRouteWithContext<RootRouteContext>()({
   component: () => (
     <>
-      <div>
-        <Link>Home</Link>
-        <Link>About</Link>
-      </div>
+      <Outlet />
 
       <React.Suspense>
-        <TanStackRouterDevtools />
+        <TanStackRouterDevtools position="bottom-right" initialIsOpen={false} />
       </React.Suspense>
     </>
   ),
+  beforeLoad: async ({ context }) => {
+    // NOTE: for first render
+    if (context.auth.isLoading) {
+      await supabase.auth.getSession();
+    }
+  },
 });
