@@ -1,0 +1,880 @@
+Resources:
+  CognitoUserPoolNPG2C301388:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      AccountRecoverySetting:
+        RecoveryMechanisms:
+          - Name: verified_phone_number
+            Priority: 1
+          - Name: verified_email
+            Priority: 2
+      AdminCreateUserConfig:
+        AllowAdminCreateUserOnly: false
+      AutoVerifiedAttributes:
+        - email
+      EmailVerificationMessage: The verification code to your new account is {####}
+      EmailVerificationSubject: Verify your new account
+      LambdaConfig:
+        PostConfirmation:
+          Fn::GetAtt:
+            - PostSignupLambda00FF0487
+            - Arn
+      Schema:
+        - Mutable: true
+          Name: email
+          Required: true
+      SmsVerificationMessage: The verification code to your new account is {####}
+      UserPoolName: CognitoUserPoolNPG
+      UsernameAttributes:
+        - email
+      UsernameConfiguration:
+        CaseSensitive: false
+      VerificationMessageTemplate:
+        DefaultEmailOption: CONFIRM_WITH_CODE
+        EmailMessage: The verification code to your new account is {####}
+        EmailSubject: Verify your new account
+        SmsMessage: The verification code to your new account is {####}
+    UpdateReplacePolicy: Retain
+    DeletionPolicy: Retain
+    Metadata:
+      aws:cdk:path: NPGCognitoStack-Dev/CognitoUserPoolNPG/Resource
+  CognitoUserPoolNPGuser25FC1F20:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties:
+      Description: Standard user group with limited access
+      GroupName: user
+      UserPoolId:
+        Ref: CognitoUserPoolNPG2C301388
+    Metadata:
+      aws:cdk:path: NPGCognitoStack-Dev/CognitoUserPoolNPG/user/Resource
+  CognitoUserPoolNPGadminAE193552:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties:
+      Description: Admin group with full access
+      GroupName: admin
+      UserPoolId:
+        Ref: CognitoUserPoolNPG2C301388
+    Metadata:
+      aws:cdk:path: NPGCognitoStack-Dev/CognitoUserPoolNPG/admin/Resource
+  CognitoUserPoolNPGPostConfirmationCognitoAD4B9982:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - PostSignupLambda00FF0487
+          - Arn
+      Principal: cognito-idp.amazonaws.com
+      SourceArn:
+        Fn::GetAtt:
+          - CognitoUserPoolNPG2C301388
+          - Arn
+    Metadata:
+      aws:cdk:path: NPGCognitoStack-Dev/CognitoUserPoolNPG/PostConfirmationCognito
+  CognitoUserPoolNPGCognitoDomain3218EB05:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      Domain: npg-auth
+      UserPoolId:
+        Ref: CognitoUserPoolNPG2C301388
+    Metadata:
+      aws:cdk:path: NPGCognitoStack-Dev/CognitoUserPoolNPG/CognitoDomain/Resource
+  PostSignupLambdaServiceRole000498CA:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    Metadata:
+      aws:cdk:path: NPGCognitoStack-Dev/PostSignupLambda/ServiceRole/Resource
+  PostSignupLambda00FF0487:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket:
+          Fn::Sub: cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}
+        S3Key: 5802f999bb1aadc64937ceb954ae395678d4b7b9622d9e15a63c6c2976a46c1d.zip
+      Handler: index.handler
+      Role:
+        Fn::GetAtt:
+          - PostSignupLambdaServiceRole000498CA
+          - Arn
+      Runtime: nodejs20.x
+    DependsOn:
+      - PostSignupLambdaServiceRole000498CA
+    Metadata:
+      aws:cdk:path: NPGCognitoStack-Dev/PostSignupLambda/Resource
+      aws:asset:path: /Users/tkminyang/Documents/llm-application/npg/apps/api/cdk.out/asset.5802f999bb1aadc64937ceb954ae395678d4b7b9622d9e15a63c6c2976a46c1d
+      aws:asset:is-bundled: true
+      aws:asset:property: Code
+  googleoauthsecret71B4A23A:
+    Type: AWS::SecretsManager::Secret
+    Properties:
+      Description: google oauth2 credentials
+      Name: google/oauth/credentials
+      SecretString: '{"GOOGLE_CLIENT_SECRET":"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"}'
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: NPGCognitoStack-Dev/google-oauth-secret/Resource
+  GoogleProvider566D8493:
+    Type: AWS::Cognito::UserPoolIdentityProvider
+    Properties:
+      AttributeMapping:
+        email: email
+      ProviderDetails:
+        client_id: 719023854537-ju8e917nuhbqhftth219c43d95lc4kn0.apps.googleusercontent.com
+        client_secret:
+          Fn::Join:
+            - ""
+            - - "{{resolve:secretsmanager:"
+              - Ref: googleoauthsecret71B4A23A
+              - :SecretString:GOOGLE_CLIENT_SECRET::}}
+        authorize_scopes: profile email openid
+      ProviderName: Google
+      ProviderType: Google
+      UserPoolId:
+        Ref: CognitoUserPoolNPG2C301388
+    Metadata:
+      aws:cdk:path: NPGCognitoStack-Dev/GoogleProvider/Resource
+  CognitoUserPoolClientNPG35BE8D81:
+    Type: AWS::Cognito::UserPoolClient
+    Properties:
+      AllowedOAuthFlows:
+        - code
+      AllowedOAuthFlowsUserPoolClient: true
+      AllowedOAuthScopes:
+        - openid
+        - aws.cognito.signin.user.admin
+        - email
+        - profile
+      CallbackURLs:
+        - http://localhost:7788/auth/callback
+      ClientName: CognitoUserPoolClientNPG
+      GenerateSecret: true
+      SupportedIdentityProviders:
+        - Google
+      UserPoolId:
+        Ref: CognitoUserPoolNPG2C301388
+    Metadata:
+      aws:cdk:path: NPGCognitoStack-Dev/CognitoUserPoolClientNPG/Resource
+  CognitoUserPoolClientNPGDescribeCognitoUserPoolClientC589957F:
+    Type: Custom::DescribeCognitoUserPoolClient
+    Properties:
+      ServiceToken:
+        Fn::GetAtt:
+          - AWS679f53fac002430cb0da5b7982bd22872D164C4C
+          - Arn
+      Create:
+        Fn::Join:
+          - ""
+          - - '{"region":"'
+            - Ref: AWS::Region
+            - '","service":"CognitoIdentityServiceProvider","action":"describeUserPoolClient","parameters":{"UserPoolId":"'
+            - Ref: CognitoUserPoolNPG2C301388
+            - '","ClientId":"'
+            - Ref: CognitoUserPoolClientNPG35BE8D81
+            - '"},"physicalResourceId":{"id":"'
+            - Ref: CognitoUserPoolClientNPG35BE8D81
+            - '"}}'
+      Update:
+        Fn::Join:
+          - ""
+          - - '{"region":"'
+            - Ref: AWS::Region
+            - '","service":"CognitoIdentityServiceProvider","action":"describeUserPoolClient","parameters":{"UserPoolId":"'
+            - Ref: CognitoUserPoolNPG2C301388
+            - '","ClientId":"'
+            - Ref: CognitoUserPoolClientNPG35BE8D81
+            - '"},"physicalResourceId":{"id":"'
+            - Ref: CognitoUserPoolClientNPG35BE8D81
+            - '"}}'
+      InstallLatestAwsSdk: false
+    DependsOn:
+      - CognitoUserPoolClientNPGDescribeCognitoUserPoolClientCustomResourcePolicyEE20E76A
+    UpdateReplacePolicy: Delete
+    DeletionPolicy: Delete
+    Metadata:
+      aws:cdk:path: NPGCognitoStack-Dev/CognitoUserPoolClientNPG/DescribeCognitoUserPoolClient/Resource/Default
+  CognitoUserPoolClientNPGDescribeCognitoUserPoolClientCustomResourcePolicyEE20E76A:
+    Type: AWS::IAM::Policy
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action: cognito-idp:DescribeUserPoolClient
+            Effect: Allow
+            Resource:
+              Fn::GetAtt:
+                - CognitoUserPoolNPG2C301388
+                - Arn
+        Version: "2012-10-17"
+      PolicyName: CognitoUserPoolClientNPGDescribeCognitoUserPoolClientCustomResourcePolicyEE20E76A
+      Roles:
+        - Ref: AWS679f53fac002430cb0da5b7982bd2287ServiceRoleC1EA0FF2
+    Metadata:
+      aws:cdk:path: NPGCognitoStack-Dev/CognitoUserPoolClientNPG/DescribeCognitoUserPoolClient/CustomResourcePolicy/Resource
+  AWS679f53fac002430cb0da5b7982bd2287ServiceRoleC1EA0FF2:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    Metadata:
+      aws:cdk:path: NPGCognitoStack-Dev/AWS679f53fac002430cb0da5b7982bd2287/ServiceRole/Resource
+  AWS679f53fac002430cb0da5b7982bd22872D164C4C:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket:
+          Fn::Sub: cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}
+        S3Key: ce2f3595a340d6c519a65888ef97e3b9b64f053f83608e32cc28162e22d7d99a.zip
+      Handler: index.handler
+      Role:
+        Fn::GetAtt:
+          - AWS679f53fac002430cb0da5b7982bd2287ServiceRoleC1EA0FF2
+          - Arn
+      Runtime:
+        Fn::FindInMap:
+          - LatestNodeRuntimeMap
+          - Ref: AWS::Region
+          - value
+      Timeout: 120
+    DependsOn:
+      - AWS679f53fac002430cb0da5b7982bd2287ServiceRoleC1EA0FF2
+    Metadata:
+      aws:cdk:path: NPGCognitoStack-Dev/AWS679f53fac002430cb0da5b7982bd2287/Resource
+      aws:asset:path: /Users/tkminyang/Documents/llm-application/npg/node_modules/.pnpm/aws-cdk-lib@2.173.2_constructs@10.4.2/node_modules/aws-cdk-lib/custom-resource-handlers/dist/custom-resources/aws-custom-resource-handler
+      aws:asset:is-bundled: false
+      aws:asset:property: Code
+  CDKMetadata:
+    Type: AWS::CDK::Metadata
+    Properties:
+      Analytics: v2:deflate64:H4sIAAAAAAAA/11PTY+CQAz9Ld7HruJhz8pmzR52QyR7JuNQSRVaMx00hvDfN4CwxNP76HtNG8H6fQPRwt516fLLsqQjNGmw7mLsXbPGScEUBJpfRZ+IlCY+8cRHsvdSX+eTwRjVh1SWeD5/OqP8ypEDhUfi5UY5+r1IUeK88JqYqnFJyGEeHZzWlLY65haa+MQJ+opUSfojPmt2oeMpcVFikH9nJGM7Y8nxrPDTwxQjW0FzkOHEHhMpyT06ObDW6CazqhgUth0Y3cCudhcMO6toFJ3HoJVlW6CHJu111x9Y25oDqtTeoen7abAFcWFcrUGqzD+HCtu7xr035V/lief8216v3aL4xLFwTsO73Z9w1rdbtIJ1BKvFWYmWvuZAFcJhwD95mtyYLQIAAA==
+    Metadata:
+      aws:cdk:path: NPGCognitoStack-Dev/CDKMetadata/Default
+    Condition: CDKMetadataAvailable
+Mappings:
+  LatestNodeRuntimeMap:
+    af-south-1:
+      value: nodejs20.x
+    ap-east-1:
+      value: nodejs20.x
+    ap-northeast-1:
+      value: nodejs20.x
+    ap-northeast-2:
+      value: nodejs20.x
+    ap-northeast-3:
+      value: nodejs20.x
+    ap-south-1:
+      value: nodejs20.x
+    ap-south-2:
+      value: nodejs20.x
+    ap-southeast-1:
+      value: nodejs20.x
+    ap-southeast-2:
+      value: nodejs20.x
+    ap-southeast-3:
+      value: nodejs20.x
+    ap-southeast-4:
+      value: nodejs20.x
+    ap-southeast-5:
+      value: nodejs20.x
+    ap-southeast-7:
+      value: nodejs20.x
+    ca-central-1:
+      value: nodejs20.x
+    ca-west-1:
+      value: nodejs20.x
+    cn-north-1:
+      value: nodejs18.x
+    cn-northwest-1:
+      value: nodejs18.x
+    eu-central-1:
+      value: nodejs20.x
+    eu-central-2:
+      value: nodejs20.x
+    eu-north-1:
+      value: nodejs20.x
+    eu-south-1:
+      value: nodejs20.x
+    eu-south-2:
+      value: nodejs20.x
+    eu-west-1:
+      value: nodejs20.x
+    eu-west-2:
+      value: nodejs20.x
+    eu-west-3:
+      value: nodejs20.x
+    il-central-1:
+      value: nodejs20.x
+    me-central-1:
+      value: nodejs20.x
+    me-south-1:
+      value: nodejs20.x
+    mx-central-1:
+      value: nodejs20.x
+    sa-east-1:
+      value: nodejs20.x
+    us-east-1:
+      value: nodejs20.x
+    us-east-2:
+      value: nodejs20.x
+    us-west-1:
+      value: nodejs20.x
+    us-west-2:
+      value: nodejs20.x
+Conditions:
+  CDKMetadataAvailable:
+    Fn::Or:
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - af-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-3
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-south-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-3
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-4
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ca-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ca-west-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - cn-north-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - cn-northwest-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-central-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-north-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-south-2
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-3
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - il-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - me-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - me-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - sa-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-east-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-west-1
+      - Fn::Equals:
+          - Ref: AWS::Region
+          - us-west-2
+Outputs:
+  ExportsOutputRefCognitoUserPoolNPGCognitoDomain3218EB054DE5F620:
+    Value:
+      Ref: CognitoUserPoolNPGCognitoDomain3218EB05
+    Export:
+      Name: NPGCognitoStack-Dev:ExportsOutputRefCognitoUserPoolNPGCognitoDomain3218EB054DE5F620
+  ExportsOutputRefCognitoUserPoolClientNPG35BE8D816F2B4CD3:
+    Value:
+      Ref: CognitoUserPoolClientNPG35BE8D81
+    Export:
+      Name: NPGCognitoStack-Dev:ExportsOutputRefCognitoUserPoolClientNPG35BE8D816F2B4CD3
+  ExportsOutputFnGetAttCognitoUserPoolClientNPGDescribeCognitoUserPoolClientC589957FUserPoolClientClientSecret878D43C7:
+    Value:
+      Fn::GetAtt:
+        - CognitoUserPoolClientNPGDescribeCognitoUserPoolClientC589957F
+        - UserPoolClient.ClientSecret
+    Export:
+      Name: NPGCognitoStack-Dev:ExportsOutputFnGetAttCognitoUserPoolClientNPGDescribeCognitoUserPoolClientC589957FUserPoolClientClientSecret878D43C7
+Parameters:
+  BootstrapVersion:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /cdk-bootstrap/hnb659fds/version
+    Description: Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]
+
+Resources:
+  CDKMetadata:
+    Type: AWS::CDK::Metadata
+    Properties:
+      Analytics: v2:deflate64:H4sIAAAAAAAA/zPSMzQ31jNSTCwv1k1OydbNyUzSqw4uSUzO1nFOywtKLc4vLUpOBbGd8/NSMksy8/NqdfLyU1L1sor1y4wM9AyN9AwUs4ozM3WLSvNKMnNT9YIgNAD56N/fWgAAAA==
+    Metadata:
+      aws:cdk:path: NPGLambdaStack-Dev/CDKMetadata/Default
+    Condition: CDKMetadataAvailable
+Conditions:
+  CDKMetadataAvailable:
+    Fn::Or:
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - af-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-3
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-south-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-3
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-4
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ca-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ca-west-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - cn-north-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - cn-northwest-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-central-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-north-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-south-2
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-3
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - il-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - me-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - me-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - sa-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-east-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-west-1
+      - Fn::Equals:
+          - Ref: AWS::Region
+          - us-west-2
+Parameters:
+  BootstrapVersion:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /cdk-bootstrap/hnb659fds/version
+    Description: Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]
+
+Resources:
+  RestApiGatewayAEAE89B5:
+    Type: AWS::ApiGateway::RestApi
+    Properties:
+      Description: Rest Api Gateway for the NPG API
+      Name: RestApiGateway
+    Metadata:
+      aws:cdk:path: NPGApiGateWayStack-Dev/RestApiGateway/Resource
+  RestApiGatewayDeploymentF53F9A831064dbd0467fab808f01dbc9de40b5f4:
+    Type: AWS::ApiGateway::Deployment
+    Properties:
+      Description: Rest Api Gateway for the NPG API
+      RestApiId:
+        Ref: RestApiGatewayAEAE89B5
+    DependsOn:
+      - RestApiGatewayauthcallbackGET5008CDA3
+      - RestApiGatewayauthcallbackEBBFBD6D
+      - RestApiGatewayauth89E4ED39
+    Metadata:
+      aws:cdk:path: NPGApiGateWayStack-Dev/RestApiGateway/Deployment/Resource
+  RestApiGatewayDeploymentStageprodCFA2B4CE:
+    Type: AWS::ApiGateway::Stage
+    Properties:
+      DeploymentId:
+        Ref: RestApiGatewayDeploymentF53F9A831064dbd0467fab808f01dbc9de40b5f4
+      RestApiId:
+        Ref: RestApiGatewayAEAE89B5
+      StageName: prod
+    Metadata:
+      aws:cdk:path: NPGApiGateWayStack-Dev/RestApiGateway/DeploymentStage.prod/Resource
+  RestApiGatewayauth89E4ED39:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId:
+        Fn::GetAtt:
+          - RestApiGatewayAEAE89B5
+          - RootResourceId
+      PathPart: auth
+      RestApiId:
+        Ref: RestApiGatewayAEAE89B5
+    Metadata:
+      aws:cdk:path: NPGApiGateWayStack-Dev/RestApiGateway/Default/auth/Resource
+  RestApiGatewayauthcallbackEBBFBD6D:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      ParentId:
+        Ref: RestApiGatewayauth89E4ED39
+      PathPart: callback
+      RestApiId:
+        Ref: RestApiGatewayAEAE89B5
+    Metadata:
+      aws:cdk:path: NPGApiGateWayStack-Dev/RestApiGateway/Default/auth/callback/Resource
+  RestApiGatewayauthcallbackGETApiPermissionNPGApiGateWayStackDevRestApiGatewayC8F5FC1FGETauthcallback9ACF0497:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - CodeExchangeLambda1C933943
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:"
+            - Ref: AWS::Partition
+            - ":execute-api:"
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":"
+            - Ref: RestApiGatewayAEAE89B5
+            - /
+            - Ref: RestApiGatewayDeploymentStageprodCFA2B4CE
+            - /GET/auth/callback
+    Metadata:
+      aws:cdk:path: NPGApiGateWayStack-Dev/RestApiGateway/Default/auth/callback/GET/ApiPermission.NPGApiGateWayStackDevRestApiGatewayC8F5FC1F.GET..auth.callback
+  RestApiGatewayauthcallbackGETApiPermissionTestNPGApiGateWayStackDevRestApiGatewayC8F5FC1FGETauthcallback98DAF784:
+    Type: AWS::Lambda::Permission
+    Properties:
+      Action: lambda:InvokeFunction
+      FunctionName:
+        Fn::GetAtt:
+          - CodeExchangeLambda1C933943
+          - Arn
+      Principal: apigateway.amazonaws.com
+      SourceArn:
+        Fn::Join:
+          - ""
+          - - "arn:"
+            - Ref: AWS::Partition
+            - ":execute-api:"
+            - Ref: AWS::Region
+            - ":"
+            - Ref: AWS::AccountId
+            - ":"
+            - Ref: RestApiGatewayAEAE89B5
+            - /test-invoke-stage/GET/auth/callback
+    Metadata:
+      aws:cdk:path: NPGApiGateWayStack-Dev/RestApiGateway/Default/auth/callback/GET/ApiPermission.Test.NPGApiGateWayStackDevRestApiGatewayC8F5FC1F.GET..auth.callback
+  RestApiGatewayauthcallbackGET5008CDA3:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      AuthorizationType: NONE
+      HttpMethod: GET
+      Integration:
+        IntegrationHttpMethod: POST
+        Type: AWS_PROXY
+        Uri:
+          Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - ":apigateway:"
+              - Ref: AWS::Region
+              - :lambda:path/2015-03-31/functions/
+              - Fn::GetAtt:
+                  - CodeExchangeLambda1C933943
+                  - Arn
+              - /invocations
+      ResourceId:
+        Ref: RestApiGatewayauthcallbackEBBFBD6D
+      RestApiId:
+        Ref: RestApiGatewayAEAE89B5
+    Metadata:
+      aws:cdk:path: NPGApiGateWayStack-Dev/RestApiGateway/Default/auth/callback/GET/Resource
+  CodeExchangeLambdaServiceRole14D61607:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action: sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service: lambda.amazonaws.com
+        Version: "2012-10-17"
+      ManagedPolicyArns:
+        - Fn::Join:
+            - ""
+            - - "arn:"
+              - Ref: AWS::Partition
+              - :iam::aws:policy/service-role/AWSLambdaBasicExecutionRole
+    Metadata:
+      aws:cdk:path: NPGApiGateWayStack-Dev/CodeExchangeLambda/ServiceRole/Resource
+  CodeExchangeLambda1C933943:
+    Type: AWS::Lambda::Function
+    Properties:
+      Code:
+        S3Bucket:
+          Fn::Sub: cdk-hnb659fds-assets-${AWS::AccountId}-${AWS::Region}
+        S3Key: 53ffbd2e3f20b74c443f0760510510577bd4937b1a92906675ff5f7d7dbb7665.zip
+      Environment:
+        Variables:
+          COGNITO_DOMAIN:
+            Fn::ImportValue: NPGCognitoStack-Dev:ExportsOutputRefCognitoUserPoolNPGCognitoDomain3218EB054DE5F620
+          COGNITO_APP_CLIENT_ID:
+            Fn::ImportValue: NPGCognitoStack-Dev:ExportsOutputRefCognitoUserPoolClientNPG35BE8D816F2B4CD3
+          COGNITO_APP_CLIENT_SECRET:
+            Fn::ImportValue: NPGCognitoStack-Dev:ExportsOutputFnGetAttCognitoUserPoolClientNPGDescribeCognitoUserPoolClientC589957FUserPoolClientClientSecret878D43C7
+      FunctionName: CodeExchangeLambda
+      Handler: index.handler
+      Role:
+        Fn::GetAtt:
+          - CodeExchangeLambdaServiceRole14D61607
+          - Arn
+      Runtime: nodejs20.x
+    DependsOn:
+      - CodeExchangeLambdaServiceRole14D61607
+    Metadata:
+      aws:cdk:path: NPGApiGateWayStack-Dev/CodeExchangeLambda/Resource
+      aws:asset:path: /Users/tkminyang/Documents/llm-application/npg/apps/api/cdk.out/asset.53ffbd2e3f20b74c443f0760510510577bd4937b1a92906675ff5f7d7dbb7665
+      aws:asset:is-bundled: true
+      aws:asset:property: Code
+  CDKMetadata:
+    Type: AWS::CDK::Metadata
+    Properties:
+      Analytics: v2:deflate64:H4sIAAAAAAAA/1WPzW6DQAyEnyX3jZvAoeeEqrf+iDwAcsBQ87OLsLcoQrx7tdmitKcZj0febxM4PqeQ7HCWfVl1+56vsFwUy87gLMWCIzeoNOMNlpxETyObrLabfaGxd7eBrIb0z3RRbChk0eQkzk8lnVEew++h6N9Iv1wVouhW0+NwrRCWrLafNA0sws6Gwqu3pbKzW6WwrqJW4P0u29YwDrDkro/vuJ5WI2mBIqQCpyBGUjj7siMNXGvofXgdvT4Q773wB7bNP96stpmzFUeQQACtPH0nBzgmcNi1wryfvFUeCPKoPztjGWVsAQAA
+    Metadata:
+      aws:cdk:path: NPGApiGateWayStack-Dev/CDKMetadata/Default
+    Condition: CDKMetadataAvailable
+Outputs:
+  RestApiGatewayEndpointF48811B0:
+    Value:
+      Fn::Join:
+        - ""
+        - - https://
+          - Ref: RestApiGatewayAEAE89B5
+          - .execute-api.
+          - Ref: AWS::Region
+          - "."
+          - Ref: AWS::URLSuffix
+          - /
+          - Ref: RestApiGatewayDeploymentStageprodCFA2B4CE
+          - /
+Conditions:
+  CDKMetadataAvailable:
+    Fn::Or:
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - af-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-northeast-3
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-south-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-3
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ap-southeast-4
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ca-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - ca-west-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - cn-north-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - cn-northwest-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-central-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-north-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-south-2
+      - Fn::Or:
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - eu-west-3
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - il-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - me-central-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - me-south-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - sa-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-east-1
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-east-2
+          - Fn::Equals:
+              - Ref: AWS::Region
+              - us-west-1
+      - Fn::Equals:
+          - Ref: AWS::Region
+          - us-west-2
+Parameters:
+  BootstrapVersion:
+    Type: AWS::SSM::Parameter::Value<String>
+    Default: /cdk-bootstrap/hnb659fds/version
+    Description: Version of the CDK Bootstrap resources in this environment, automatically retrieved from SSM Parameter Store. [cdk:skip]
+
