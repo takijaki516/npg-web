@@ -2,7 +2,7 @@
 
 import { useRef, useEffect } from "react";
 
-import { cn } from "@/lib/utils";
+import { cn } from "../../from-next/src/lib/utils";
 import { Check } from "lucide-react";
 
 interface TimePickerProps {
@@ -16,7 +16,7 @@ interface TimePickerProps {
   className?: string;
 }
 
-export default function TimePicker({
+export function TimePicker({
   userLanguage,
   selectedHour,
   selectedMinute,

@@ -6,7 +6,12 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function convertToRangeOfDayInUTCTime({
+/**
+ * @returns
+ * startTimeOfDay: inclusive
+ * endTimeOfDay: exclusive
+ */
+export function convertToRangeOfDayUTCTime({
   localDate,
   timeZone,
 }: {
@@ -28,6 +33,41 @@ export function convertToRangeOfDayInUTCTime({
   return { startTimeOfDay: startDateTimeSQL, endTimeOfDay: endDateTimeSQL };
 }
 
+/**
+ * @param startLocalDate - inclusive
+ * @param endLocalDate - exclusive
+ */
+export function convertToRangeOfSpecificDayUTCTime({
+  endLocalDate,
+  startLocalDate,
+  timeZone,
+}: {
+  startLocalDate: string;
+  endLocalDate: string;
+  timeZone: string;
+}) {
+  const startDateTime = DateTime.fromFormat(
+    `${startLocalDate} 00:00:00`,
+    "yyyy-MM-dd HH:mm:ss",
+    {
+      zone: timeZone,
+    },
+  );
+
+  const endDateTime = DateTime.fromFormat(
+    `${endLocalDate} 00:00:00`,
+    "yyyy-MM-dd HH:mm:ss",
+    {
+      zone: timeZone,
+    },
+  );
+
+  const startDateTimeSQL = startDateTime.toUTC().toSQL();
+  const endDateTimeSQL = endDateTime.toUTC().toSQL();
+
+  return { startDateTime: startDateTimeSQL, endDateTime: endDateTimeSQL };
+}
+
 export function convertToUTCTime({
   localDate,
   timeZone,
@@ -38,8 +78,6 @@ export function convertToUTCTime({
   const dateTime = DateTime.fromFormat(`${localDate}`, "yyyy-MM-dd HH:mm:ss", {
     zone: timeZone,
   });
-
-  console.log("🚀 ~ file: utils.ts:40 ~ dateTime:", dateTime);
 
   const dateTimeSQL = dateTime.toUTC().toSQL();
 

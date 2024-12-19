@@ -1,10 +1,7 @@
-"use client";
-
-import { useRouter } from "next/navigation";
 import { LogOut } from "lucide-react";
 
-import type { Database } from "@/lib/types/database.types";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import type { Database } from "../../from-next/src/lib/types/database.types";
+import { Avatar, AvatarFallback, AvatarImage } from "../../from-next/src/components/ui/avatar";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -12,21 +9,20 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { supabaseClient } from "@/supabase-utils/client";
+} from "../../from-next/src/components/ui/dropdown-menu";
 
 interface NavUserProps {
   profile: Database["public"]["Tables"]["profiles"]["Row"];
 }
 
 export function NavUser({ profile }: NavUserProps) {
-  const router = useRouter();
+  // const router = useRouter();
 
-  async function handleSignout() {
-    const supabase = supabaseClient();
-    await supabase.auth.signOut();
-    router.push("/");
-  }
+  // async function handleSignout() {
+  //   const supabase = supabaseClient();
+  //   await supabase.auth.signOut();
+  //   router.push("/");
+  // }
 
   return (
     <DropdownMenu>
@@ -66,7 +62,7 @@ export function NavUser({ profile }: NavUserProps) {
 
         <DropdownMenuItem
           className="cursor-pointer bg-red-500 hover:bg-red-600 focus:bg-red-600"
-          onClick={handleSignout}
+          // onClick={handleSignout}
         >
           <LogOut />
           Log out

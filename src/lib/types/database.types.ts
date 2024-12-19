@@ -94,6 +94,60 @@ export type Database = {
         };
         Relationships: [];
       };
+      daily_intakes: {
+        Row: {
+          created_at: string;
+          date: string;
+          goal_calories_kcal: number;
+          goal_carbohydrate_g: number;
+          goal_fat_g: number;
+          goal_protein_g: number;
+          id: string;
+          intake_calories_kcal: number;
+          intake_carbohydrate_g: number;
+          intake_fat_g: number;
+          intake_protein_g: number;
+          llm_description: string;
+          updated_at: string;
+          user_email: string;
+          user_id: string | null;
+        };
+        Insert: {
+          created_at?: string;
+          date: string;
+          goal_calories_kcal?: number;
+          goal_carbohydrate_g?: number;
+          goal_fat_g?: number;
+          goal_protein_g?: number;
+          id?: string;
+          intake_calories_kcal?: number;
+          intake_carbohydrate_g?: number;
+          intake_fat_g?: number;
+          intake_protein_g?: number;
+          llm_description?: string;
+          updated_at?: string;
+          user_email: string;
+          user_id?: string | null;
+        };
+        Update: {
+          created_at?: string;
+          date?: string;
+          goal_calories_kcal?: number;
+          goal_carbohydrate_g?: number;
+          goal_fat_g?: number;
+          goal_protein_g?: number;
+          id?: string;
+          intake_calories_kcal?: number;
+          intake_carbohydrate_g?: number;
+          intake_fat_g?: number;
+          intake_protein_g?: number;
+          llm_description?: string;
+          updated_at?: string;
+          user_email?: string;
+          user_id?: string | null;
+        };
+        Relationships: [];
+      };
       daily_weights_exercises: {
         Row: {
           created_at: string;
@@ -425,7 +479,6 @@ export type Database = {
           body_fat_mass_kg: number | null;
           created_at: string;
           goal_description: string | null;
-          height_cm: number | null;
           id: string;
           skeletal_muscle_mass_kg: number | null;
           updated_at: string;
@@ -437,7 +490,6 @@ export type Database = {
           body_fat_mass_kg?: number | null;
           created_at?: string;
           goal_description?: string | null;
-          height_cm?: number | null;
           id?: string;
           skeletal_muscle_mass_kg?: number | null;
           updated_at?: string;
@@ -449,7 +501,6 @@ export type Database = {
           body_fat_mass_kg?: number | null;
           created_at?: string;
           goal_description?: string | null;
-          height_cm?: number | null;
           id?: string;
           skeletal_muscle_mass_kg?: number | null;
           updated_at?: string;

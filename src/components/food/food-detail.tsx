@@ -1,4 +1,4 @@
-import { type Database } from "@/lib/types/database.types";
+import { type Database } from "../../../from-next/src/lib/types/database.types";
 
 interface FoodDetailProps {
   profile: Database["public"]["Tables"]["profiles"]["Row"];
@@ -11,7 +11,6 @@ interface FoodDetailProps {
 
 export function FoodDetail({
   profile,
-  name,
   calories,
   carbohydrate,
   protein,

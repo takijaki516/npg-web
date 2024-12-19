@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn } from "../../from-next/src/lib/utils";
 import { X } from "lucide-react";
 
 interface DeleteButtonProps {

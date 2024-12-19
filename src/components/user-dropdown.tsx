@@ -1,7 +1,7 @@
 import { User2, Settings } from "lucide-react";
-import Link from "next/link";
+import { Link } from "@tanstack/react-router";
 
-import type { Database } from "@/lib/types/database.types";
+import type { Database } from "../../from-next/src/lib/types/database.types";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -9,8 +9,8 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "./ui/dropdown-menu";
-import { Button } from "./ui/button";
+} from "../../from-next/src/components/ui/dropdown-menu";
+import { Button } from "../../from-next/src/components/ui/button";
 import { UserSignoutButton } from "./user-signout-button";
 
 interface UserDropdownProps {
