@@ -1,11 +1,18 @@
-import { pgTable, timestamp, uuid, real, smallint } from "drizzle-orm/pg-core";
-import { profiles } from "./profiles";
+import {
+  pgTable,
+  timestamp,
+  uuid,
+  real,
+  smallint,
+  text,
+} from "drizzle-orm/pg-core";
+import { user } from "./better-auth";
 import { eachWeightsExercises } from "./each-weights-exercises";
 
 export const weightsSetInfo = pgTable("weights_set_info", {
   id: uuid("id").primaryKey().defaultRandom(),
-  profileId: uuid("profile_id")
-    .references(() => profiles.id)
+  userId: text("user_id")
+    .references(() => user.id)
     .notNull(),
 
   eachWeightsExerciseId: uuid("each_weights_exercise_id")

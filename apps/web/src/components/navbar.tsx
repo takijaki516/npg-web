@@ -1,6 +1,7 @@
 import { Home } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
+import { supabase } from "@/lib/supabase";
 // import { ThemeToggle } from "./theme-toggle";
 import { UserDropdown } from "./user-dropdown";
 import { Button } from "@/components/ui/button";
@@ -12,27 +13,14 @@ interface NavbarProps {
 
 export function Navbar({ profile }: NavbarProps) {
   async function handleTest() {
-    const authorizeParams = new URLSearchParams();
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: "google",
+      options: {
+        redirectTo: "http://localhost:5173/auth/callback",
+      },
+    });
 
-    const state = Array.from(crypto.getRandomValues(new Uint8Array(16)))
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("");
-
-    authorizeParams.append("response_type", "code");
-    authorizeParams.append("client_id", "5o2o6ogu0huht3dpr8qn1q8ef0");
-    authorizeParams.append(
-      "redirect_uri",
-      `http://localhost:7788/auth/callback`,
-    );
-    authorizeParams.append("state", state);
-    authorizeParams.append("identity_provider", "Google");
-    authorizeParams.append("scope", "profile email openid");
-
-    const url = `https://npg-auth.auth.ap-northeast-2.amazoncognito.com/oauth2/authorize?${authorizeParams.toString()}`;
-
-    const res = await fetch(url);
-
-    console.log(res);
+    console.log(data, error);
   }
 
   return (
@@ -61,3 +49,7 @@ export function Navbar({ profile }: NavbarProps) {
     </nav>
   );
 }
+
+
+//https://accounts.google.com/o/oauth2/v2/auth/oauthchooseaccount?client_id=618922330263-8cq9giikm0lpkbmril83gakq77ma7ajc.apps.googleusercontent.com&redirect_to=http%3A%2F%2Flocalhost%3A5173%2Fauth%2Fcallback&redirect_uri=http%3A%2F%2Flocalhost%3A54321%2Fauth%2Fv1%2Fcallback&response_type=code&scope=email%20profile&state=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3MzQ5OTMyODksInNpdGVfdXJsIjoiaHR0cDovLzEyNy4wLjAuMTo1MTczIiwiaWQiOiIwMDAwMDAwMC0wMDAwLTAwMDAtMDAwMC0wMDAwMDAwMDAwMDAiLCJmdW5jdGlvbl9ob29rcyI6bnVsbCwicHJvdmlkZXIiOiJnb29nbGUiLCJyZWZlcnJlciI6Imh0dHA6Ly9sb2NhbGhvc3Q6NTE3My9hdXRoL2NhbGxiYWNrIiwiZmxvd19zdGF0ZV9pZCI6IiJ9.69JLh-ZQj8eBr5TmVhbsoFoAZjlX5q824iCIwPoCKxQ&service=lso&o2v=2&ddm=1&flowName=GeneralOAuthFlow
+// http://127.0.0.1:54321/auth/v1/authorize?provider=google&redirect_to=http%3A%2F%2Flocalhost%3A5173%2Fauth%2Fcallback

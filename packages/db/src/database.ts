@@ -1,3 +1,4 @@
+// NOTE: just for migration/seed
 import "dotenv/config";
 import { neon, neonConfig } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";

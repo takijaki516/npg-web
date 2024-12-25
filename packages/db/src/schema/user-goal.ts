@@ -1,10 +1,10 @@
 import { pgTable, timestamp, uuid, text, real } from "drizzle-orm/pg-core";
-import { profiles } from "./profiles";
+import { user } from "./better-auth";
 
 export const userGoals = pgTable("user_goals", {
   id: uuid("id").primaryKey().defaultRandom(),
-  profileId: uuid("profile_id")
-    .references(() => profiles.id)
+  userId: text("user_id")
+    .references(() => user.id)
     .notNull(),
 
   weightKg: real("weight_kg").notNull(),

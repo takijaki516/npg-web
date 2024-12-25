@@ -1,10 +1,17 @@
-import { pgTable, real, timestamp, uuid, smallint } from "drizzle-orm/pg-core";
-import { profiles } from "./profiles";
+import {
+  pgTable,
+  real,
+  timestamp,
+  uuid,
+  smallint,
+  text,
+} from "drizzle-orm/pg-core";
+import { user } from "./better-auth";
 
 export const healthInfos = pgTable("health_infos", {
   id: uuid("id").primaryKey().defaultRandom(),
-  profileId: uuid("profile_id")
-    .references(() => profiles.id)
+  userId: text("user_id")
+    .references(() => user.id)
     .notNull(),
 
   measuredData: timestamp("measured_data").notNull(),

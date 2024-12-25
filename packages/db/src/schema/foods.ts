@@ -1,11 +1,11 @@
 import { pgTable, timestamp, uuid, real, text } from "drizzle-orm/pg-core";
-import { profiles } from "./profiles";
 import { meals } from "./meals";
+import { user } from "./better-auth";
 
 export const foods = pgTable("foods", {
   id: uuid("id").primaryKey().defaultRandom(),
-  profileId: uuid("profile_id")
-    .references(() => profiles.id)
+  userId: text("user_id")
+    .references(() => user.id)
     .notNull(),
   mealId: uuid("meal_id")
     .references(() => meals.id)

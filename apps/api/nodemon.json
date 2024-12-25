@@ -1,5 +1,0 @@
-{
-  "watch": ["src/", "lib/"],
-  "ext": "ts,yaml,js,py",
-  "exec": "sh -c 'cdk synth NPGCognitoStack-Dev --no-staging >> template.yaml && cdk synth NPGLambdaStack-Dev --no-staging >> template.yaml && cdk synth NPGApiGateWayStack-Dev --no-staging >> template.yaml && sam local start-api --warm-containers eager -p 7788 -t template.yaml'"
-}
