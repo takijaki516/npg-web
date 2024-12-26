@@ -1,15 +1,12 @@
-// schemas
-export * from "./schema/better-auth";
-export * from "./schema/daily-cardio-exercises";
-export * from "./schema/daily-intakes";
-export * from "./schema/daily-weights-exercises";
-export * from "./schema/each-weights-exercises";
-export * from "./schema/foods";
+// schema
+export * from "./schema/auth";
+export * from "./schema/cardio-exercise";
+export * from "./schema/daily-intake";
+export * from "./schema/daily-weight";
 export * from "./schema/health-info";
-export * from "./schema/meals";
+export * from "./schema/meal";
 export * from "./schema/user-goal";
-export * from "./schema/weights-set-info";
 
-//
+// database client;
 export { neon } from "@neondatabase/serverless";
 export { drizzle } from "drizzle-orm/neon-http";

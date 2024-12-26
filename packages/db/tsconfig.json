@@ -1,9 +1,14 @@
 {
   "extends": "@repo/typescript-config/base.json",
-  "include": ["src/**/*.ts", "drizzle.config.ts"],
+
+  "include": ["drizzle.config.ts", "src/**/*.ts"],
   "exclude": ["dist", "build", "node_modules"],
+
   "compilerOptions": {
     "moduleResolution": "bundler",
-    "noEmit": true
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   }
 }
