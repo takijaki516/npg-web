@@ -9,14 +9,21 @@ export * from "./schema/daily-weight";
 export * from "./schema/health-info";
 export * from "./schema/meal";
 export * from "./schema/user-goal";
+export * from "./schema/profile";
 
 // database client;
 
-export function createDb(env: any) {
-  let connectionString = env.DATABASE_URL;
+export function createDb({
+  DATABASE_URL,
+  NODE_ENV,
+}: {
+  DATABASE_URL: string;
+  NODE_ENV: string;
+}) {
+  let connectionString = DATABASE_URL;
 
   // Configuring Neon for local development
-  if (env.NODE_ENV === "development") {
+  if (NODE_ENV === "development") {
     connectionString = "postgres://postgres:postgres@db.localtest.me:5432/main";
     neonConfig.fetchEndpoint = (host) => {
       const [protocol, port] =

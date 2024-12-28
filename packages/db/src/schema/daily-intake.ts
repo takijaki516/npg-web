@@ -17,10 +17,10 @@ export const dailyIntakes = pgTable("daily_intakes", {
 
   llmDescription: text("llm_description"),
 
-  goalCaloriesKcal: real("goal_calories_kcal").notNull(),
-  goalCarbohydratesG: real("goal_carbohydrates_g").notNull(),
-  goalProteinG: real("goal_protein_g").notNull(),
-  goalFatG: real("goal_fat_g").notNull(),
+  goalCaloriesKcal: real("goal_calories_kcal"),
+  goalCarbohydratesG: real("goal_carbohydrates_g"),
+  goalProteinG: real("goal_protein_g"),
+  goalFatG: real("goal_fat_g"),
 
   createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow().notNull(),
