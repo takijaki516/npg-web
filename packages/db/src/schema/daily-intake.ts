@@ -1,11 +1,11 @@
 import { pgTable, text, timestamp, uuid, real } from "drizzle-orm/pg-core";
 
-import { user } from "./auth";
+import { profile } from "./profile";
 
 export const dailyIntakes = pgTable("daily_intakes", {
   id: uuid().defaultRandom().primaryKey().notNull(),
-  userId: text("user_id")
-    .references(() => user.id)
+  profileEmail: text("profile_email")
+    .references(() => profile.email)
     .notNull(),
 
   date: timestamp({ mode: "string" }).notNull(),

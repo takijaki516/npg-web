@@ -17,9 +17,6 @@ export const user = pgTable(
 
     image: text(),
 
-    timezone: text().default("Asia/Seoul").notNull(),
-    language: text().default("ko").notNull(),
-
     createdAt: timestamp({ mode: "string" }).notNull(),
     updatedAt: timestamp({ mode: "string" }).notNull(),
   },

@@ -6,12 +6,13 @@ import {
   smallint,
   real,
 } from "drizzle-orm/pg-core";
-import { user } from "./auth";
+
+import { profile } from "./profile";
 
 export const dailyWeightsExercises = pgTable("daily_weights_exercises", {
   id: uuid().defaultRandom().primaryKey().notNull(),
-  userId: text("user_id")
-    .references(() => user.id)
+  profileEmail: text("profile_email")
+    .references(() => profile.email)
     .notNull(),
 
   startTime: timestamp("start_time", { mode: "string" }).notNull(),
@@ -23,8 +24,8 @@ export const dailyWeightsExercises = pgTable("daily_weights_exercises", {
 
 export const eachWeightsExercises = pgTable("each_weights_exercises", {
   id: uuid().defaultRandom().primaryKey().notNull(),
-  userId: text("user_id")
-    .references(() => user.id)
+  profileEmail: text("profile_email")
+    .references(() => profile.email)
     .notNull(),
   weightsExerciseId: uuid("weights_exercise_id")
     .references(() => dailyWeightsExercises.id)
@@ -39,8 +40,8 @@ export const eachWeightsExercises = pgTable("each_weights_exercises", {
 
 export const weightsSetInfo = pgTable("weights_set_info", {
   id: uuid().defaultRandom().primaryKey().notNull(),
-  userId: text("user_id")
-    .references(() => user.id)
+  profileEmail: text("profile_email")
+    .references(() => profile.email)
     .notNull(),
   eachWeightsExerciseId: uuid("each_weights_exercise_id")
     .references(() => eachWeightsExercises.id)

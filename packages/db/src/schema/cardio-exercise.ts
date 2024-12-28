@@ -1,11 +1,11 @@
 import { pgTable, text, timestamp, uuid, smallint } from "drizzle-orm/pg-core";
 
-import { user } from "./auth";
+import { profile } from "./profile";
 
 export const dailyCardioExercises = pgTable("daily_cardio_exercises", {
   id: uuid().defaultRandom().primaryKey().notNull(),
-  userId: text("user_id")
-    .references(() => user.id)
+  profileEmail: text("profile_email")
+    .references(() => profile.email)
     .notNull(),
 
   exerciseName: text("exercise_name").notNull(),

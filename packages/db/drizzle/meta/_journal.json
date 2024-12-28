@@ -15,6 +15,20 @@
       "when": 1735186824437,
       "tag": "0001_shiny_zodiak",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1735368578495,
+      "tag": "0002_purple_sinister_six",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1735368717798,
+      "tag": "0003_third_moira_mactaggert",
+      "breakpoints": true
     }
   ]
 }

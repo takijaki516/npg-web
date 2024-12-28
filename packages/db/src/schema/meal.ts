@@ -1,10 +1,10 @@
 import { pgTable, uuid, text, real, timestamp } from "drizzle-orm/pg-core";
-import { user } from "./auth";
+import { profile } from "./profile";
 
 export const foods = pgTable("foods", {
   id: uuid().defaultRandom().primaryKey().notNull(),
-  userId: text("user_id")
-    .references(() => user.id)
+  profileEmail: text("profile_email")
+    .references(() => profile.email)
     .notNull(),
   mealId: uuid("meal_id")
     .references(() => meals.id)
@@ -24,8 +24,8 @@ export const foods = pgTable("foods", {
 
 export const meals = pgTable("meals", {
   id: uuid().defaultRandom().primaryKey().notNull(),
-  userId: text("user_id")
-    .references(() => user.id)
+  profileEmail: text("profile_email")
+    .references(() => profile.email)
     .notNull(),
 
   mealTime: timestamp("meal_time", { mode: "string" }).notNull(),

@@ -7,12 +7,12 @@ import {
   smallint,
 } from "drizzle-orm/pg-core";
 
-import { user } from "./auth";
+import { profile } from "./profile";
 
 export const healthInfos = pgTable("health_infos", {
   id: uuid().defaultRandom().primaryKey().notNull(),
-  userId: text("user_id")
-    .references(() => user.id)
+  profileEmail: text("profile_email")
+    .references(() => profile.email)
     .notNull(),
 
   measuredData: timestamp("measured_data", { mode: "string" }).notNull(),
