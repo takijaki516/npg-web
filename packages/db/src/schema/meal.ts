@@ -1,3 +1,4 @@
+import { relations } from "drizzle-orm";
 import { pgTable, uuid, text, real, timestamp } from "drizzle-orm/pg-core";
 import { profile } from "./profile";
 
@@ -22,6 +23,17 @@ export const foods = pgTable("foods", {
   updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow().notNull(),
 });
 
+export const foodsRelations = relations(foods, ({ one }) => ({
+  profile: one(profile, {
+    fields: [foods.profileEmail],
+    references: [profile.email],
+  }),
+  meal: one(meals, {
+    fields: [foods.mealId],
+    references: [meals.id],
+  }),
+}));
+
 export const meals = pgTable("meals", {
   id: uuid().defaultRandom().primaryKey().notNull(),
   profileEmail: text("profile_email")
@@ -40,3 +52,11 @@ export const meals = pgTable("meals", {
   createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow().notNull(),
 });
+
+export const mealsRelations = relations(meals, ({ one, many }) => ({
+  profile: one(profile, {
+    fields: [meals.profileEmail],
+    references: [profile.email],
+  }),
+  foods: many(foods),
+}));

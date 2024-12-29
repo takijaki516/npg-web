@@ -1,3 +1,4 @@
+import { relations } from "drizzle-orm";
 import { pgTable, text, timestamp, uuid, smallint } from "drizzle-orm/pg-core";
 
 import { profile } from "./profile";
@@ -17,3 +18,13 @@ export const dailyCardioExercises = pgTable("daily_cardio_exercises", {
   createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow().notNull(),
 });
+
+export const dailyCardioExercisesRelations = relations(
+  dailyCardioExercises,
+  ({ one }) => ({
+    profile: one(profile, {
+      fields: [dailyCardioExercises.profileEmail],
+      references: [profile.email],
+    }),
+  })
+);

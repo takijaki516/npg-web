@@ -1,3 +1,4 @@
+import { relations } from "drizzle-orm";
 import {
   pgTable,
   uuid,
@@ -22,6 +23,17 @@ export const dailyWeightsExercises = pgTable("daily_weights_exercises", {
   updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow().notNull(),
 });
 
+export const dailyWeightsExercisesRelations = relations(
+  dailyWeightsExercises,
+  ({ many, one }) => ({
+    eachWeightsExercises: many(eachWeightsExercises),
+    profile: one(profile, {
+      fields: [dailyWeightsExercises.profileEmail],
+      references: [profile.email],
+    }),
+  })
+);
+
 export const eachWeightsExercises = pgTable("each_weights_exercises", {
   id: uuid().defaultRandom().primaryKey().notNull(),
   profileEmail: text("profile_email")
@@ -38,6 +50,21 @@ export const eachWeightsExercises = pgTable("each_weights_exercises", {
   updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow().notNull(),
 });
 
+export const eachWeightsExercisesRelations = relations(
+  eachWeightsExercises,
+  ({ many, one }) => ({
+    weightsSetInfo: many(weightsSetInfo),
+    dailyWeightsExercise: one(dailyWeightsExercises, {
+      fields: [eachWeightsExercises.weightsExerciseId],
+      references: [dailyWeightsExercises.id],
+    }),
+    profile: one(profile, {
+      fields: [eachWeightsExercises.profileEmail],
+      references: [profile.email],
+    }),
+  })
+);
+
 export const weightsSetInfo = pgTable("weights_set_info", {
   id: uuid().defaultRandom().primaryKey().notNull(),
   profileEmail: text("profile_email")
@@ -53,3 +80,14 @@ export const weightsSetInfo = pgTable("weights_set_info", {
   createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow().notNull(),
 });
+
+export const weightsSetInfoRelations = relations(weightsSetInfo, ({ one }) => ({
+  eachWeightsExercise: one(eachWeightsExercises, {
+    fields: [weightsSetInfo.eachWeightsExerciseId],
+    references: [eachWeightsExercises.id],
+  }),
+  profile: one(profile, {
+    fields: [weightsSetInfo.profileEmail],
+    references: [profile.email],
+  }),
+}));

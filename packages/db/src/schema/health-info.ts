@@ -1,3 +1,4 @@
+import { relations } from "drizzle-orm";
 import {
   pgTable,
   uuid,
@@ -26,3 +27,10 @@ export const healthInfos = pgTable("health_infos", {
   createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow().notNull(),
 });
+
+export const healthInfosRelations = relations(healthInfos, ({ one }) => ({
+  profile: one(profile, {
+    fields: [healthInfos.profileEmail],
+    references: [profile.email],
+  }),
+}));

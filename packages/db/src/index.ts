@@ -1,6 +1,15 @@
 import { neon, neonConfig } from "@neondatabase/serverless";
 import { drizzle } from "drizzle-orm/neon-http";
 
+import * as authSchema from "./schema/auth";
+import * as cardioExerciseSchema from "./schema/cardio-exercise";
+import * as dailyIntakeSchema from "./schema/daily-intake";
+import * as dailyWeightSchema from "./schema/daily-weight";
+import * as healthInfoSchema from "./schema/health-info";
+import * as mealSchema from "./schema/meal";
+import * as userGoalSchema from "./schema/user-goal";
+import * as profileSchema from "./schema/profile";
+
 // schema
 export * from "./schema/auth";
 export * from "./schema/cardio-exercise";
@@ -33,5 +42,17 @@ export function createDb({
   }
 
   const sql = neon(connectionString);
-  return drizzle({ client: sql });
+  return drizzle({
+    client: sql,
+    schema: {
+      ...authSchema,
+      ...cardioExerciseSchema,
+      ...dailyIntakeSchema,
+      ...dailyWeightSchema,
+      ...healthInfoSchema,
+      ...mealSchema,
+      ...userGoalSchema,
+      ...profileSchema,
+    },
+  });
 }
