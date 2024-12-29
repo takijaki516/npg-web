@@ -1,35 +1,77 @@
 import { createFileRoute, redirect, Outlet } from "@tanstack/react-router";
+
+import { getProfileOptions } from "@/lib/queries";
+import { Sidebar } from "@/components/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 
-import { AppSidebar } from "@/components/sidebar";
-import { getProfile } from "@/lib/queries/profile";
-
 export const Route = createFileRoute("/(user)/_layout")({
-  beforeLoad: async ({ context }) => {
-    if (!context.auth.session) {
+  beforeLoad: ({ context }) => {
+    if (!context.session || !context.user) {
       throw redirect({ to: "/login" });
     }
+
+    return { user: context.user };
   },
-  loader: async ({ context }) => {
-    const queryClient = context.queryClient;
+  loader: ({ context }) => {
+    context.queryClient.ensureQueryData(getProfileOptions);
 
-    const userProfile = await queryClient.ensureQueryData({
-      queryKey: ["profile"],
-      queryFn: getProfile,
-    });
+    // get current local date time
+    // const currentLocalDateTime = DateTime.now()
+    //   .setZone(profile.timezone)
+    //   .toFormat("yyyy-MM-dd");
 
-    return { profile: userProfile };
+    // const { utcStartTimeOfDay, utcEndTimeOfDay } = convertToRangeOfDayUTCTime({
+    //   localDate: currentLocalDateTime,
+    //   timeZone: profile.timezone,
+    // });
+
+    // if (!utcStartTimeOfDay || !utcEndTimeOfDay) {
+    //   throw new Error("failed to get start and end time of day");
+    // }
+
+    // // fetch data
+    // queryClient.ensureQueryData({
+    //   queryKey: ["userGoal"],
+    //   queryFn: () => getOrCreateGoal(),
+    // });
+
+    // queryClient.ensureQueryData({
+    //   queryKey: ["dailyIntake"],
+    //   queryFn: () =>
+    //     getOrCreateDailyIntake({
+    //       utcStartOfRange: utcStartTimeOfDay,
+    //       utcEndOfRange: utcEndTimeOfDay,
+    //     }),
+    // });
+
+    // queryClient.ensureQueryData({
+    //   queryKey: ["latestHealthInfo"],
+    //   queryFn: () => getLatestHealthInfo(),
+    // });
+
+    // queryClient.ensureQueryData(
+    //   getDailyWeightsExerciseOptions({
+    //     utcStartOfRange: utcStartTimeOfDay,
+    //     utcEndOfRange: utcEndTimeOfDay,
+    //   }),
+    // );
+
+    // queryClient.ensureQueryData(
+    //   getDailyMealsWithFoodsOptions({
+    //     utcStartOfRange: utcStartTimeOfDay,
+    //     utcEndOfRange: utcEndTimeOfDay,
+    //   }),
+    // );
   },
   component: MeLayout,
 });
 
 function MeLayout() {
-  const { profile } = Route.useLoaderData();
-
   return (
     <div className="relative flex">
       <TooltipProvider>
-        <AppSidebar profile={profile} />
+        <Sidebar />
+
         <Outlet />
       </TooltipProvider>
     </div>

@@ -17,7 +17,6 @@ import { Route as IndexImport } from './routes/index'
 import { Route as userLayoutImport } from './routes/(user)/_layout'
 import { Route as authAuthImport } from './routes/(auth)/_auth'
 import { Route as userLayoutMeImport } from './routes/(user)/_layout/me'
-import { Route as authAuthCallbackImport } from './routes/(auth)/auth.callback'
 
 // Create Virtual Routes
 
@@ -77,12 +76,6 @@ const userLayoutMeRoute = userLayoutMeImport.update({
   getParentRoute: () => userLayoutRoute,
 } as any)
 
-const authAuthCallbackRoute = authAuthCallbackImport.update({
-  id: '/auth/callback',
-  path: '/auth/callback',
-  getParentRoute: () => authRoute,
-} as any)
-
 // Populate the FileRoutesByPath interface
 
 declare module '@tanstack/react-router' {
@@ -121,13 +114,6 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof userLayoutImport
       parentRoute: typeof userRoute
-    }
-    '/(auth)/auth/callback': {
-      id: '/(auth)/auth/callback'
-      path: '/auth/callback'
-      fullPath: '/auth/callback'
-      preLoaderRoute: typeof authAuthCallbackImport
-      parentRoute: typeof authImport
     }
     '/(user)/_layout/me': {
       id: '/(user)/_layout/me'
@@ -171,12 +157,10 @@ const authAuthRouteWithChildren = authAuthRoute._addFileChildren(
 
 interface authRouteChildren {
   authAuthRoute: typeof authAuthRouteWithChildren
-  authAuthCallbackRoute: typeof authAuthCallbackRoute
 }
 
 const authRouteChildren: authRouteChildren = {
   authAuthRoute: authAuthRouteWithChildren,
-  authAuthCallbackRoute: authAuthCallbackRoute,
 }
 
 const authRouteWithChildren = authRoute._addFileChildren(authRouteChildren)
@@ -205,7 +189,6 @@ const userRouteWithChildren = userRoute._addFileChildren(userRouteChildren)
 
 export interface FileRoutesByFullPath {
   '/': typeof userLayoutRouteWithChildren
-  '/auth/callback': typeof authAuthCallbackRoute
   '/me': typeof userLayoutMeRoute
   '/login': typeof authAuthLoginLazyRoute
   '/signup': typeof authAuthSignupLazyRoute
@@ -213,7 +196,6 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '/': typeof userLayoutRouteWithChildren
-  '/auth/callback': typeof authAuthCallbackRoute
   '/me': typeof userLayoutMeRoute
   '/login': typeof authAuthLoginLazyRoute
   '/signup': typeof authAuthSignupLazyRoute
@@ -226,7 +208,6 @@ export interface FileRoutesById {
   '/(auth)/_auth': typeof authAuthRouteWithChildren
   '/(user)': typeof userRouteWithChildren
   '/(user)/_layout': typeof userLayoutRouteWithChildren
-  '/(auth)/auth/callback': typeof authAuthCallbackRoute
   '/(user)/_layout/me': typeof userLayoutMeRoute
   '/(auth)/_auth/login': typeof authAuthLoginLazyRoute
   '/(auth)/_auth/signup': typeof authAuthSignupLazyRoute
@@ -234,9 +215,9 @@ export interface FileRoutesById {
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/auth/callback' | '/me' | '/login' | '/signup'
+  fullPaths: '/' | '/me' | '/login' | '/signup'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/auth/callback' | '/me' | '/login' | '/signup'
+  to: '/' | '/me' | '/login' | '/signup'
   id:
     | '__root__'
     | '/'
@@ -244,7 +225,6 @@ export interface FileRouteTypes {
     | '/(auth)/_auth'
     | '/(user)'
     | '/(user)/_layout'
-    | '/(auth)/auth/callback'
     | '/(user)/_layout/me'
     | '/(auth)/_auth/login'
     | '/(auth)/_auth/signup'
@@ -284,8 +264,7 @@ export const routeTree = rootRoute
     "/(auth)": {
       "filePath": "(auth)",
       "children": [
-        "/(auth)/_auth",
-        "/(auth)/auth/callback"
+        "/(auth)/_auth"
       ]
     },
     "/(auth)/_auth": {
@@ -308,10 +287,6 @@ export const routeTree = rootRoute
       "children": [
         "/(user)/_layout/me"
       ]
-    },
-    "/(auth)/auth/callback": {
-      "filePath": "(auth)/auth.callback.tsx",
-      "parent": "/(auth)"
     },
     "/(user)/_layout/me": {
       "filePath": "(user)/_layout/me.tsx",

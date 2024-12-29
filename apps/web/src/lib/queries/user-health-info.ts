@@ -1,17 +1,17 @@
-import { supabase } from "@/lib/supabase";
+import { honoClient } from "@/lib/hono";
 
-export const getLatestHealthInfo = async ({ email }: { email: string }) => {
-  const { data, error } = await supabase
-    .from("health_info")
-    .select("*")
-    .eq("user_email", email)
-    .order("measured_date", { ascending: false })
-    .limit(1)
-    .single();
+export const getLatestHealthInfo = async () => {
+  const res = await honoClient.user["latest-health-info"].$get();
 
-  if (error) {
-    throw new Error(error.message);
+  if (!res.ok) {
+    throw new Error("failed to get latest health info");
   }
 
-  return data;
+  const body = await res.json();
+
+  return body.healthInfo;
 };
+
+export type HealthInfo = NonNullable<
+  Awaited<ReturnType<typeof getLatestHealthInfo>>
+>;

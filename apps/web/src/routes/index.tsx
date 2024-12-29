@@ -1,27 +1,22 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { Brain, Camera, Dumbbell, PieChart, Sparkles } from "lucide-react";
+import { useSuspenseQuery } from "@tanstack/react-query";
 
 // import Iphone15Pro from "@/components/ui/iphone-15-pro";
 // import Safari from "@/components/ui/safari";
 import { Card, CardContent } from "@/components/ui/card";
 import { Navbar } from "@/components/navbar";
-import { supabase } from "@/lib/supabase";
+import { getProfileOptions } from "@/lib/queries";
 
 export const Route = createFileRoute("/")({
   component: Index,
-  loader: async () => {
-    const { data } = await supabase
-      .from("profiles")
-      .select("*")
-      .limit(1)
-      .single();
-
-    return { profile: data };
+  loader: async ({ context }) => {
+    context.queryClient.ensureQueryData(getProfileOptions);
   },
 });
 
 function Index() {
-  const { profile } = Route.useLoaderData();
+  const { data: profile } = useSuspenseQuery(getProfileOptions);
 
   return (
     <div className="relative flex min-h-dvh w-full flex-col items-center bg-background">

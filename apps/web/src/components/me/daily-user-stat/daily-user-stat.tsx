@@ -1,94 +1,80 @@
 import * as React from "react";
-import { ChevronDown, ChevronRight } from "lucide-react";
-import { getRouteApi } from "@tanstack/react-router";
+import { DateTime } from "luxon";
+import { useSuspenseQuery, useSuspenseQueries } from "@tanstack/react-query";
 
+import { DailyIntake } from "./daily-intake";
 import {
-  Collapsible,
-  CollapsibleContent,
-  CollapsibleTrigger,
-} from "@/components/ui/collapsible";
-import { UserHealthInfoStat } from "./user-health-info-stat";
-import { UserGoalStat } from "./user-goal-stat";
-import { DailyIntake, type DailyIntakeData } from "./daily-intake";
-import { DailyGoalIntake, type DailyGoalIntakeData } from "./daily-goal-intake";
+  getLatestHealthInfo,
+  getOrCreateDailyIntake,
+  getOrCreateGoal,
+  getProfileOptions,
+} from "@/lib/queries";
+import { convertToRangeOfDayUTCTime } from "@/lib/utils";
 
 export function DailyUserStat() {
-  const [isCollapsibleOpen, setIsCollapsibleOpen] = React.useState(false);
-  const routeApi = getRouteApi("/(user)/_layout/me");
-  const {
-    profile,
-    userGoal,
-    currentLocalDateTime,
-    healthInfo,
-    dailyIntake,
-    dailyMealsWithFoods,
-  } = routeApi.useLoaderData();
+  const { data: profile } = useSuspenseQuery(getProfileOptions);
 
-  const dailyGoalIntakeData = {
-    llmDescription: dailyIntake.llm_description,
-    goalCalories: dailyIntake.goal_calories_kcal,
-    goalCarbohydrate: dailyIntake.goal_carbohydrate_g,
-    goalFat: dailyIntake.goal_fat_g,
-    goalProtein: dailyIntake.goal_protein_g,
-  } satisfies DailyGoalIntakeData;
+  const currentLocalDateTime = DateTime.now()
+    .setZone(profile.timezone)
+    .toFormat("yyyy-MM-dd");
 
-  // const dailyIntakeData = {
-  //   calories: dailyIntake.intake_calories_kcal,
-  //   carbohydrates: dailyIntake.intake_carbohydrate_g,
-  //   protein: dailyIntake.intake_protein_g,
-  //   fat: dailyIntake.intake_fat_g,
-  // } satisfies DailyIntakeData;
+  const { utcStartTimeOfDay, utcEndTimeOfDay } = convertToRangeOfDayUTCTime({
+    localDate: currentLocalDateTime,
+    timeZone: profile.timezone,
+  });
+
+  // TODO: handle error
+  if (!utcStartTimeOfDay || !utcEndTimeOfDay) {
+    throw new Error("failed to get start and end time of day");
+  }
+
+  const [
+    { data: userGoal },
+    { data: dailyIntake },
+    { data: latestHealthInfo },
+  ] = useSuspenseQueries({
+    queries: [
+      {
+        queryKey: ["userGoal"],
+        queryFn: getOrCreateGoal,
+      },
+      {
+        queryKey: ["dailyIntake"],
+        queryFn: () =>
+          getOrCreateDailyIntake({
+            utcStartOfRange: utcStartTimeOfDay,
+            utcEndOfRange: utcEndTimeOfDay,
+          }),
+      },
+      {
+        queryKey: ["latestHealthInfo"],
+        queryFn: getLatestHealthInfo,
+      },
+    ],
+  });
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex items-center gap-4 text-lg font-semibold">
-        <div className="flex items-center gap-2">
+    <div className="flex flex-col rounded-md border border-border p-2">
+      <div className="flex items-center text-lg font-semibold">
+        <div className="flex items-center">
           <span>{currentLocalDateTime}</span>
           <span>
             @{profile.timezone === "Asia/Seoul" ? "Seoul" : "New York"}
           </span>
         </div>
 
-        <div className="flex items-center gap-4">
-          <UserHealthInfoStat profile={profile} healthInfo={healthInfo} />
-          <UserGoalStat userGoal={userGoal} profile={profile} />
-        </div>
+        <div className="flex items-center gap-4"></div>
       </div>
 
-      <Collapsible
-        open={isCollapsibleOpen}
-        onOpenChange={setIsCollapsibleOpen}
-        className="relative min-h-10"
-      >
-        <CollapsibleTrigger className="absolute top-1 flex items-center gap-6">
-          {isCollapsibleOpen ? (
-            <ChevronDown size={24} />
-          ) : (
-            <ChevronRight size={24} />
-          )}
-          {!isCollapsibleOpen && (
-            <span className="font-bold">
-              {profile.language === "ko" ? "더보기" : "More"}
-            </span>
-          )}
-        </CollapsibleTrigger>
-
-        <CollapsibleContent className="ml-12 flex flex-col gap-2">
-          <div className="grid justify-between gap-4 xs:grid-cols-2 sm:grid-cols-3">
-            <DailyGoalIntake
-              profile={profile}
-              currentDate={currentLocalDateTime}
-              dailyGoalIntakeData={dailyGoalIntakeData}
-            />
-
-            <DailyIntake
-              profile={profile}
-              dailyMealsData={dailyMealsWithFoods}
-              className="h-full"
-            />
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
+      {/* REVIEW: if suspense is not working, create a new component for this */}
+      <React.Suspense fallback={<div>Loading...</div>}>
+        <DailyIntake
+          dailyIntake={dailyIntake}
+          profile={profile}
+          userGoal={userGoal}
+          latestHealthInfo={latestHealthInfo}
+        />
+      </React.Suspense>
     </div>
   );
 }

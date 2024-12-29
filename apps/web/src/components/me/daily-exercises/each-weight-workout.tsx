@@ -15,7 +15,7 @@ import {
 import { SetInfo } from "@/components/me/daily-exercises/set-info";
 
 interface EachWeightWorkoutProps {
-  eachWeightWorkoutData: DailyWeightsExercisesWithAllInfos[number]["each_weights_exercises"][number];
+  eachWeightWorkoutData: DailyWeightsExercisesWithAllInfos[number]["eachWeightsExercises"][number];
 }
 
 export function EachWeightWorkout({
@@ -32,22 +32,20 @@ export function EachWeightWorkout({
           <div className="flex items-center gap-2">
             <div className="flex items-center gap-1">
               <PersonStanding />
-              {eachWeightWorkoutData.body_part}
+              {eachWeightWorkoutData.bodyPart}
             </div>
 
             <div className="flex items-center gap-1">
               <Dumbbell />
-              {eachWeightWorkoutData.workout_name}
+              {eachWeightWorkoutData.workoutName}
             </div>
           </div>
         </CollapsibleTrigger>
 
         <CollapsibleContent className="ml-3 mt-3 flex flex-col gap-2 border-l pl-3">
-          {eachWeightWorkoutData.each_weights_exercises_set_info.map(
-            (setInfo) => (
-              <SetInfo key={setInfo.id} setInfoData={setInfo} />
-            ),
-          )}
+          {eachWeightWorkoutData.weightsSetInfo.map((setInfo) => (
+            <SetInfo key={setInfo.id} setInfoData={setInfo} />
+          ))}
         </CollapsibleContent>
       </Collapsible>
     </div>

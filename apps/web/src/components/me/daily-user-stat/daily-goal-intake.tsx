@@ -1,12 +1,9 @@
 import * as React from "react";
 import { Bot, RotateCw, Star, X } from "lucide-react";
-import { z } from "zod";
-import { DateTime } from "luxon";
 import { toast } from "sonner";
 import { useQueryClient, useQuery, useMutation } from "@tanstack/react-query";
 
-import { supabase } from "@/lib/supabase";
-import { type Database } from "@/lib/types/database.types";
+import { type Profile } from "@/lib/queries";
 import { cn, convertToRangeOfDayUTCTime } from "@/lib/utils";
 import { InfoField } from "@/components/me/info-fields";
 import { insertDailyGoalIntakeSchema } from "@/lib/schemas/intake.schema";
@@ -35,14 +32,12 @@ export interface DailyGoalIntakeData {
 }
 
 interface DailyTargetIntakeProps {
-  profile: Database["public"]["Tables"]["profiles"]["Row"];
   currentDate: string;
   className?: string;
   dailyGoalIntakeData: DailyGoalIntakeData;
 }
 
 export function DailyGoalIntake({
-  profile,
   currentDate,
   className,
   dailyGoalIntakeData,

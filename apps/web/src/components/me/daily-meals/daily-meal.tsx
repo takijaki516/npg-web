@@ -1,17 +1,16 @@
 import { Clock, Settings, X } from "lucide-react";
 import { DateTime } from "luxon";
 
-import { type Database } from "@/lib/types/database.types";
-import { type DailyMealsWithFoods } from "@/lib/queries";
+import type { DailyMealsWithFoods, Profile } from "@/lib/queries";
 import { DailyFood } from "./daily-food";
 
 interface DailyMealProps {
   dailyMealData: DailyMealsWithFoods[number];
-  profile: Database["public"]["Tables"]["profiles"]["Row"];
+  profile: Profile;
 }
 
 export function DailyMeal({ dailyMealData, profile }: DailyMealProps) {
-  const localTime = DateTime.fromISO(dailyMealData.meal_time, {
+  const localTime = DateTime.fromISO(dailyMealData.mealTime, {
     zone: profile.timezone,
   }).toFormat("HH:mm");
 

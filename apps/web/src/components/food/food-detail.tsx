@@ -1,7 +1,7 @@
-import { type Database } from "../../../../../from-next/src/lib/types/database.types";
+import type { Profile } from "@/lib/queries";
 
 interface FoodDetailProps {
-  profile: Database["public"]["Tables"]["profiles"]["Row"];
+  profile: Profile;
   name: string;
   calories: number;
   carbohydrate: number;

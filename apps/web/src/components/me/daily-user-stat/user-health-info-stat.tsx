@@ -6,11 +6,11 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import type { Database } from "@/lib/types/database.types";
+import type { HealthInfo, Profile } from "@/lib/queries";
 
 interface UserHealthInfoStatProps {
-  healthInfo: Database["public"]["Tables"]["health_info"]["Row"] | null;
-  profile: Database["public"]["Tables"]["profiles"]["Row"];
+  healthInfo?: HealthInfo | null | undefined;
+  profile: Profile;
 }
 
 export function UserHealthInfoStat({
@@ -36,7 +36,7 @@ export function UserHealthInfoStat({
   let healthInfoFreshness: "outdated" | "moderate" | "fresh" = "outdated";
 
   const healthInfoDateUTC = DateTime.fromFormat(
-    healthInfo.measured_date,
+    healthInfo.measuredData,
     "yyyy-MM-dd",
     { zone: "utc" },
   ).toMillis();

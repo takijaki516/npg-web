@@ -1,7 +1,7 @@
 import { User2, Settings } from "lucide-react";
 import { Link } from "@tanstack/react-router";
+import type { Profile } from "@/lib/queries";
 
-import type { Database } from "@/lib/types/database.types";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,7 +15,7 @@ import { UserSignoutButton } from "./user-signout-button";
 
 interface UserDropdownProps {
   align: "start" | "center" | "end";
-  profile: Database["public"]["Tables"]["profiles"]["Row"];
+  profile: Profile;
 }
 
 export function UserDropdown({ align, profile }: UserDropdownProps) {
@@ -28,7 +28,7 @@ export function UserDropdown({ align, profile }: UserDropdownProps) {
       </DropdownMenuTrigger>
 
       <DropdownMenuContent align={align} className="space-y-1">
-        <DropdownMenuLabel>Hello, {profile.username}</DropdownMenuLabel>
+        <DropdownMenuLabel>Hello, {profile.email}</DropdownMenuLabel>
 
         <DropdownMenuSeparator />
 

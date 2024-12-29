@@ -1,32 +1,27 @@
-import { supabase } from "@/lib/supabase";
+import { honoClient } from "../hono";
 
-export const getOrCreateGoal = async ({
-  email,
-  userId,
-}: {
-  email: string;
-  userId: string;
-}) => {
-  const { data } = await supabase
-    .from("user_goals")
-    .select("*")
-    .eq("user_email", email)
-    .limit(1)
-    .single();
+export const getOrCreateGoal = async () => {
+  const res = await honoClient.user.goal.$get();
 
-  if (!data) {
-    const { data: newGoalData, error } = await supabase
-      .from("user_goals")
-      .insert({ user_email: email, user_id: userId })
-      .select("*")
-      .single();
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    return newGoalData;
+  if (!res.ok) {
+    throw new Error("failed to get goal");
   }
 
-  return data;
+  const body = await res.json();
+
+  if (!body.goal) {
+    const newGoalRes = await honoClient.user.goal.$post();
+
+    if (!newGoalRes.ok) {
+      throw new Error("failed to create goal");
+    }
+
+    const newGoalBody = await newGoalRes.json();
+
+    return newGoalBody.goal;
+  }
+
+  return body.goal;
 };
+
+export type UserGoal = NonNullable<Awaited<ReturnType<typeof getOrCreateGoal>>>;

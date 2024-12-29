@@ -4,8 +4,8 @@ import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { authClient } from "@/lib/better-auth";
 
-import { supabase } from "@/lib/supabase";
 import { authSchema } from "@/lib/schemas/auth.schema";
 import {
   Card,
@@ -32,33 +32,20 @@ function RouteComponent() {
   });
 
   const onSubmit = async (values: z.infer<typeof authSchema>) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email: values.email,
-      password: values.password,
-    });
-
-    if (error) {
-      toast.error(
-        "로그인에 실패하였습니다.\n" +
-          "이메일 또는 비밀번호를 확인해주세요.\n" +
-          "회원가입을 진행하지 않았다면 회원가입을 진행해주세요.\n",
-        {
-          style: {
-            whiteSpace: "pre-line",
-          },
-        },
-      );
-      return;
-    }
-
+    console.log(
+      "🚀 ~ file: _auth.login.lazy.tsx:35 ~ onSubmit ~ values:",
+      values,
+    );
     router.navigate({ to: "/" });
   };
 
   async function handleLoginWithGoogle() {
-    await supabase.auth.signInWithOAuth({
+    await authClient.signIn.social({
       provider: "google",
-      options: {
-        redirectTo: "http://localhost:3000/api/auth/callback",
+      fetchOptions: {
+        onSuccess: () => {
+          router.navigate({ to: "/" });
+        },
       },
     });
   }

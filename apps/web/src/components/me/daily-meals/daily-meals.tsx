@@ -1,12 +1,37 @@
 import { CookingPot, SearchX } from "lucide-react";
-import { getRouteApi } from "@tanstack/react-router";
+import { useSuspenseQuery } from "@tanstack/react-query";
+import { DateTime } from "luxon";
 
-import { AddMealDialog } from "../add-meals-dialog/add-meal-dialog";
+import {
+  getDailyMealsWithFoodsOptions,
+  getProfileOptions,
+} from "@/lib/queries";
 import { DailyMeal } from "./daily-meal";
+import { convertToRangeOfDayUTCTime } from "@/lib/utils";
 
 export function DailyMealsCard() {
-  const routeApi = getRouteApi("/(user)/_layout/me");
-  const { profile, dailyMealsWithFoods } = routeApi.useLoaderData();
+  const { data: profile } = useSuspenseQuery(getProfileOptions);
+
+  // get current local date time
+  const currentLocalDateTime = DateTime.now()
+    .setZone(profile.timezone)
+    .toFormat("yyyy-MM-dd");
+
+  const { utcStartTimeOfDay, utcEndTimeOfDay } = convertToRangeOfDayUTCTime({
+    localDate: currentLocalDateTime,
+    timeZone: profile.timezone,
+  });
+
+  if (!utcStartTimeOfDay || !utcEndTimeOfDay) {
+    throw new Error("failed to get start and end time of day");
+  }
+
+  const { data: dailyMealsWithFoods } = useSuspenseQuery(
+    getDailyMealsWithFoodsOptions({
+      utcStartOfRange: utcStartTimeOfDay,
+      utcEndOfRange: utcEndTimeOfDay,
+    }),
+  );
 
   return (
     <div className="flex flex-col gap-4">
@@ -18,7 +43,7 @@ export function DailyMealsCard() {
           </div>
         </div>
 
-        <AddMealDialog profile={profile} />
+        {/* <AddMealDialog profile={profile} /> */}
       </div>
 
       {dailyMealsWithFoods.length === 0 && (

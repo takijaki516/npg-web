@@ -7,7 +7,6 @@ import {
   Utensils,
 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import type { Database } from "@/lib/types/database.types";
 
 import { NavUser } from "./nav-user";
 
@@ -40,11 +39,7 @@ const NAVS = [
   },
 ];
 
-interface AppSidebarProps {
-  profile: Database["public"]["Tables"]["profiles"]["Row"];
-}
-
-export function AppSidebar({ profile }: AppSidebarProps) {
+export function Sidebar() {
   return (
     <div className="sticky top-0 hidden h-dvh w-[90px] flex-col items-center justify-between overflow-hidden bg-sidebar py-4 md:flex">
       <div className="flex w-full flex-col items-center px-2">
@@ -69,7 +64,7 @@ export function AppSidebar({ profile }: AppSidebarProps) {
         </ul>
       </div>
 
-      <NavUser profile={profile} />
+      <NavUser />
     </div>
   );
 }

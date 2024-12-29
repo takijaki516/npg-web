@@ -1,7 +1,5 @@
 {
-  "name": "vite",
-  "private": true,
-  "version": "0.0.0",
+  "name": "@repo/web",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -10,6 +8,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@repo/backend": "workspace:*",
     "@hookform/resolvers": "^3.9.1",
     "@radix-ui/react-alert-dialog": "^1.1.4",
     "@radix-ui/react-avatar": "^1.1.2",

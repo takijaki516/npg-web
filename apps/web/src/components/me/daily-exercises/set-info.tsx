@@ -1,7 +1,7 @@
 import { type DailyWeightsExercisesWithAllInfos } from "@/lib/queries";
 
 interface SetInfoProps {
-  setInfoData: DailyWeightsExercisesWithAllInfos[number]["each_weights_exercises"][number]["each_weights_exercises_set_info"][number];
+  setInfoData: DailyWeightsExercisesWithAllInfos[number]["eachWeightsExercises"][number]["weightsSetInfo"][number];
 }
 
 export function SetInfo({ setInfoData }: SetInfoProps) {
@@ -9,7 +9,6 @@ export function SetInfo({ setInfoData }: SetInfoProps) {
     <div className="flex items-center gap-2">
       <div>
         <span>#</span>
-        <span>{setInfoData.set_number}</span>
       </div>
 
       <div>
@@ -19,7 +18,7 @@ export function SetInfo({ setInfoData }: SetInfoProps) {
 
       <div>
         <span>무게:</span>
-        <span>{setInfoData.kg}</span>
+        <span>{setInfoData.weight}</span>
       </div>
     </div>
   );

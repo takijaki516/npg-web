@@ -1,19 +1,22 @@
-import { supabase } from "@/lib/supabase";
+import { queryOptions } from "@tanstack/react-query";
+import { honoClient } from "@/lib/hono";
 
-export async function getProfile() {
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("*")
-    .limit(1)
-    .single();
+async function getProfile() {
+  const res = await honoClient.user.profile.$get();
 
-  if (error) {
-    throw new Error(error.message);
+  if (!res.ok) {
+    throw new Error("failed to get profile");
   }
 
-  if (!data) {
-    throw new Error("User not found");
-  }
+  const body = await res.json();
 
-  return data;
+  return body.profile;
 }
+
+export const getProfileOptions = queryOptions({
+  queryKey: ["profile"],
+  queryFn: getProfile,
+  staleTime: 5000,
+});
+
+export type Profile = NonNullable<Awaited<ReturnType<typeof getProfile>>>;

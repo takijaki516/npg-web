@@ -6,18 +6,15 @@ import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import "./index.css";
 
 import { routeTree } from "./routeTree.gen";
-import { AuthProvider, useAuth } from "./auth";
 
 const queryClient = new QueryClient();
 
 const router = createRouter({
   routeTree,
   context: {
-    auth: {
-      session: null,
-      isLoading: true,
-    },
     queryClient,
+    session: null,
+    user: null,
   },
   defaultPreload: "intent",
 });
@@ -28,17 +25,8 @@ declare module "@tanstack/react-router" {
   }
 }
 
-function InAuth() {
-  const auth = useAuth();
-  return <RouterProvider router={router} context={{ auth }} />;
-}
-
 function App() {
-  return (
-    <AuthProvider>
-      <InAuth />
-    </AuthProvider>
-  );
+  return <RouterProvider router={router} />;
 }
 
 const rootElement = document.getElementById("root")!;

@@ -4,7 +4,8 @@ import { useFieldArray, useForm } from "react-hook-form";
 import { Clock, Plus } from "lucide-react";
 import { DateTime } from "luxon";
 
-import { supabase } from "@/lib/supabase";
+import type { Profile } from "@/lib/queries";
+
 import {
   Dialog,
   DialogContent,
@@ -12,14 +13,14 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { Database } from "@/lib/types/database.types";
+
 import { insertDailyWeightsExerciseSchema } from "@/lib/schemas/exercise.schema";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { WeightWorkoutForm } from "./add-workout-weights";
 import { TimePicker } from "@/components/time-picker";
 
 interface AddWorkoutDialogProps {
-  profile: Database["public"]["Tables"]["profiles"]["Row"];
+  profile: Profile;
 }
 
 export function AddWorkoutDialog({ profile }: AddWorkoutDialogProps) {
@@ -70,8 +71,8 @@ export function AddWorkoutDialog({ profile }: AddWorkoutDialogProps) {
       body_part: "arms",
       workout_name: "barbell-curl",
       weights_workouts_sets: [],
-      user_email: profile.user_email,
-      user_id: profile.user_id!, // NOTE: user_id is not nullable
+      user_email: profile.email,
+      user_id: profile.id, // NOTE: user_id is not nullable
     });
   }
 

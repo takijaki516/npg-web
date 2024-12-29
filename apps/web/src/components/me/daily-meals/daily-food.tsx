@@ -1,7 +1,7 @@
 import * as React from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 
-import { type DailyMealsWithFoods } from "@/lib/queries";
+import type { DailyMealsWithFoods, Profile } from "@/lib/queries";
 import {
   Collapsible,
   CollapsibleContent,
@@ -9,46 +9,22 @@ import {
 } from "@/components/ui/collapsible";
 import { FoodImage } from "@/components/food/food-image";
 import { FoodDetail } from "@/components/food/food-detail";
-// import { S3GetObjPresignResponse } from "@/app/api/s3-get-presign/route";
-import { type Database } from "@/lib/types/database.types";
 
 interface DailyFoodProps {
   food: DailyMealsWithFoods[number]["foods"][number];
-  profile: Database["public"]["Tables"]["profiles"]["Row"];
+  profile: Profile;
 }
 
 export function DailyFood({ food, profile }: DailyFoodProps) {
   const [isCollapsibleOpen, setIsCollapsibleOpen] = React.useState(false);
-  const [imageUrl, setImageUrl] = React.useState(food.pic_url ?? "");
-
-  // React.useEffect(() => {
-  //   const getPresignedUrl = async () => {
-  //     if (imageUrl) {
-  //       const res = await fetch("/api/s3-get-presign", {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //         },
-  //         body: JSON.stringify({
-  //           fileUUID: imageUrl,
-  //         }),
-  //       });
-
-  //       const data: S3GetObjPresignResponse = await res.json();
-
-  //       setImageUrl(data.url);
-  //     }
-  //   };
-
-  //   getPresignedUrl();
-  // }, []);
+  const [imageUrl, setImageUrl] = React.useState(food.foodPic ?? "");
 
   return (
     <Collapsible open={isCollapsibleOpen} onOpenChange={setIsCollapsibleOpen}>
       <CollapsibleTrigger className="flex w-full items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           {isCollapsibleOpen ? <ChevronDown /> : <ChevronRight />}
-          <span>{food.food_name}</span>
+          <span>{food.foodName}</span>
         </div>
       </CollapsibleTrigger>
 
@@ -59,11 +35,11 @@ export function DailyFood({ food, profile }: DailyFoodProps) {
 
         <FoodDetail
           profile={profile}
-          name={food.food_name ?? ""}
-          calories={food.calories ?? 0}
-          carbohydrate={food.carbohydrate ?? 0}
-          protein={food.protein ?? 0}
-          fat={food.fat ?? 0}
+          name={food.foodName}
+          calories={food.foodCaloriesKcal}
+          carbohydrate={food.foodCarbohydratesG}
+          protein={food.foodProteinG}
+          fat={food.foodFatG}
         />
       </CollapsibleContent>
     </Collapsible>

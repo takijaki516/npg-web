@@ -1,13 +1,15 @@
-import { Navbar } from "@/components/navbar";
 import { createFileRoute, Outlet, redirect } from "@tanstack/react-router";
 import { z } from "zod";
 
+import { Navbar } from "@/components/navbar";
+
 export const Route = createFileRoute("/(auth)/_auth")({
+  // REVIEW:
   validateSearch: z.object({
     redirect: z.string().optional().catch(""),
   }),
   beforeLoad: ({ context, search }) => {
-    if (context.auth.session) {
+    if (context.session) {
       throw redirect({ to: search.redirect || "/" });
     }
   },
@@ -17,7 +19,7 @@ export const Route = createFileRoute("/(auth)/_auth")({
 function RouteComponent() {
   return (
     <div className="relative flex min-h-dvh w-full flex-col items-center bg-background">
-      <Navbar profile={null} />
+      <Navbar user={null} />
       <Outlet />
     </div>
   );

@@ -6,15 +6,15 @@ import { DailyMealsCard } from "./daily-meals/daily-meals";
 export function BentoDashboard() {
   return (
     <BentoGrid className="grid w-full gap-4 md:grid-cols-2">
-      <BentoGridItem className="rounded-xl p-4 md:col-span-full">
+      <BentoGridItem className="rounded-xl md:col-span-full">
         <DailyUserStat />
       </BentoGridItem>
 
-      <BentoGridItem className="hidden rounded-xl p-4 md:inline-block">
+      <BentoGridItem className="hidden rounded-xl md:inline-block">
         <DailyExercisesCard />
       </BentoGridItem>
 
-      <BentoGridItem className="hidden rounded-xl p-4 md:inline-block">
+      <BentoGridItem className="hidden rounded-xl md:inline-block">
         <DailyMealsCard />
       </BentoGridItem>
 

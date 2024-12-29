@@ -30,7 +30,10 @@ export function convertToRangeOfDayUTCTime({
   const startDateTimeSQL = startDateTime.toUTC().toSQL();
   const endDateTimeSQL = endDateTime.toUTC().toSQL();
 
-  return { startTimeOfDay: startDateTimeSQL, endTimeOfDay: endDateTimeSQL };
+  return {
+    utcStartTimeOfDay: startDateTimeSQL,
+    utcEndTimeOfDay: endDateTimeSQL,
+  };
 }
 
 /**

@@ -1,42 +1,44 @@
-import { supabase } from "@/lib/supabase";
+import { honoClient } from "@/lib/hono";
 
 export const getOrCreateDailyIntake = async ({
-  userEmail,
-  userId,
   utcStartOfRange,
   utcEndOfRange,
 }: {
-  userEmail: string;
-  userId: string;
   utcStartOfRange: string;
   utcEndOfRange: string;
 }) => {
-  const { data } = await supabase
-    .from("daily_intakes")
-    .select("*")
-    .eq("user_email", userEmail)
-    .gte("date", utcStartOfRange)
-    .lt("date", utcEndOfRange)
-    .limit(1)
-    .single();
+  const res = await honoClient.user["daily-intake"].$get({
+    query: {
+      startDate: utcStartOfRange,
+      endDate: utcEndOfRange,
+    },
+  });
 
-  if (!data) {
-    const { data: insertedData, error } = await supabase
-      .from("daily_intakes")
-      .insert({
-        user_email: userEmail,
-        user_id: userId,
-        date: utcStartOfRange,
-      })
-      .select("*")
-      .single();
-
-    if (error) {
-      throw new Error(error.message);
-    }
-
-    return insertedData;
+  if (!res.ok) {
+    throw new Error("failed to get daily intake");
   }
 
-  return data;
+  const body = await res.json();
+
+  if (!body.dailyIntake) {
+    const newDailyIntakeRes = await honoClient.user["daily-intake"].$post({
+      json: {
+        date: utcStartOfRange,
+      },
+    });
+
+    if (!newDailyIntakeRes.ok) {
+      throw new Error("failed to create daily intake");
+    }
+
+    const newDailyIntakeBody = await newDailyIntakeRes.json();
+
+    return newDailyIntakeBody.dailyIntake;
+  }
+
+  return body.dailyIntake;
 };
+
+export type DailyIntake = NonNullable<
+  Awaited<ReturnType<typeof getOrCreateDailyIntake>>
+>;

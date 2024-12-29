@@ -1,33 +1,46 @@
-import { supabase } from "@/lib/supabase";
+import { queryOptions } from "@tanstack/react-query";
+import { honoClient } from "@/lib/hono";
 
-export const getDailyWeightsExerciseWithAllInfos = async ({
+const getDailyWeightsExerciseWithAllInfos = async ({
   utcStartOfRange,
   utcEndOfRange,
 }: {
   utcStartOfRange: string;
   utcEndOfRange: string;
 }) => {
-  const { data, error } = await supabase
-    .from("daily_weights_exercises")
-    .select(
-      `
-      *,
-      each_weights_exercises (
-        *,
-        each_weights_exercises_set_info(*)
-      )
-      `,
-    )
-    .gte("start_time", utcStartOfRange)
-    .lt("start_time", utcEndOfRange)
-    .order("start_time", { ascending: true });
+  const res = await honoClient.weights["daily-weights"].$get({
+    query: {
+      startUtcDateTime: utcStartOfRange,
+      endUtcDateTime: utcEndOfRange,
+    },
+  });
 
-  if (error) {
-    throw new Error(error.message);
+  if (!res.ok) {
+    throw new Error("failed to get daily weights exercises");
   }
 
-  return data;
+  const body = await res.json();
+
+  return body.weights;
 };
+
+export function getDailyWeightsExerciseOptions({
+  utcStartOfRange,
+  utcEndOfRange,
+}: {
+  utcStartOfRange: string;
+  utcEndOfRange: string;
+}) {
+  return queryOptions({
+    queryKey: ["dailyWeightsExercises"],
+    queryFn: () =>
+      getDailyWeightsExerciseWithAllInfos({
+        utcStartOfRange,
+        utcEndOfRange,
+      }),
+    staleTime: 5000,
+  });
+}
 
 export type DailyWeightsExercisesWithAllInfos = NonNullable<
   Awaited<ReturnType<typeof getDailyWeightsExerciseWithAllInfos>>

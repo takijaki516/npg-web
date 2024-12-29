@@ -1,30 +1,41 @@
-import { supabase } from "@/lib/supabase";
+import { queryOptions } from "@tanstack/react-query";
+import { honoClient } from "@/lib/hono";
 
-export const getDailyMealsWithFoods = async ({
+const getDailyMealsWithFoods = async ({
   utcStartOfRange,
   utcEndOfRange,
 }: {
   utcStartOfRange: string;
   utcEndOfRange: string;
 }) => {
-  const { data, error } = await supabase
-    .from("meals")
-    .select(
-      `
-      *,
-      foods (*)
-      `,
-    )
-    .gte("meal_time", utcStartOfRange)
-    .lt("meal_time", utcEndOfRange)
-    .order("meal_time", { ascending: true });
+  const res = await honoClient.meals.$get({
+    query: {
+      startUtcDateTime: utcStartOfRange,
+      endUtcDateTime: utcEndOfRange,
+    },
+  });
 
-  if (error) {
-    throw new Error(error.message);
+  if (!res.ok) {
+    throw new Error("failed to get daily meals with foods");
   }
 
-  return data;
+  const body = await res.json();
+
+  return body.meals;
 };
+
+export function getDailyMealsWithFoodsOptions({
+  utcStartOfRange,
+  utcEndOfRange,
+}: {
+  utcStartOfRange: string;
+  utcEndOfRange: string;
+}) {
+  return queryOptions({
+    queryKey: ["dailyMealsWithFoods"],
+    queryFn: () => getDailyMealsWithFoods({ utcStartOfRange, utcEndOfRange }),
+  });
+}
 
 export type DailyMealsWithFoods = NonNullable<
   Awaited<ReturnType<typeof getDailyMealsWithFoods>>

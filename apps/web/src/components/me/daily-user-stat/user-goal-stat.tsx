@@ -5,21 +5,21 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import type { Database } from "@/lib/types/database.types";
+import type { Profile, UserGoal } from "@/lib/queries";
 
 interface UserGoalStatProps {
-  userGoal: Database["public"]["Tables"]["user_goals"]["Row"];
-  profile: Database["public"]["Tables"]["profiles"]["Row"];
+  userGoal: UserGoal;
+  profile: Profile;
 }
 
 export function UserGoalStat({ userGoal, profile }: UserGoalStatProps) {
-  const isUserGoalDataSufficient = userGoal.weight_kg;
+  const isUserGoalDataSufficient = userGoal.weightKg;
 
   const isUserGoalDataPerfect =
     isUserGoalDataSufficient &&
-    userGoal.goal_description &&
-    userGoal.body_fat_mass_kg &&
-    userGoal.skeletal_muscle_mass_kg;
+    userGoal.goalDescription &&
+    userGoal.bodyFatMassKg &&
+    userGoal.skeletalMuscleMassKg;
 
   // conditionally render button
   let ConditionalIcon;

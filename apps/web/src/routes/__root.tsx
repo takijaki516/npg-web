@@ -1,14 +1,15 @@
 import * as React from "react";
 import { Outlet, createRootRouteWithContext } from "@tanstack/react-router";
 import { type QueryClient } from "@tanstack/react-query";
+import type { Session, User } from "better-auth";
 
 import { TanStackRouterDevtools } from "@/components/tanstack-router-devtool";
-import { type AuthContext } from "@/auth";
-import { supabase } from "@/lib/supabase";
+import { authClient } from "@/lib/better-auth";
 
 interface RootRouteContext {
-  auth: AuthContext;
   queryClient: QueryClient;
+  session: Session | null;
+  user: User | null;
 }
 
 export const Route = createRootRouteWithContext<RootRouteContext>()({
@@ -21,10 +22,26 @@ export const Route = createRootRouteWithContext<RootRouteContext>()({
       </React.Suspense>
     </>
   ),
-  beforeLoad: async ({ context }) => {
+  // TODO: add caching
+  beforeLoad: async () => {
     // NOTE: for first render
-    if (context.auth.isLoading) {
-      await supabase.auth.getSession();
+    const { data, error } = await authClient.getSession();
+
+    // TODO: handle error
+    if (error) {
+      throw error;
     }
+
+    if (!data) {
+      return {
+        session: null,
+        user: null,
+      };
+    }
+
+    return {
+      session: data.session,
+      user: data.user,
+    };
   },
 });
