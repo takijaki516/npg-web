@@ -76,6 +76,7 @@ export const weightsSetInfo = pgTable("weights_set_info", {
 
   reps: smallint().notNull(),
   weight: real().notNull(),
+  setNumber: smallint("set_number").notNull(),
 
   createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow().notNull(),

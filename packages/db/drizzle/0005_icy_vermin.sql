@@ -1,0 +1,1 @@
+ALTER TABLE "weights_set_info" ADD COLUMN "set_number" smallint NOT NULL;
