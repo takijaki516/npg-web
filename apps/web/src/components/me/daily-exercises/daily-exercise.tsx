@@ -1,38 +1,19 @@
 import * as React from "react";
-import { BicepsFlexed, SearchX } from "lucide-react";
-import { DateTime } from "luxon";
+import { SearchX } from "lucide-react";
 
-import { getDailyWeightsExerciseOptions, type Profile } from "@/lib/queries";
+import { DailyWeightsExercisesWithAllInfos, type Profile } from "@/lib/queries";
 import { EachWeightWorkout } from "@/components/me/daily-exercises/each-weight-workout";
-import { useSuspenseQuery } from "@tanstack/react-query";
-import { convertToRangeOfDayUTCTime } from "@/lib/utils";
+import { utcToLocalTime } from "@/lib/utils";
 
 interface DailyExerciseProps {
   profile: Profile;
+  dailyWeightsExercises: DailyWeightsExercisesWithAllInfos;
 }
 
-export function DailyExercise({ profile }: DailyExerciseProps) {
-  // get current local date time
-  const currentLocalDateTime = DateTime.now()
-    .setZone(profile.timezone)
-    .toFormat("yyyy-MM-dd");
-
-  const { utcStartTimeOfDay, utcEndTimeOfDay } = convertToRangeOfDayUTCTime({
-    localDate: currentLocalDateTime,
-    timeZone: profile.timezone,
-  });
-
-  if (!utcStartTimeOfDay || !utcEndTimeOfDay) {
-    throw new Error("failed to get start and end time of day");
-  }
-
-  const { data: dailyWeightsExercises } = useSuspenseQuery(
-    getDailyWeightsExerciseOptions({
-      utcStartOfRange: utcStartTimeOfDay,
-      utcEndOfRange: utcEndTimeOfDay,
-    }),
-  );
-
+export function DailyExercise({
+  profile,
+  dailyWeightsExercises,
+}: DailyExerciseProps) {
   return (
     <React.Suspense fallback={<div>Loading...</div>}>
       {dailyWeightsExercises.length === 0 && (
@@ -48,17 +29,28 @@ export function DailyExercise({ profile }: DailyExerciseProps) {
 
       {dailyWeightsExercises.length > 0 &&
         dailyWeightsExercises.map((dailyExerciseItem) => {
-          return (
-            <div className="flex flex-col rounded-md border p-2">
-              <BicepsFlexed />
+          const localDateTime = utcToLocalTime({
+            utcTime: dailyExerciseItem.startTime,
+            timezone: profile.timezone,
+          });
 
-              <div>
-                <span>시작시간:</span>
-                <span>{dailyExerciseItem.startTime}</span>
-              </div>
-              <div>
-                <span>종료시간:</span>
-                <span>{dailyExerciseItem.endTime}</span>
+          const [hh, mm] = localDateTime.split(" ")[1].split(":");
+
+          return (
+            <div
+              className="flex flex-col gap-2 rounded-md border p-2"
+              key={dailyExerciseItem.id}
+            >
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <span>시작시간</span>
+                  <span>{`${hh}:${mm}`}</span>
+                </div>
+
+                <div className="flex items-center gap-2">
+                  <span>운동시간</span>
+                  <span>{dailyExerciseItem.durationMinutes}분</span>
+                </div>
               </div>
 
               {dailyExerciseItem.eachWeightsExercises.map((eachWeights) => {

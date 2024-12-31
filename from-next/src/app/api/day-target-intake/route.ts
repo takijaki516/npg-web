@@ -40,7 +40,7 @@ export async function POST(req: Request) {
     }
 
     const localDate = DateTime.fromFormat(current_date, "yyyy-MM-dd").setZone(
-      profile.timezone,
+      profile.timezone
     );
     const twoWeeksAgoLocalDate = localDate.minus({ weeks: 2 });
 
@@ -57,7 +57,7 @@ export async function POST(req: Request) {
     const userGoal = await supabase
       .from("user_goals")
       .select(
-        "user_email, weight_kg, body_fat_mass_kg, skeletal_muscle_mass_kg, goal_description",
+        "user_email, weight_kg, body_fat_mass_kg, skeletal_muscle_mass_kg, goal_description"
       )
       .limit(1)
       .single();
@@ -65,7 +65,7 @@ export async function POST(req: Request) {
     const healthInfo = await supabase
       .from("health_info")
       .select(
-        "user_email, measured_date, height_cm, weight_kg, body_fat_mass_kg, skeletal_muscle_mass_kg, age",
+        "user_email, measured_date, height_cm, weight_kg, body_fat_mass_kg, skeletal_muscle_mass_kg, age"
       )
       .order("measured_date", { ascending: false })
       .limit(1)
@@ -82,7 +82,7 @@ export async function POST(req: Request) {
       total_fat,
       total_protein,
       foods(calories, food_name, protein, fat, carbohydrate)
-      `,
+      `
       )
       .gte("meal_time", startUTCTimeOfTwoWeeksAgo)
       .lt("meal_time", endUTCTime)
@@ -171,14 +171,14 @@ USER DATA END
 ---
 
 Calculate the appropriate target intake for the time range from ${startUTCTimeOfDay} to ${endUTCTimeOfDay}.
-Provide the description of the target intake too.
-For example,
+Provide an appropriate explanation how you calculated the target intake so that the user can understand.
+Here is example of explanations,
 - "Your information data shows that you are a person who is trying to lose weight. So, your target intake should be lower than your average intake"
 - "You did not provide sufficient information about your goal. So, Here is the general target intake for your age and gender."
 
 
 Generate the response in ${userLanguage} language.
-Use the JSON schema for the response!!
+Use the JSON schema for the response!
 `;
 
   return SYSTEM_PROMPT;

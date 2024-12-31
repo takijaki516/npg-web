@@ -2,6 +2,11 @@ import * as React from "react";
 import { Check, ChevronDown } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
+import {
+  insertDailyWeightsExerciseSchema,
+  WEIGHT_BODY_PARTS,
+  WORKOUT_OPTIONS,
+} from "@repo/shared-schema";
 
 import {
   Command,
@@ -16,8 +21,6 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
-import { WEIGHT_BODY_PARTS, WORKOUT_OPTIONS } from "@/lib/types/exercise.types";
-import { insertDailyWeightsExerciseSchema } from "@/lib/schemas/exercise.schema";
 
 interface ComboboxProps {
   placeholder: string;
@@ -59,7 +62,7 @@ export function Combobox({
           aria-expanded={open}
           className="relative flex w-[200px] justify-between"
         >
-          {value ? value : placeholder}
+          {value ?? placeholder}
           <ChevronDown className="absolute right-2 h-9 rounded-md bg-background/80" />
         </Button>
       </PopoverTrigger>
@@ -80,10 +83,11 @@ export function Combobox({
                     onSelect={() => {
                       setValue(opt);
                       setOpen(false);
+                      // REVIEW:
                       if (options.setLatestSelectedBodyPart) {
                         options.setLatestSelectedBodyPart(opt);
                         form.setValue(
-                          `weights_workouts.${workoutIdx}.body_part`,
+                          `weightsWorkouts.${workoutIdx}.bodyPart`,
                           opt,
                         );
                       }
@@ -111,7 +115,7 @@ export function Combobox({
                       setValue(opt);
                       setOpen(false);
                       form.setValue(
-                        `weights_workouts.${workoutIdx}.workout_name`,
+                        `weightsWorkouts.${workoutIdx}.workoutName`,
                         opt,
                       );
                     }}

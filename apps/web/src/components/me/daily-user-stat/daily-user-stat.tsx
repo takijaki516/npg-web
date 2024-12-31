@@ -1,50 +1,31 @@
 import * as React from "react";
-import { DateTime } from "luxon";
-import { useSuspenseQuery, useSuspenseQueries } from "@tanstack/react-query";
+import { useSuspenseQueries } from "@tanstack/react-query";
 
+import { UserHealthInfoStat } from "./user-health-info-stat";
+import { UserGoalStat } from "./user-goal-stat";
 import { DailyIntake } from "./daily-intake";
 import {
   getLatestHealthInfo,
-  getOrCreateDailyIntake,
   getOrCreateGoal,
-  getProfileOptions,
+  type Profile,
 } from "@/lib/queries";
-import { convertToRangeOfDayUTCTime } from "@/lib/utils";
 
-export function DailyUserStat() {
-  const { data: profile } = useSuspenseQuery(getProfileOptions);
+interface DailyUserStatProps {
+  profile: Profile;
+  currentLocalDateTime: string;
+}
 
-  const currentLocalDateTime = DateTime.now()
-    .setZone(profile.timezone)
-    .toFormat("yyyy-MM-dd");
+export function DailyUserStat({
+  profile,
+  currentLocalDateTime,
+}: DailyUserStatProps) {
+  const justDate = currentLocalDateTime.split(" ")[0];
 
-  const { utcStartTimeOfDay, utcEndTimeOfDay } = convertToRangeOfDayUTCTime({
-    localDate: currentLocalDateTime,
-    timeZone: profile.timezone,
-  });
-
-  // TODO: handle error
-  if (!utcStartTimeOfDay || !utcEndTimeOfDay) {
-    throw new Error("failed to get start and end time of day");
-  }
-
-  const [
-    { data: userGoal },
-    { data: dailyIntake },
-    { data: latestHealthInfo },
-  ] = useSuspenseQueries({
+  const [{ data: userGoal }, { data: latestHealthInfo }] = useSuspenseQueries({
     queries: [
       {
         queryKey: ["userGoal"],
         queryFn: getOrCreateGoal,
-      },
-      {
-        queryKey: ["dailyIntake"],
-        queryFn: () =>
-          getOrCreateDailyIntake({
-            utcStartOfRange: utcStartTimeOfDay,
-            utcEndOfRange: utcEndTimeOfDay,
-          }),
       },
       {
         queryKey: ["latestHealthInfo"],
@@ -55,24 +36,25 @@ export function DailyUserStat() {
 
   return (
     <div className="flex flex-col rounded-md border border-border p-2">
-      <div className="flex items-center text-lg font-semibold">
+      <div className="flex items-center gap-4 text-lg font-semibold">
         <div className="flex items-center">
-          <span>{currentLocalDateTime}</span>
+          <span>{justDate}</span>
           <span>
             @{profile.timezone === "Asia/Seoul" ? "Seoul" : "New York"}
           </span>
         </div>
 
-        <div className="flex items-center gap-4"></div>
+        <div className="flex items-center gap-1">
+          <UserHealthInfoStat profile={profile} healthInfo={latestHealthInfo} />
+          <UserGoalStat profile={profile} userGoal={userGoal} />
+        </div>
       </div>
 
       {/* REVIEW: if suspense is not working, create a new component for this */}
       <React.Suspense fallback={<div>Loading...</div>}>
         <DailyIntake
-          dailyIntake={dailyIntake}
           profile={profile}
-          userGoal={userGoal}
-          latestHealthInfo={latestHealthInfo}
+          currentLocalDateTime={currentLocalDateTime}
         />
       </React.Suspense>
     </div>

@@ -1,16 +1,20 @@
 import { honoClient } from "@/lib/hono";
 
 export const getOrCreateDailyIntake = async ({
-  utcStartOfRange,
-  utcEndOfRange,
+  currentLocalDateTime,
+  timezone,
 }: {
-  utcStartOfRange: string;
-  utcEndOfRange: string;
+  currentLocalDateTime: string;
+  timezone: string;
 }) => {
+  console.log(
+    "🚀 ~ file: daily-intake.ts:10 ~ currentLocalDateTime:",
+    currentLocalDateTime,
+  );
   const res = await honoClient.user["daily-intake"].$get({
     query: {
-      startDate: utcStartOfRange,
-      endDate: utcEndOfRange,
+      currentLocalDateTime: currentLocalDateTime,
+      timezone: timezone,
     },
   });
 
@@ -19,22 +23,6 @@ export const getOrCreateDailyIntake = async ({
   }
 
   const body = await res.json();
-
-  if (!body.dailyIntake) {
-    const newDailyIntakeRes = await honoClient.user["daily-intake"].$post({
-      json: {
-        date: utcStartOfRange,
-      },
-    });
-
-    if (!newDailyIntakeRes.ok) {
-      throw new Error("failed to create daily intake");
-    }
-
-    const newDailyIntakeBody = await newDailyIntakeRes.json();
-
-    return newDailyIntakeBody.dailyIntake;
-  }
 
   return body.dailyIntake;
 };

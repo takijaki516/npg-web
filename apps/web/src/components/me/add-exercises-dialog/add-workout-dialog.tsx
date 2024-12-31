@@ -1,11 +1,15 @@
 import * as React from "react";
 import { z } from "zod";
-import { useFieldArray, useForm } from "react-hook-form";
-import { Clock, Plus } from "lucide-react";
-import { DateTime } from "luxon";
+import { useFieldArray, useForm, Controller } from "react-hook-form";
+import { Plus } from "lucide-react";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
+import { insertDailyWeightsExerciseSchema } from "@repo/shared-schema";
 
+import { honoClient } from "@/lib/hono";
 import type { Profile } from "@/lib/queries";
-
+import { WeightWorkoutForm } from "./add-workout-weights";
+import { TimePicker } from "@/components/time-picker";
 import {
   Dialog,
   DialogContent,
@@ -13,66 +17,44 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-
-import { insertDailyWeightsExerciseSchema } from "@/lib/schemas/exercise.schema";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { WeightWorkoutForm } from "./add-workout-weights";
-import { TimePicker } from "@/components/time-picker";
+import { MinuteSelector } from "@/components/minute-selector";
 
 interface AddWorkoutDialogProps {
   profile: Profile;
+  currentLocalDateTime: string;
 }
 
-export function AddWorkoutDialog({ profile }: AddWorkoutDialogProps) {
-  const currentLocalStartTime = DateTime.now();
-  const currentLocalEndTime = DateTime.now().plus({ hours: 1 });
-  const localWorkoutDate = currentLocalStartTime.toFormat("yyyy-MM-dd");
+export function AddWorkoutDialog({
+  profile,
+  currentLocalDateTime,
+}: AddWorkoutDialogProps) {
+  const justDate = currentLocalDateTime.split(" ")[0];
 
+  const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
-
-  // start time picker
-  const [isStartTimePickerOpen, setIsStartTimePickerOpen] =
-    React.useState(false);
-  const [startSelectedHour, setStartSelectedHour] = React.useState(
-    currentLocalStartTime.toFormat("HH"),
-  );
-  const [startSelectedMinute, setStartSelectedMinute] = React.useState(
-    currentLocalStartTime.toFormat("mm"),
-  );
-
-  // end time picker
-  const [isEndTimePickerOpen, setIsEndTimePickerOpen] = React.useState(false);
-  const [endSelectedHour, setEndSelectedHour] = React.useState(
-    currentLocalEndTime.toFormat("HH"),
-  );
-  const [endSelectedMinute, setEndSelectedMinute] = React.useState(
-    currentLocalEndTime.toFormat("mm"),
-  );
-
   const workoutForm = useForm<z.infer<typeof insertDailyWeightsExerciseSchema>>(
     {
       resolver: zodResolver(insertDailyWeightsExerciseSchema),
       defaultValues: {
-        user_email: profile.user_email,
-        user_id: profile.user_id!,
-        start_time: currentLocalStartTime.toFormat("yyyy-MM-dd HH:mm:ss"),
-        weights_workouts: [],
+        profileEmail: profile.email,
+        timezone: profile.timezone,
+        startTime: currentLocalDateTime,
+        durationMinutes: 5,
+        weightsWorkouts: [],
       },
     },
   );
 
   const weightsWorkoutsArrForm = useFieldArray({
     control: workoutForm.control,
-    name: `weights_workouts`,
+    name: `weightsWorkouts`,
   });
 
   function handleAddWorkout() {
     weightsWorkoutsArrForm.append({
-      body_part: "arms",
-      workout_name: "barbell-curl",
-      weights_workouts_sets: [],
-      user_email: profile.email,
-      user_id: profile.id, // NOTE: user_id is not nullable
+      bodyPart: "arms",
+      workoutName: "barbell-curl",
+      weightsWorkoutsSets: [],
     });
   }
 
@@ -83,46 +65,24 @@ export function AddWorkoutDialog({ profile }: AddWorkoutDialogProps) {
   async function handleSubmitWorkout(
     data: z.infer<typeof insertDailyWeightsExerciseSchema>,
   ) {
-    // NOTE: set startTime to UTC
-    const startTime = DateTime.fromFormat(
-      data.start_time,
-      "yyyy-MM-dd HH:mm:ss",
-    );
-    const utcStartTime = startTime.toUTC().toFormat("yyyy-MM-dd HH:mm:ss");
-    data.start_time = utcStartTime;
+    console.log("🚀 ~ file: add-workout-dialog.tsx:75 ~ data:", data);
 
-    const res = await supabase.rpc("add_daily_workouts", {
-      body: data,
+    const res = await honoClient.weights.$post({
+      json: data,
     });
 
-    console.log(
-      "🚀 ~ file: add-workout-dialog.tsx:96 ~ AddWorkoutDialog ~ res:",
-      res,
-    );
+    if (res.status === 200) {
+      await queryClient.invalidateQueries({ queryKey: ["weights"] });
+    }
 
+    workoutForm.reset();
     setIsDialogOpen(false);
   }
 
-  React.useEffect(() => {
-    workoutForm.setValue(
-      "start_time",
-      `${localWorkoutDate} ${startSelectedHour}:${startSelectedMinute}:00`,
-    );
-  }, [startSelectedHour, startSelectedMinute]);
-
-  React.useEffect(() => {
-    workoutForm.setValue(
-      "end_time",
-      `${localWorkoutDate} ${endSelectedHour}:${endSelectedMinute}:00`,
-    );
-  }, [endSelectedHour, endSelectedMinute]);
-
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <DialogTrigger asChild>
-        <Button variant={"outline"}>
-          <Plus className="h-9 w-9" />
-        </Button>
+      <DialogTrigger className="rounded-full p-1 hover:bg-muted">
+        <Plus />
       </DialogTrigger>
 
       <DialogContent
@@ -131,44 +91,42 @@ export function AddWorkoutDialog({ profile }: AddWorkoutDialogProps) {
         className="flex h-full max-h-[calc(100dvh-80px)] w-full max-w-xl flex-col gap-4 overflow-y-auto"
       >
         <DialogTitle>
-          <div className="text-2xl">{localWorkoutDate}</div>
+          <div className="text-2xl">{justDate}</div>
         </DialogTitle>
 
-        <div className="group flex w-fit cursor-pointer items-center gap-1 rounded-lg bg-muted/50 px-3 py-1">
-          <span className="flex items-center gap-1">
-            <Clock className="h-4 w-4 text-gray-400" />
-            <span className="whitespace-nowrap text-muted-foreground">
-              운동 시작시간:
-            </span>
+        <div className="group flex w-fit cursor-pointer items-center gap-2 rounded-lg bg-muted/50 px-3 py-1">
+          <span className="whitespace-nowrap text-muted-foreground">
+            운동 시간
           </span>
 
-          <TimePicker
-            selectedHour={startSelectedHour}
-            selectedMinute={startSelectedMinute}
-            setSelectedHour={setStartSelectedHour}
-            setSelectedMinute={setStartSelectedMinute}
-            isTimePickerOpen={isStartTimePickerOpen}
-            setIsTimePickerOpen={setIsStartTimePickerOpen}
-            userLanguage={profile.language}
+          <Controller
+            name="startTime"
+            control={workoutForm.control}
+            render={({ field }) => (
+              <TimePicker
+                value={field.value}
+                setValue={field.onChange}
+                userLanguage={profile.language}
+                timezone={profile.timezone}
+              />
+            )}
           />
         </div>
 
-        <div className="group flex w-fit cursor-pointer items-center gap-1 rounded-lg bg-muted/50 px-3 py-1">
-          <span className="flex items-center gap-1">
-            <Clock className="h-4 w-4 text-gray-400" />
-            <span className="whitespace-nowrap text-muted-foreground">
-              운동 종료시간:
-            </span>
+        <div className="group flex w-fit cursor-pointer items-center gap-2 rounded-lg bg-muted/50 px-3 py-1">
+          <span className="whitespace-nowrap text-muted-foreground">
+            운동 시간:
           </span>
 
-          <TimePicker
-            selectedHour={endSelectedHour}
-            selectedMinute={endSelectedMinute}
-            setSelectedHour={setEndSelectedHour}
-            setSelectedMinute={setEndSelectedMinute}
-            isTimePickerOpen={isEndTimePickerOpen}
-            setIsTimePickerOpen={setIsEndTimePickerOpen}
-            userLanguage={profile.language}
+          <Controller
+            name="durationMinutes"
+            control={workoutForm.control}
+            render={({ field }) => (
+              <MinuteSelector
+                setValue={field.onChange}
+                value={field.value.toString()}
+              />
+            )}
           />
         </div>
 
@@ -183,17 +141,16 @@ export function AddWorkoutDialog({ profile }: AddWorkoutDialogProps) {
           </Button>
 
           <div className="flex max-h-[500px] flex-col gap-4 overflow-y-auto">
-            {workoutForm
-              .getValues("weights_workouts")
-              .map((weightsWorkout, workoutIdx) => (
+            {workoutForm.getValues("weightsWorkouts").map((_, workoutIdx) => {
+              return (
                 <WeightWorkoutForm
                   key={workoutIdx}
                   workoutIdx={workoutIdx}
-                  profile={profile}
                   form={workoutForm}
                   handleRemoveWorkout={handleRemoveWorkout}
                 />
-              ))}
+              );
+            })}
           </div>
         </div>
 

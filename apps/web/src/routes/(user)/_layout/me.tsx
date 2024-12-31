@@ -15,13 +15,13 @@ function RouteComponent() {
 
   return (
     <div className="flex min-h-dvh flex-1 flex-col items-center">
-      <MeHeader currentPageTitle={`${profile.email}`} />
+      <React.Suspense fallback={<div>Loading...</div>}>
+        <MeHeader currentPageTitle={`${profile.email}`} />
+      </React.Suspense>
 
       <div className="flex w-full max-w-3xl flex-col p-4 pb-[100px] md:pt-6">
         <main className="flex flex-col lg:w-full lg:items-center">
-          <React.Suspense fallback={<div>Loading...</div>}>
-            <BentoDashboard />
-          </React.Suspense>
+          <BentoDashboard />
         </main>
       </div>
     </div>

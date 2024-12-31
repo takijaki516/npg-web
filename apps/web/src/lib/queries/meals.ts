@@ -2,16 +2,16 @@ import { queryOptions } from "@tanstack/react-query";
 import { honoClient } from "@/lib/hono";
 
 const getDailyMealsWithFoods = async ({
-  utcStartOfRange,
-  utcEndOfRange,
+  currentLocalDateTime,
+  timezone,
 }: {
-  utcStartOfRange: string;
-  utcEndOfRange: string;
+  currentLocalDateTime: string;
+  timezone: string;
 }) => {
   const res = await honoClient.meals.$get({
     query: {
-      startUtcDateTime: utcStartOfRange,
-      endUtcDateTime: utcEndOfRange,
+      currentLocalDateTime,
+      timezone,
     },
   });
 
@@ -25,15 +25,19 @@ const getDailyMealsWithFoods = async ({
 };
 
 export function getDailyMealsWithFoodsOptions({
-  utcStartOfRange,
-  utcEndOfRange,
+  currentLocalDateTime,
+  timezone,
 }: {
-  utcStartOfRange: string;
-  utcEndOfRange: string;
+  currentLocalDateTime: string;
+  timezone: string;
 }) {
   return queryOptions({
     queryKey: ["dailyMealsWithFoods"],
-    queryFn: () => getDailyMealsWithFoods({ utcStartOfRange, utcEndOfRange }),
+    queryFn: () =>
+      getDailyMealsWithFoods({
+        currentLocalDateTime,
+        timezone,
+      }),
   });
 }
 

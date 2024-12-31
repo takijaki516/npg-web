@@ -1,57 +1,78 @@
-"use client";
-
-import { useRef, useEffect } from "react";
+import * as React from "react";
+import { Check, Clock } from "lucide-react";
+import { DateTime } from "luxon";
 
 import { cn } from "@/lib/utils";
-import { Check } from "lucide-react";
+
+const HOURS = Array.from({ length: 24 }, (_, i) =>
+  i.toString().padStart(2, "0"),
+);
+const MINUTES = Array.from({ length: 60 }, (_, i) =>
+  i.toString().padStart(2, "0"),
+);
 
 interface TimePickerProps {
-  selectedHour: string;
-  setSelectedHour: (hour: string) => void;
-  selectedMinute: string;
-  setSelectedMinute: (minute: string) => void;
-  isTimePickerOpen: boolean;
-  setIsTimePickerOpen: (open: boolean) => void;
   userLanguage: string;
+  timezone: string;
   className?: string;
+  value: string;
+  setValue: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export function TimePicker({
   userLanguage,
-  selectedHour,
-  selectedMinute,
-  setSelectedHour,
-  setSelectedMinute,
-  isTimePickerOpen,
-  setIsTimePickerOpen,
+  timezone,
   className,
+  value,
+  setValue,
 }: TimePickerProps) {
-  const dropdownRef = useRef<HTMLDivElement>(null);
+  const currentLocalDateTime = DateTime.fromFormat(
+    value,
+    "yyyy-MM-dd HH:mm:ss",
+  ).setZone(timezone);
 
-  const hours = Array.from({ length: 24 }, (_, i) =>
-    i.toString().padStart(2, "0"),
+  const [isOpen, setIsOpen] = React.useState(false);
+  const dropdownRef = React.useRef<HTMLDivElement>(null);
+
+  const [selectedHour, setSelectedHour] = React.useState(
+    currentLocalDateTime.hour.toString().padStart(2, "0"),
   );
-  const minutes = Array.from({ length: 60 }, (_, i) =>
-    i.toString().padStart(2, "0"),
+  const [selectedMinute, setSelectedMinute] = React.useState(
+    currentLocalDateTime.minute.toString().padStart(2, "0"),
   );
 
-  useEffect(() => {
+  function handleTimeChange(hourOrMinute: "hour" | "minute", value: string) {
+    if (hourOrMinute === "hour") {
+      currentLocalDateTime.set({ hour: parseInt(value) });
+      setSelectedHour(value);
+    } else {
+      currentLocalDateTime.set({ minute: parseInt(value) });
+      setSelectedMinute(value);
+    }
+
+    setValue(currentLocalDateTime.toFormat("yyyy-MM-dd HH:mm:ss"));
+  }
+
+  function handleNowClick() {
+    const currentLocalTime = DateTime.now().setZone(timezone);
+    setSelectedHour(currentLocalTime.hour.toString().padStart(2, "0"));
+    setSelectedMinute(currentLocalTime.minute.toString().padStart(2, "0"));
+    setValue(currentLocalDateTime.toFormat("yyyy-MM-dd HH:mm:ss"));
+  }
+
+  React.useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (
         dropdownRef.current &&
         !dropdownRef.current.contains(event.target as Node)
       ) {
-        setIsTimePickerOpen(false);
+        setIsOpen(false);
       }
     }
 
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-  const formatDisplay = () => {
-    return `${selectedHour}:${selectedMinute}`;
-  };
 
   return (
     <div
@@ -63,18 +84,25 @@ export function TimePicker({
     >
       <div
         className="flex items-center gap-2"
-        onClick={() => setIsTimePickerOpen(!isTimePickerOpen)}
+        onClick={() => setIsOpen(!isOpen)}
       >
         <input
           type="text"
           readOnly
-          value={formatDisplay()}
+          value={`${selectedHour}:${selectedMinute}`}
           placeholder="hh:mm"
-          className="w-12 cursor-pointer bg-transparent text-center text-gray-200 outline-none"
+          className="w-12 cursor-pointer bg-transparent text-center outline-none"
         />
       </div>
+      {/* TODO: fix UI */}
+      <button
+        className="rounded-md p-1 text-muted-foreground hover:bg-background/80"
+        onClick={handleNowClick}
+      >
+        <Clock className="h-4 w-4" />
+      </button>
 
-      {isTimePickerOpen && (
+      {isOpen && (
         <div className="absolute left-0 top-8 z-50 mt-1 rounded-lg bg-muted">
           <div className="flex px-2 py-1 text-muted-foreground">
             <div className="flex-1">
@@ -87,7 +115,7 @@ export function TimePicker({
 
           <div className="flex h-48">
             <div className="h-full flex-1 overflow-y-auto">
-              {hours.map((hour) => (
+              {HOURS.map((hour) => (
                 <div
                   key={hour}
                   className={`cursor-pointer px-2 py-1 ${
@@ -95,7 +123,7 @@ export function TimePicker({
                       ? "bg-background/60 text-foreground"
                       : "text-muted-foreground hover:bg-background/80"
                   }`}
-                  onClick={() => setSelectedHour(hour)}
+                  onClick={() => handleTimeChange("hour", hour)}
                 >
                   {hour}
                 </div>
@@ -103,7 +131,7 @@ export function TimePicker({
             </div>
 
             <div className="h-full flex-1 overflow-y-auto">
-              {minutes.map((minute) => (
+              {MINUTES.map((minute) => (
                 <div
                   key={minute}
                   className={`cursor-pointer px-2 py-1 ${
@@ -111,7 +139,7 @@ export function TimePicker({
                       ? "bg-background/60 text-foreground"
                       : "text-muted-foreground hover:bg-background/80"
                   }`}
-                  onClick={() => setSelectedMinute(minute)}
+                  onClick={() => handleTimeChange("minute", minute)}
                 >
                   {minute}
                 </div>
@@ -122,7 +150,7 @@ export function TimePicker({
           <div className="flex w-36 items-center justify-between border-t border-background px-[2px] py-[2px]">
             <button
               className="flex flex-1 justify-center rounded-md py-1 text-muted-foreground hover:bg-background/80"
-              onClick={() => setIsTimePickerOpen(false)}
+              onClick={() => setIsOpen(false)}
             >
               <Check className="h-4 w-4" />
             </button>

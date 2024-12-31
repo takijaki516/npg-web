@@ -1,49 +1,40 @@
 import { CookingPot, SearchX } from "lucide-react";
 import { useSuspenseQuery } from "@tanstack/react-query";
-import { DateTime } from "luxon";
 
-import {
-  getDailyMealsWithFoodsOptions,
-  getProfileOptions,
-} from "@/lib/queries";
+import { getDailyMealsWithFoodsOptions, type Profile } from "@/lib/queries";
 import { DailyMeal } from "./daily-meal";
-import { convertToRangeOfDayUTCTime } from "@/lib/utils";
+import { AddMealDialog } from "../add-meals-dialog/add-meal-dialog";
 
-export function DailyMealsCard() {
-  const { data: profile } = useSuspenseQuery(getProfileOptions);
+interface DailyMealsCardProps {
+  profile: Profile;
+  currentLocalDateTime: string;
+}
 
-  // get current local date time
-  const currentLocalDateTime = DateTime.now()
-    .setZone(profile.timezone)
-    .toFormat("yyyy-MM-dd");
-
-  const { utcStartTimeOfDay, utcEndTimeOfDay } = convertToRangeOfDayUTCTime({
-    localDate: currentLocalDateTime,
-    timeZone: profile.timezone,
-  });
-
-  if (!utcStartTimeOfDay || !utcEndTimeOfDay) {
-    throw new Error("failed to get start and end time of day");
-  }
-
+export function DailyMealsCard({
+  profile,
+  currentLocalDateTime,
+}: DailyMealsCardProps) {
   const { data: dailyMealsWithFoods } = useSuspenseQuery(
     getDailyMealsWithFoodsOptions({
-      utcStartOfRange: utcStartTimeOfDay,
-      utcEndOfRange: utcEndTimeOfDay,
+      currentLocalDateTime,
+      timezone: profile.timezone,
     }),
   );
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-1 rounded-md border border-border p-2">
       <div className="flex items-center justify-between">
-        <div className="flex gap-2">
+        <div className="flex gap-1">
           <CookingPot />
           <div className="text-lg font-semibold">
             {profile.language === "ko" ? "오늘의 식단" : "Today's Meal"}
           </div>
         </div>
 
-        {/* <AddMealDialog profile={profile} /> */}
+        <AddMealDialog
+          profile={profile}
+          currentLocalDateTime={currentLocalDateTime}
+        />
       </div>
 
       {dailyMealsWithFoods.length === 0 && (

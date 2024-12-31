@@ -1,23 +1,17 @@
 import * as React from "react";
-import { Clock, Plus, Utensils } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { Plus, Utensils } from "lucide-react";
+import { Controller, useForm } from "react-hook-form";
 import { z } from "zod";
-import { DateTime } from "luxon";
 import { v4 as uuidv4 } from "uuid";
 import { toast } from "sonner";
-import { useRouter } from "@tanstack/react-router";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useQueryClient } from "@tanstack/react-query";
+import { insertMealSchema } from "@repo/shared-schema";
 
-import { cn } from "@/lib/utils";
-import { supabase } from "@/lib/supabase";
-import { type Database } from "@/lib/types/database.types";
-import {
-  insertMealSchema,
-  insertMealWithoutPicSchema,
-} from "@/lib/schemas/meal.schema";
+import { type Profile } from "@/lib/queries";
+import { honoClient } from "@/lib/hono";
 import { AddFoodDialog } from "./add-food-dialog";
 import { SingleFood } from "./single-food";
-import { TimePicker } from "@/components/time-picker";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -25,133 +19,99 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
+import { TimePicker } from "@/components/time-picker";
 import { InfoField } from "@/components/me/info-fields";
 
 interface AddMealDialogProps {
   className?: string;
-  profile: Database["public"]["Tables"]["profiles"]["Row"];
+  profile: Profile;
+  currentLocalDateTime: string;
 }
 
-export function AddMealDialog({ className, profile }: AddMealDialogProps) {
-  const currentLocalTime = DateTime.now().setZone(profile.timezone);
-  const localDate = currentLocalTime.toFormat("yyyy-MM-dd");
+export function AddMealDialog({
+  profile,
+  currentLocalDateTime,
+}: AddMealDialogProps) {
+  const justDate = currentLocalDateTime.split(" ")[0];
 
-  const router = useRouter();
+  const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
-  const [selectedHour, setSelectedHour] = React.useState(
-    currentLocalTime.hour.toString().padStart(2, "0"),
-  );
-  const [selectedMinute, setSelectedMinute] = React.useState(
-    currentLocalTime.minute.toString().padStart(2, "0"),
-  );
-
-  const [isTimePickerOpen, setIsTimePickerOpen] = React.useState(false);
-
   const mealForm = useForm<z.infer<typeof insertMealSchema>>({
     resolver: zodResolver(insertMealSchema),
     defaultValues: {
-      user_email: profile.user_email,
-      user_id: profile.user_id!,
-
-      meal_time: currentLocalTime.toFormat("yyyy-MM-dd HH:mm:ss"),
-      total_calories: 0,
-      total_carbohydrate: 0,
-      total_fat: 0,
-      total_protein: 0,
+      profileEmail: profile.email,
+      mealTime: currentLocalDateTime,
+      totalCaloriesKcal: 0,
+      totalCarbohydratesG: 0,
+      totalProteinG: 0,
+      totalFatG: 0,
       foods: [],
     },
   });
-
-  function handleNowClick() {
-    const currentLocalTime = DateTime.now().setZone(profile.timezone);
-    setSelectedHour(currentLocalTime.hour.toString().padStart(2, "0"));
-    setSelectedMinute(currentLocalTime.minute.toString().padStart(2, "0"));
-    setIsTimePickerOpen(false);
-  }
 
   async function mealSubmitHandler(values: z.infer<typeof insertMealSchema>) {
     // loop through foods and add image
     const foodsWithPic = await Promise.all(
       values.foods.map(async (food) => {
-        if (!food.pic_file) {
+        if (!food.foodPicFile) {
           return {
             ...food,
           };
         }
 
         const fileUUID = uuidv4();
-        const fileType = food.pic_file.type;
+        const fileType = food.foodPicFile.type;
 
-        const res = await fetch("/api/s3-presign", {
-          method: "POST",
-          body: JSON.stringify({
-            fileUUID,
+        const presignedRes = await honoClient.presign.$post({
+          json: {
+            key: fileUUID,
+            action: "PUT",
             fileType,
-          }),
-          headers: {
-            "Content-Type": "application/json",
           },
         });
 
-        const presignedUrl = await res.json();
+        // TODO: proper error handle
+        if (!presignedRes.ok) {
+          throw new Error("failed to presign");
+        }
 
-        await fetch(presignedUrl.url, {
+        const presignedBody = await presignedRes.json();
+
+        // TODO: proper error handle
+        if (!presignedBody.url) {
+          throw new Error("failed to presign");
+        }
+
+        await fetch(presignedBody.url, {
           method: "PUT",
-          body: food.pic_file,
+          body: food.foodPicFile,
           headers: {
-            "Content-Type": food.pic_file.type,
+            "Content-Type": fileType,
           },
         });
 
         return {
           ...food,
-          pic_url: fileUUID,
-          pic_file: undefined,
+          foodPic: presignedBody.key,
+          foodPicFile: undefined,
         };
       }),
     );
 
     values.foods = foodsWithPic;
 
-    const utcMealTime = DateTime.fromFormat(
-      values.meal_time,
-      "yyyy-MM-dd HH:mm:ss",
-      {
-        zone: profile.timezone,
-      },
-    )
-      .toUTC()
-      .toSQL();
-
-    if (!utcMealTime) {
-      // TODO: proper error handle
-      return;
-    }
-
-    values.meal_time = utcMealTime;
-
-    const valuesWithoutPic = insertMealWithoutPicSchema.safeParse(values);
-
-    if (!valuesWithoutPic.success) {
-      toast.error(
-        profile.language === "ko"
-          ? "모든 정보를 입력해주세요."
-          : "Please fill in all information.",
-      );
-      // TODO: proper error handle
-      return;
-    }
-
-    const res = await supabase.rpc("add_meals", {
-      body: valuesWithoutPic.data,
+    const res = await honoClient.meals.$post({
+      json: values,
     });
 
-    if (res.error) {
+    if (!res.ok) {
       // TODO: proper error handle
-      return;
+      throw new Error("failed to add meal");
     }
 
-    router.invalidate();
+    await queryClient.invalidateQueries({
+      queryKey: ["dailyMealsWithFoods"],
+    });
     mealForm.reset();
     toast.success(
       profile.language === "ko" ? "식단 추가 완료" : "Meal added successfully",
@@ -162,37 +122,28 @@ export function AddMealDialog({ className, profile }: AddMealDialogProps) {
   React.useEffect(() => {
     const foodsArr = mealForm.watch("foods");
     const totalCalories = foodsArr.reduce((acc, food) => {
-      return acc + food.calories;
+      return acc + food.foodCaloriesKcal;
     }, 0);
     const totalCarbohydrate = foodsArr.reduce((acc, food) => {
-      return acc + food.carbohydrate;
+      return acc + food.foodCarbohydratesG;
     }, 0);
     const totalFat = foodsArr.reduce((acc, food) => {
-      return acc + food.fat;
+      return acc + food.foodFatG;
     }, 0);
     const totalProtein = foodsArr.reduce((acc, food) => {
-      return acc + food.protein;
+      return acc + food.foodProteinG;
     }, 0);
 
-    mealForm.setValue("total_calories", totalCalories);
-    mealForm.setValue("total_carbohydrate", totalCarbohydrate);
-    mealForm.setValue("total_fat", totalFat);
-    mealForm.setValue("total_protein", totalProtein);
+    mealForm.setValue("totalCaloriesKcal", totalCalories);
+    mealForm.setValue("totalCarbohydratesG", totalCarbohydrate);
+    mealForm.setValue("totalFatG", totalFat);
+    mealForm.setValue("totalProteinG", totalProtein);
   }, [mealForm.watch("foods")]);
-
-  React.useEffect(() => {
-    mealForm.setValue(
-      "meal_time",
-      `${localDate} ${selectedHour}:${selectedMinute}:00`,
-    );
-  }, [selectedHour, selectedMinute]);
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <DialogTrigger asChild>
-        <Button variant={"outline"} className={cn(className)}>
-          <Plus className="h-9 w-9" />
-        </Button>
+      <DialogTrigger className="rounded-full p-1 hover:bg-muted">
+        <Plus />
       </DialogTrigger>
 
       <DialogContent
@@ -202,7 +153,7 @@ export function AddMealDialog({ className, profile }: AddMealDialogProps) {
       >
         <DialogTitle className="flex items-center gap-2">
           <Utensils />
-          <div className="text-2xl">{localDate}</div>
+          <div className="text-2xl">{justDate}</div>
         </DialogTitle>
 
         <div className="grid grid-cols-1 gap-2 xs:grid-cols-2">
@@ -211,42 +162,38 @@ export function AddMealDialog({ className, profile }: AddMealDialogProps) {
               {profile.language === "ko" ? "식사 시간" : "Meal Time"}
             </span>
 
-            <TimePicker
-              userLanguage={profile.language}
-              selectedHour={selectedHour}
-              selectedMinute={selectedMinute}
-              setSelectedHour={setSelectedHour}
-              setSelectedMinute={setSelectedMinute}
-              isTimePickerOpen={isTimePickerOpen}
-              setIsTimePickerOpen={setIsTimePickerOpen}
+            <Controller
+              name="mealTime"
+              control={mealForm.control}
+              render={({ field }) => (
+                <TimePicker
+                  value={field.value}
+                  setValue={field.onChange}
+                  userLanguage={profile.language}
+                  timezone={profile.timezone}
+                />
+              )}
             />
-
-            <button
-              className="rounded-md p-1 text-muted-foreground hover:bg-background/80"
-              onClick={handleNowClick}
-            >
-              <Clock className="h-4 w-4 text-gray-400" />
-            </button>
           </div>
 
           <InfoField
             label={profile.language === "ko" ? "총 칼로리" : "Total Calories"}
-            value={mealForm.watch("total_calories").toFixed().toString()}
+            value={mealForm.watch("totalCaloriesKcal").toFixed().toString()}
           />
 
           <InfoField
             label={profile.language === "ko" ? "총 탄수화물" : "Total Carbs"}
-            value={mealForm.watch("total_carbohydrate").toFixed().toString()}
+            value={mealForm.watch("totalCarbohydratesG").toFixed().toString()}
           />
 
           <InfoField
             label={profile.language === "ko" ? "총 지방" : "Total Fat"}
-            value={mealForm.watch("total_fat").toFixed().toString()}
+            value={mealForm.watch("totalFatG").toFixed().toString()}
           />
 
           <InfoField
             label={profile.language === "ko" ? "총 단백질" : "Total Protein"}
-            value={mealForm.watch("total_protein").toFixed().toString()}
+            value={mealForm.watch("totalProteinG").toFixed().toString()}
           />
         </div>
 
@@ -258,7 +205,7 @@ export function AddMealDialog({ className, profile }: AddMealDialogProps) {
               mealForm.getValues("foods").map((foodItem) => {
                 return (
                   <SingleFood
-                    key={foodItem.food_name}
+                    key={foodItem.foodName}
                     food={foodItem}
                     mealForm={mealForm}
                     profile={profile}
@@ -279,9 +226,4 @@ export function AddMealDialog({ className, profile }: AddMealDialogProps) {
       </DialogContent>
     </Dialog>
   );
-}
-
-export interface S3PresignRequest {
-  fileUUID: string;
-  fileType: string;
 }

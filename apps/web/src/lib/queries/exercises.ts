@@ -2,16 +2,16 @@ import { queryOptions } from "@tanstack/react-query";
 import { honoClient } from "@/lib/hono";
 
 const getDailyWeightsExerciseWithAllInfos = async ({
-  utcStartOfRange,
-  utcEndOfRange,
+  currentLocalDateTime,
+  timezone,
 }: {
-  utcStartOfRange: string;
-  utcEndOfRange: string;
+  currentLocalDateTime: string;
+  timezone: string;
 }) => {
   const res = await honoClient.weights["daily-weights"].$get({
     query: {
-      startUtcDateTime: utcStartOfRange,
-      endUtcDateTime: utcEndOfRange,
+      currentLocalDateTime,
+      timezone,
     },
   });
 
@@ -25,18 +25,18 @@ const getDailyWeightsExerciseWithAllInfos = async ({
 };
 
 export function getDailyWeightsExerciseOptions({
-  utcStartOfRange,
-  utcEndOfRange,
+  currentLocalDateTime,
+  timezone,
 }: {
-  utcStartOfRange: string;
-  utcEndOfRange: string;
+  currentLocalDateTime: string;
+  timezone: string;
 }) {
   return queryOptions({
     queryKey: ["dailyWeightsExercises"],
     queryFn: () =>
       getDailyWeightsExerciseWithAllInfos({
-        utcStartOfRange,
-        utcEndOfRange,
+        currentLocalDateTime,
+        timezone,
       }),
     staleTime: 5000,
   });

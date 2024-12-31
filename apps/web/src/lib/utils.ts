@@ -86,3 +86,15 @@ export function convertToUTCTime({
 
   return { dateTime: dateTimeSQL };
 }
+
+export function utcToLocalTime({
+  utcTime,
+  timezone,
+}: {
+  utcTime: string;
+  timezone: string;
+}) {
+  const dateTime = DateTime.fromSQL(utcTime, { zone: "utc" }).setZone(timezone);
+
+  return dateTime.toFormat("yyyy-MM-dd HH:mm:ss");
+}

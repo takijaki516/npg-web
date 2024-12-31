@@ -1,7 +1,7 @@
 import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
+import { insertDailyWeightsExerciseSchema } from "@repo/shared-schema";
 
-import { insertDailyWeightsExerciseSchema } from "@/lib/schemas/exercise.schema";
 import { DeleteButton } from "@/components/delete-button";
 
 interface WeightsWorkoutSetFormProps {
@@ -22,7 +22,7 @@ export function WeightsWorkoutSetForm({
       <span>
         #
         {form.getValues(
-          `weights_workouts.${workoutIdx}.weights_workouts_sets.${setIdx}.set_number`,
+          `weightsWorkouts.${workoutIdx}.weightsWorkoutsSets.${setIdx}.setNumber`,
         )}
       </span>
 
@@ -32,7 +32,7 @@ export function WeightsWorkoutSetForm({
           className="w-10 rounded-md px-1"
           type="number"
           {...form.register(
-            `weights_workouts.${workoutIdx}.weights_workouts_sets.${setIdx}.reps`,
+            `weightsWorkouts.${workoutIdx}.weightsWorkoutsSets.${setIdx}.reps`,
             {
               valueAsNumber: true,
             },
@@ -46,7 +46,7 @@ export function WeightsWorkoutSetForm({
           className="w-14 rounded-md px-1"
           type="number"
           {...form.register(
-            `weights_workouts.${workoutIdx}.weights_workouts_sets.${setIdx}.reps`,
+            `weightsWorkouts.${workoutIdx}.weightsWorkoutsSets.${setIdx}.weightKg`,
             {
               valueAsNumber: true,
             },

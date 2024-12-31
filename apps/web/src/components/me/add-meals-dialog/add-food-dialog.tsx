@@ -1,12 +1,12 @@
 import * as React from "react";
-import { RotateCw, Plus, ImageUp, X, Bot, Check } from "lucide-react";
+import { RotateCw, Plus, ImageUp, X, Check } from "lucide-react";
 import { useDropzone } from "react-dropzone";
 import { useFieldArray, type UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { toast } from "sonner";
+import { insertMealSchema } from "@repo/shared-schema";
 
-import { type Database } from "@/lib/types/database.types";
-import { insertMealSchema } from "@/lib/schemas/meal.schema";
+import { type Profile } from "@/lib/queries";
 import {
   Dialog,
   DialogContent,
@@ -19,7 +19,7 @@ import { Input } from "@/components/ui/input";
 
 interface AddFoodDialogProps {
   mealForm: UseFormReturn<z.infer<typeof insertMealSchema>>;
-  profile: Database["public"]["Tables"]["profiles"]["Row"];
+  profile: Profile;
 }
 
 export function AddFoodDialog({ mealForm, profile }: AddFoodDialogProps) {
@@ -34,9 +34,34 @@ export function AddFoodDialog({ mealForm, profile }: AddFoodDialogProps) {
   const [foodProteins, setFoodProteins] = React.useState(0);
   const [foodFats, setFoodFats] = React.useState(0);
 
-  const onDrop = React.useCallback((acceptedFiles: File[]) => {
-    setFoodImageFile(acceptedFiles[0]);
-  }, []);
+  const onDrop = React.useCallback(
+    async (acceptedFiles: File[]) => {
+      if (!acceptedFiles[0]) return;
+
+      setFoodImageFile(acceptedFiles[0]);
+
+      setIsLLMLoading(true);
+      const formData = new FormData();
+      formData.append("image", acceptedFiles[0]);
+      formData.append("language", profile.language);
+
+      const res = await fetch("http://localhost:8787/ai/calc-calorie", {
+        method: "POST",
+        body: formData,
+        credentials: "include",
+      });
+
+      const data = await res.json();
+
+      setIsLLMLoading(false);
+      setFoodName(data.foodName);
+      setFoodCalories(data.calories);
+      setFoodCarbohydrates(data.carbohydrate);
+      setFoodProteins(data.protein);
+      setFoodFats(data.fat);
+    },
+    [profile.language],
+  );
 
   const { getRootProps, getInputProps } = useDropzone({
     onDrop,
@@ -56,7 +81,8 @@ export function AddFoodDialog({ mealForm, profile }: AddFoodDialogProps) {
       !foodCalories ||
       !foodCarbohydrates ||
       !foodProteins ||
-      !foodFats
+      !foodFats ||
+      !foodImageFile
     ) {
       toast.error(
         profile.language === "ko"
@@ -67,15 +93,15 @@ export function AddFoodDialog({ mealForm, profile }: AddFoodDialogProps) {
     }
 
     foodsArrForm.append({
-      food_name: foodName,
-      calories: foodCalories,
-      carbohydrate: foodCarbohydrates,
-      protein: foodProteins,
-      fat: foodFats,
-      pic_file: foodImageFile,
+      foodName: foodName,
+      foodCaloriesKcal: foodCalories,
+      foodCarbohydratesG: foodCarbohydrates,
+      foodProteinG: foodCalories,
+      foodFatG: foodFats,
+      foodPicFile: foodImageFile,
     });
 
-    // reset
+    // reset field
     setFoodName("");
     setFoodCalories(0);
     setFoodCarbohydrates(0);
@@ -85,24 +111,6 @@ export function AddFoodDialog({ mealForm, profile }: AddFoodDialogProps) {
 
     // close dialog
     setIsFoodDialogOpen(false);
-  }
-
-  async function onLLMCalorieQuerySubmit() {
-    // if (!foodImageFile) return;
-    // setIsLLMLoading(true);
-    // const formData = new FormData();
-    // formData.append("image", foodImageFile);
-    // const res = await fetch("/api/calories", {
-    //   method: "POST",
-    //   body: formData,
-    // });
-    // const data: z.infer<typeof llmCalorieResponseSchema> = await res.json();
-    // setIsLLMLoading(false);
-    // setFoodName(data.foodName);
-    // setFoodCalories(data.calories);
-    // setFoodCarbohydrates(data.carbohydrate);
-    // setFoodProteins(data.protein);
-    // setFoodFats(data.fat);
   }
 
   return (
@@ -139,18 +147,6 @@ export function AddFoodDialog({ mealForm, profile }: AddFoodDialogProps) {
               >
                 <X className="size-4" />
               </button>
-
-              <Button
-                className="absolute bottom-0 right-0 h-10 w-10 animate-pulse"
-                variant={"secondary"}
-                onClick={onLLMCalorieQuerySubmit}
-              >
-                {isLLMLoading ? (
-                  <RotateCw className="animate-spin" />
-                ) : (
-                  <Bot size={50} />
-                )}
-              </Button>
             </div>
           ) : (
             <div
@@ -167,50 +163,75 @@ export function AddFoodDialog({ mealForm, profile }: AddFoodDialogProps) {
               <Label className="w-16 break-keep text-center">
                 {profile.language === "ko" ? "이름" : "Name"}
               </Label>
-              <Input
-                value={foodName}
-                onChange={(e) => setFoodName(e.target.value)}
-              />
+
+              {isLLMLoading ? (
+                <RotateCw className="animate-spin" />
+              ) : (
+                <Input
+                  value={foodName}
+                  onChange={(e) => setFoodName(e.target.value)}
+                />
+              )}
             </div>
 
             <div className="flex items-center gap-1">
               <Label className="w-16 break-keep text-center">
                 {profile.language === "ko" ? "칼로리" : "Calories"}
               </Label>
-              <Input
-                value={foodCalories}
-                onChange={(e) => setFoodCalories(Number(e.target.value))}
-              />
+
+              {isLLMLoading ? (
+                <RotateCw className="animate-spin" />
+              ) : (
+                <Input
+                  value={foodCalories}
+                  onChange={(e) => setFoodCalories(Number(e.target.value))}
+                />
+              )}
             </div>
 
             <div className="flex items-center gap-1">
               <Label className="w-16 break-keep text-center">
                 {profile.language === "ko" ? "탄수화물" : "Carbs"}
               </Label>
-              <Input
-                value={foodCarbohydrates}
-                onChange={(e) => setFoodCarbohydrates(Number(e.target.value))}
-              />
+
+              {isLLMLoading ? (
+                <RotateCw className="animate-spin" />
+              ) : (
+                <Input
+                  value={foodCarbohydrates}
+                  onChange={(e) => setFoodCarbohydrates(Number(e.target.value))}
+                />
+              )}
             </div>
 
             <div className="flex items-center gap-1">
               <Label className="w-16 break-keep text-center">
                 {profile.language === "ko" ? "단백질" : "Protein"}
               </Label>
-              <Input
-                value={foodProteins}
-                onChange={(e) => setFoodProteins(Number(e.target.value))}
-              />
+
+              {isLLMLoading ? (
+                <RotateCw className="animate-spin" />
+              ) : (
+                <Input
+                  value={foodProteins}
+                  onChange={(e) => setFoodProteins(Number(e.target.value))}
+                />
+              )}
             </div>
 
             <div className="flex items-center gap-1">
               <Label className="w-16 break-keep text-center">
                 {profile.language === "ko" ? "지방" : "Fat"}
               </Label>
-              <Input
-                value={foodFats}
-                onChange={(e) => setFoodFats(Number(e.target.value))}
-              />
+
+              {isLLMLoading ? (
+                <RotateCw className="animate-spin" />
+              ) : (
+                <Input
+                  value={foodFats}
+                  onChange={(e) => setFoodFats(Number(e.target.value))}
+                />
+              )}
             </div>
           </div>
 

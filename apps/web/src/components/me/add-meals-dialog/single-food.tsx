@@ -2,9 +2,9 @@ import * as React from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
+import { insertFoodSchema, insertMealSchema } from "@repo/shared-schema";
 
-import { type Database } from "@/lib/types/database.types";
-import { foodSchema, insertMealSchema } from "@/lib/schemas/meal.schema";
+import { type Profile } from "@/lib/queries";
 import { FoodImage } from "@/components/food/food-image";
 import { FoodDetail } from "@/components/food/food-detail";
 import { DeleteButton } from "@/components/delete-button";
@@ -15,9 +15,9 @@ import {
 } from "@/components/ui/collapsible";
 
 interface SingleFoodProps {
-  food: z.infer<typeof foodSchema>;
+  food: z.infer<typeof insertFoodSchema>;
   mealForm: UseFormReturn<z.infer<typeof insertMealSchema>>;
-  profile: Database["public"]["Tables"]["profiles"]["Row"];
+  profile: Profile;
 }
 
 export function SingleFood({ food, mealForm, profile }: SingleFoodProps) {
@@ -25,11 +25,13 @@ export function SingleFood({ food, mealForm, profile }: SingleFoodProps) {
 
   function onRemoveFood() {
     const foods = mealForm.getValues("foods");
-    const newFoods = foods.filter((f) => f.food_name !== food.food_name);
+    const newFoods = foods.filter((f) => f.foodName !== food.foodName);
     mealForm.setValue("foods", newFoods);
   }
 
-  const foodPicUrl = food.pic_file ? URL.createObjectURL(food.pic_file) : "";
+  const foodPicUrl = food.foodPicFile
+    ? URL.createObjectURL(food.foodPicFile)
+    : "";
 
   return (
     <Collapsible open={isCollapsibleOpen} onOpenChange={setIsCollapsibleOpen}>
@@ -37,7 +39,7 @@ export function SingleFood({ food, mealForm, profile }: SingleFoodProps) {
         <CollapsibleTrigger className="flex w-full items-center gap-4">
           <div className="flex w-full items-center gap-2">
             {isCollapsibleOpen ? <ChevronDown /> : <ChevronRight />}
-            <span>{food.food_name}</span>
+            <span>{food.foodName}</span>
           </div>
         </CollapsibleTrigger>
 
@@ -51,11 +53,11 @@ export function SingleFood({ food, mealForm, profile }: SingleFoodProps) {
 
         <FoodDetail
           profile={profile}
-          name={food.food_name ?? ""}
-          calories={food.calories ?? 0}
-          carbohydrate={food.carbohydrate ?? 0}
-          protein={food.protein ?? 0}
-          fat={food.fat ?? 0}
+          name={food.foodName}
+          calories={food.foodCaloriesKcal}
+          carbohydrate={food.foodCarbohydratesG}
+          protein={food.foodProteinG}
+          fat={food.foodFatG}
         />
       </CollapsibleContent>
     </Collapsible>

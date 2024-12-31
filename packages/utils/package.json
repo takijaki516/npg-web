@@ -1,0 +1,12 @@
+{
+  "name": "@repo/utils",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "dependencies": {
+    "luxon": "^3.5.0"
+  },
+  "devDependencies": {
+    "@types/luxon": "^3.4.2"
+  }
+}
