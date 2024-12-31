@@ -1,10 +1,10 @@
 import { Home } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
-// import { ThemeToggle } from "./theme-toggle";
 import { UserDropdown } from "./user-dropdown";
 import { Button } from "@/components/ui/button";
 import type { Profile } from "@/lib/queries";
+import { ModeToggle } from "./mode-toggle";
 
 interface NavbarProps {
   profile?: Profile | null | undefined;
@@ -27,7 +27,7 @@ export function Navbar({ profile }: NavbarProps) {
             </Button>
           )}
 
-          {/* <ThemeToggle /> */}
+          <ModeToggle />
         </div>
       </div>
     </nav>

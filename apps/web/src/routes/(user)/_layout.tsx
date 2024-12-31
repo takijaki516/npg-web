@@ -3,7 +3,6 @@ import { createFileRoute, redirect, Outlet } from "@tanstack/react-router";
 
 import { getProfileOptions } from "@/lib/queries";
 import { Sidebar } from "@/components/sidebar";
-import { TooltipProvider } from "@/components/ui/tooltip";
 
 export const Route = createFileRoute("/(user)/_layout")({
   beforeLoad: ({ context }) => {
@@ -21,13 +20,11 @@ export const Route = createFileRoute("/(user)/_layout")({
 function MeLayout() {
   return (
     <div className="relative flex">
-      <TooltipProvider>
-        <React.Suspense fallback={<div>Loading...</div>}>
-          <Sidebar />
-        </React.Suspense>
+      <React.Suspense fallback={<div>Loading...</div>}>
+        <Sidebar />
+      </React.Suspense>
 
-        <Outlet />
-      </TooltipProvider>
+      <Outlet />
     </div>
   );
 }

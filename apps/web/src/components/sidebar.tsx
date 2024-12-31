@@ -9,6 +9,7 @@ import {
 import { Link } from "@tanstack/react-router";
 
 import { NavUser } from "./nav-user";
+import { ModeToggle } from "./mode-toggle";
 
 const NAVS = [
   {
@@ -64,7 +65,10 @@ export function Sidebar() {
         </ul>
       </div>
 
-      <NavUser />
+      <div className="flex flex-col items-center justify-center gap-2">
+        <ModeToggle />
+        <NavUser />
+      </div>
     </div>
   );
 }
