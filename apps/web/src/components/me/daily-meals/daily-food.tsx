@@ -2,13 +2,13 @@ import * as React from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 
 import type { DailyMealsWithFoods, Profile } from "@/lib/queries";
+import { FoodImage } from "@/components/food/food-image";
+import { FoodDetailInfoField } from "@/components/food/food-detail";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { FoodImage } from "@/components/food/food-image";
-import { FoodDetail } from "@/components/food/food-detail";
 
 interface DailyFoodProps {
   food: DailyMealsWithFoods[number]["foods"][number];
@@ -17,7 +17,8 @@ interface DailyFoodProps {
 
 export function DailyFood({ food, profile }: DailyFoodProps) {
   const [isCollapsibleOpen, setIsCollapsibleOpen] = React.useState(false);
-  const [imageUrl, setImageUrl] = React.useState(food.foodPic ?? "");
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const [imageUrl, _setImageUrl] = React.useState(food.foodPic ?? "");
 
   return (
     <Collapsible open={isCollapsibleOpen} onOpenChange={setIsCollapsibleOpen}>
@@ -33,19 +34,25 @@ export function DailyFood({ food, profile }: DailyFoodProps) {
           <FoodImage src={imageUrl ?? ""} />
         </div>
 
-        <FoodDetail
-          profile={profile}
-          name={food.foodName}
-          calories={food.foodCaloriesKcal}
-          carbohydrate={food.foodCarbohydratesG}
-          protein={food.foodProteinG}
-          fat={food.foodFatG}
-        />
+        <div className="flex flex-col gap-1 text-sm">
+          <FoodDetailInfoField
+            label={profile.language === "ko" ? "칼로리" : "Calories"}
+            value={food.foodCaloriesKcal.toString()}
+          />
+          <FoodDetailInfoField
+            label={profile.language === "ko" ? "탄수화물" : "Carbs"}
+            value={food.foodCarbohydratesG.toString()}
+          />
+          <FoodDetailInfoField
+            label={profile.language === "ko" ? "단백질" : "Protein"}
+            value={food.foodProteinG.toString()}
+          />
+          <FoodDetailInfoField
+            label={profile.language === "ko" ? "지방" : "Fat"}
+            value={food.foodFatG.toString()}
+          />
+        </div>
       </CollapsibleContent>
     </Collapsible>
   );
-}
-
-export interface S3GetObjPresignRequest {
-  fileUUID: string;
 }

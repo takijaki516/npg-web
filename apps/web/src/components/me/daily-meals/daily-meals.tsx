@@ -22,7 +22,7 @@ export function DailyMealsCard({
   );
 
   return (
-    <div className="flex flex-col gap-1 rounded-md border border-border p-2">
+    <div className="flex flex-col gap-1 rounded-md p-2">
       <div className="flex items-center justify-between">
         <div className="flex gap-1">
           <CookingPot />
@@ -38,7 +38,7 @@ export function DailyMealsCard({
       </div>
 
       {dailyMealsWithFoods.length === 0 && (
-        <div className="flex aspect-square w-full flex-col items-center justify-center gap-8 rounded-md border text-muted-foreground">
+        <div className="flex aspect-square w-full flex-col items-center justify-center gap-8 rounded-md border border-border text-muted-foreground">
           <SearchX size={48} className="animate-[pulse_3s_infinite]" />
           <div>
             {profile.language === "ko"

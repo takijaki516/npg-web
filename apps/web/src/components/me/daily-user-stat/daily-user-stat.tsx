@@ -1,14 +1,15 @@
-import * as React from "react";
 import { useSuspenseQueries } from "@tanstack/react-query";
 
+import {
+  getOrCreateDailyIntakeOptions,
+  type Profile,
+  getOrCreateGoalOptions,
+  getLatestHealthInfoOptions,
+  getDailyMealsWithFoodsOptions,
+} from "@/lib/queries";
 import { UserHealthInfoStat } from "./user-health-info-stat";
 import { UserGoalStat } from "./user-goal-stat";
 import { DailyIntake } from "./daily-intake";
-import {
-  getLatestHealthInfo,
-  getOrCreateGoal,
-  type Profile,
-} from "@/lib/queries";
 
 interface DailyUserStatProps {
   profile: Profile;
@@ -19,23 +20,30 @@ export function DailyUserStat({
   profile,
   currentLocalDateTime,
 }: DailyUserStatProps) {
-  const justDate = currentLocalDateTime.split(" ")[0];
-
-  const [{ data: userGoal }, { data: latestHealthInfo }] = useSuspenseQueries({
+  const [
+    { data: userGoal },
+    { data: latestHealthInfo },
+    { data: dailyIntake },
+    { data: dailyMealsWithFoods },
+  ] = useSuspenseQueries({
     queries: [
-      {
-        queryKey: ["userGoal"],
-        queryFn: getOrCreateGoal,
-      },
-      {
-        queryKey: ["latestHealthInfo"],
-        queryFn: getLatestHealthInfo,
-      },
+      getOrCreateGoalOptions,
+      getLatestHealthInfoOptions,
+      getOrCreateDailyIntakeOptions({
+        currentLocalDateTime,
+        timezone: profile.timezone,
+      }),
+      getDailyMealsWithFoodsOptions({
+        currentLocalDateTime: currentLocalDateTime,
+        timezone: profile.timezone,
+      }),
     ],
   });
 
+  const justDate = currentLocalDateTime.split(" ")[0];
+
   return (
-    <div className="flex flex-col rounded-md border border-border p-2">
+    <div className="flex flex-col rounded-md p-2">
       <div className="flex items-center gap-4 text-lg font-semibold">
         <div className="flex items-center">
           <span>{justDate}</span>
@@ -50,13 +58,12 @@ export function DailyUserStat({
         </div>
       </div>
 
-      {/* REVIEW: if suspense is not working, create a new component for this */}
-      <React.Suspense fallback={<div>Loading...</div>}>
-        <DailyIntake
-          profile={profile}
-          currentLocalDateTime={currentLocalDateTime}
-        />
-      </React.Suspense>
+      <DailyIntake
+        profile={profile}
+        currentLocalDateTime={currentLocalDateTime}
+        dailyMealsWithFoods={dailyMealsWithFoods}
+        dailyIntake={dailyIntake}
+      />
     </div>
   );
 }

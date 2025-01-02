@@ -38,7 +38,7 @@ export function getDailyWeightsExerciseOptions({
         currentLocalDateTime,
         timezone,
       }),
-    staleTime: 5000,
+    staleTime: 1000 * 60 * 5,
   });
 }
 

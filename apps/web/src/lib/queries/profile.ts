@@ -5,7 +5,7 @@ async function getProfile() {
   const res = await honoClient.user.profile.$get();
 
   if (!res.ok) {
-    throw new Error("failed to get profile");
+    throw new Error("Failed to fetch profile");
   }
 
   const body = await res.json();

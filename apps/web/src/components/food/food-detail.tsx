@@ -1,50 +1,23 @@
-import type { Profile } from "@/lib/queries";
+import { cn } from "@/lib/utils";
 
-interface FoodDetailProps {
-  profile: Profile;
-  name: string;
-  calories: number;
-  carbohydrate: number;
-  protein: number;
-  fat: number;
-}
-
-export function FoodDetail({
-  profile,
-  calories,
-  carbohydrate,
-  protein,
-  fat,
-}: FoodDetailProps) {
+export function FoodDetailInfoField({
+  label,
+  value,
+  className,
+}: {
+  label: string;
+  value: string;
+  className?: string;
+}) {
   return (
-    <div className="flex flex-col gap-1 text-sm">
-      <div className="flex items-center justify-between gap-1 rounded-lg bg-muted/50 px-3 py-1">
-        <span className="text-muted-foreground">
-          {profile.language === "ko" ? "칼로리" : "Calories"}
-        </span>
-        <span className="font-medium">{calories}</span>
-      </div>
-
-      <div className="flex items-center justify-between gap-1 rounded-lg bg-muted/50 px-3 py-1">
-        <span className="text-muted-foreground">
-          {profile.language === "ko" ? "탄수화물" : "Carbs"}
-        </span>
-        <span className="font-medium">{carbohydrate}</span>
-      </div>
-
-      <div className="flex items-center justify-between gap-1 rounded-lg bg-muted/50 px-3 py-1">
-        <span className="text-muted-foreground">
-          {profile.language === "ko" ? "단백질" : "Protein"}
-        </span>
-        <span className="font-medium">{protein}</span>
-      </div>
-
-      <div className="flex items-center justify-between gap-1 rounded-lg bg-muted/50 px-3 py-1">
-        <span className="text-muted-foreground">
-          {profile.language === "ko" ? "지방" : "Fat"}
-        </span>
-        <span className="font-medium">{fat}</span>
-      </div>
+    <div
+      className={cn(
+        "flex items-center justify-between gap-1 rounded-lg bg-muted/50 px-3 py-1",
+        className,
+      )}
+    >
+      <span className="text-muted-foreground">{label}</span>
+      <span className="font-medium">{value}</span>
     </div>
   );
 }

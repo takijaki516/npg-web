@@ -1,5 +1,5 @@
 import { Soup } from "lucide-react";
-import { cn } from "../../../../../from-next/src/lib/utils";
+import { cn } from "@/lib/utils";
 
 interface FoodImageProps {
   className?: string;

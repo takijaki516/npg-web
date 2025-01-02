@@ -1,16 +1,13 @@
+import { queryOptions } from "@tanstack/react-query";
 import { honoClient } from "@/lib/hono";
 
-export const getOrCreateDailyIntake = async ({
+const getOrCreateDailyIntake = async ({
   currentLocalDateTime,
   timezone,
 }: {
   currentLocalDateTime: string;
   timezone: string;
 }) => {
-  console.log(
-    "🚀 ~ file: daily-intake.ts:10 ~ currentLocalDateTime:",
-    currentLocalDateTime,
-  );
   const res = await honoClient.user["daily-intake"].$get({
     query: {
       currentLocalDateTime: currentLocalDateTime,
@@ -26,6 +23,20 @@ export const getOrCreateDailyIntake = async ({
 
   return body.dailyIntake;
 };
+
+export function getOrCreateDailyIntakeOptions({
+  currentLocalDateTime,
+  timezone,
+}: {
+  currentLocalDateTime: string;
+  timezone: string;
+}) {
+  return queryOptions({
+    queryKey: ["dailyIntake"],
+    queryFn: () => getOrCreateDailyIntake({ currentLocalDateTime, timezone }),
+    staleTime: 1000 * 60 * 5,
+  });
+}
 
 export type DailyIntake = NonNullable<
   Awaited<ReturnType<typeof getOrCreateDailyIntake>>

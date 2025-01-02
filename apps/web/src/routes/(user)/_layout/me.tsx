@@ -1,29 +1,54 @@
-import * as React from "react";
 import { createFileRoute } from "@tanstack/react-router";
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { DateTime } from "luxon";
 
-import { MeHeader } from "@/components/me-header";
+import { useDateTimeStore } from "@/lib/zustand/time-store";
+import {
+  getDailyMealsWithFoodsOptions,
+  getDailyWeightsExerciseOptions,
+  getLatestHealthInfoOptions,
+  getOrCreateDailyIntakeOptions,
+  getOrCreateGoalOptions,
+} from "@/lib/queries";
 import { BentoDashboard } from "@/components/me/bento-dashboard";
-import { getProfileOptions } from "@/lib/queries";
 
 export const Route = createFileRoute("/(user)/_layout/me")({
   component: RouteComponent,
+  loader: async ({ context }) => {
+    const queryClient = context.queryClient;
+    const profile = context.profile;
+
+    const currentDateTime = DateTime.now().toFormat("yyyy-MM-dd HH:mm:ss");
+    useDateTimeStore.getState().setCurrentDateTime(currentDateTime);
+
+    queryClient.ensureQueryData(getOrCreateGoalOptions);
+    queryClient.ensureQueryData(getLatestHealthInfoOptions);
+    queryClient.ensureQueryData(
+      getOrCreateDailyIntakeOptions({
+        currentLocalDateTime: currentDateTime,
+        timezone: profile.timezone,
+      }),
+    );
+    queryClient.ensureQueryData(
+      getDailyWeightsExerciseOptions({
+        currentLocalDateTime: currentDateTime,
+        timezone: profile.timezone,
+      }),
+    );
+    queryClient.ensureQueryData(
+      getDailyMealsWithFoodsOptions({
+        currentLocalDateTime: currentDateTime,
+        timezone: profile.timezone,
+      }),
+    );
+  },
 });
 
 function RouteComponent() {
-  const { data: profile } = useSuspenseQuery(getProfileOptions);
-
   return (
-    <div className="flex min-h-dvh flex-1 flex-col items-center">
-      <React.Suspense fallback={<div>Loading...</div>}>
-        <MeHeader currentPageTitle={`${profile.email}`} />
-      </React.Suspense>
-
-      <div className="flex w-full max-w-3xl flex-col p-4 pb-[100px] md:pt-6">
-        <main className="flex flex-col lg:w-full lg:items-center">
-          <BentoDashboard />
-        </main>
-      </div>
+    <div className="flex h-dvh flex-1 flex-col items-center justify-center overflow-hidden py-6">
+      <main className="flex max-w-3xl flex-col overflow-y-auto lg:w-full">
+        <BentoDashboard />
+      </main>
     </div>
   );
 }

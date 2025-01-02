@@ -19,7 +19,7 @@ export const Route = createFileRoute("/(auth)/_auth")({
 function RouteComponent() {
   return (
     <div className="relative flex min-h-dvh w-full flex-col items-center bg-background">
-      <Navbar user={null} />
+      <Navbar profile={null} />
       <Outlet />
     </div>
   );

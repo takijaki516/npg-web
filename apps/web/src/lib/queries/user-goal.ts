@@ -1,6 +1,7 @@
-import { honoClient } from "../hono";
+import { queryOptions } from "@tanstack/react-query";
+import { honoClient } from "@/lib/hono";
 
-export const getOrCreateGoal = async () => {
+const getOrCreateGoal = async () => {
   const res = await honoClient.user.goal.$get();
 
   if (!res.ok) {
@@ -23,5 +24,11 @@ export const getOrCreateGoal = async () => {
 
   return body.goal;
 };
+
+export const getOrCreateGoalOptions = queryOptions({
+  queryKey: ["user-goal"],
+  queryFn: getOrCreateGoal,
+  staleTime: 1000 * 60 * 5,
+});
 
 export type UserGoal = NonNullable<Awaited<ReturnType<typeof getOrCreateGoal>>>;

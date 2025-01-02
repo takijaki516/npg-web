@@ -1,22 +1,17 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useRouteContext } from "@tanstack/react-router";
 import { Brain, Camera, Dumbbell, PieChart, Sparkles } from "lucide-react";
-import { useSuspenseQuery } from "@tanstack/react-query";
 
 // import Iphone15Pro from "@/components/ui/iphone-15-pro";
 // import Safari from "@/components/ui/safari";
 import { Card, CardContent } from "@/components/ui/card";
 import { Navbar } from "@/components/navbar";
-import { getProfileOptions } from "@/lib/queries";
 
 export const Route = createFileRoute("/")({
   component: Index,
-  loader: async ({ context }) => {
-    context.queryClient.ensureQueryData(getProfileOptions);
-  },
 });
 
 function Index() {
-  const { data: profile } = useSuspenseQuery(getProfileOptions);
+  const { profile } = useRouteContext({ from: "/" });
 
   return (
     <div className="relative flex min-h-dvh w-full flex-col items-center bg-background">

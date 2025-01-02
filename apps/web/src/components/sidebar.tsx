@@ -14,7 +14,7 @@ import { ModeToggle } from "./mode-toggle";
 const NAVS = [
   {
     title: "코치",
-    url: "/me/coach",
+    url: "/",
     icon: Bot,
   },
   {
@@ -45,7 +45,7 @@ export function Sidebar() {
     <div className="sticky top-0 hidden h-dvh w-[90px] flex-col items-center justify-between overflow-hidden bg-sidebar py-4 md:flex">
       <div className="flex w-full flex-col items-center px-2">
         <Link
-          href="/me"
+          href="/"
           className="flex w-full cursor-pointer items-center justify-center rounded-xl py-4 hover:bg-sidebar-accent"
         >
           <Home />

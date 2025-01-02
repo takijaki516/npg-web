@@ -1,15 +1,13 @@
 import * as React from "react";
 import { Outlet, createRootRouteWithContext } from "@tanstack/react-router";
 import { type QueryClient } from "@tanstack/react-query";
-import type { Session, User } from "better-auth";
 
 import { TanStackRouterDevtools } from "@/components/tanstack-router-devtool";
-import { authClient } from "@/lib/better-auth";
+import { type AuthClient, authClient } from "@/lib/better-auth";
 
 interface RootRouteContext {
   queryClient: QueryClient;
-  session: Session | null;
-  user: User | null;
+  profile: AuthClient["$Infer"]["Session"]["profile"] | null;
 }
 
 export const Route = createRootRouteWithContext<RootRouteContext>()({
@@ -23,7 +21,11 @@ export const Route = createRootRouteWithContext<RootRouteContext>()({
     </>
   ),
   // TODO: add caching
-  beforeLoad: async () => {
+  beforeLoad: async ({ context }) => {
+    if (context.profile) {
+      return { profile: context.profile };
+    }
+
     // NOTE: for first render
     const { data, error } = await authClient.getSession();
 
@@ -34,14 +36,18 @@ export const Route = createRootRouteWithContext<RootRouteContext>()({
 
     if (!data) {
       return {
-        session: null,
-        user: null,
+        profile: null,
       };
     }
 
     return {
-      session: data.session,
-      user: data.user,
+      profile: data.profile,
     };
+  },
+  onError: (error) => {
+    console.log("🚀 ~ file: __root.tsx:32 ~ beforeLoad: ~ error:", error);
+  },
+  errorComponent: ({ error }) => {
+    return <div>{error.message}</div>;
   },
 });

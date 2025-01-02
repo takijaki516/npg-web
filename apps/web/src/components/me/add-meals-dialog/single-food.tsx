@@ -6,7 +6,7 @@ import { insertFoodSchema, insertMealSchema } from "@repo/shared-schema";
 
 import { type Profile } from "@/lib/queries";
 import { FoodImage } from "@/components/food/food-image";
-import { FoodDetail } from "@/components/food/food-detail";
+import { FoodDetailInfoField } from "@/components/food/food-detail";
 import { DeleteButton } from "@/components/delete-button";
 import {
   Collapsible,
@@ -35,9 +35,9 @@ export function SingleFood({ food, mealForm, profile }: SingleFoodProps) {
 
   return (
     <Collapsible open={isCollapsibleOpen} onOpenChange={setIsCollapsibleOpen}>
-      <div className="flex w-full items-center justify-between">
-        <CollapsibleTrigger className="flex w-full items-center gap-4">
-          <div className="flex w-full items-center gap-2">
+      <div className="flex items-center gap-4">
+        <CollapsibleTrigger asChild className="flex items-center">
+          <div className="flex cursor-pointer items-center gap-2">
             {isCollapsibleOpen ? <ChevronDown /> : <ChevronRight />}
             <span>{food.foodName}</span>
           </div>
@@ -47,18 +47,28 @@ export function SingleFood({ food, mealForm, profile }: SingleFoodProps) {
       </div>
 
       <CollapsibleContent className="ml-3 mt-1 flex items-center gap-2 border-l pl-4">
-        <div className="w-32">
+        <div className="aspect-square h-32">
           <FoodImage src={foodPicUrl} />
         </div>
 
-        <FoodDetail
-          profile={profile}
-          name={food.foodName}
-          calories={food.foodCaloriesKcal}
-          carbohydrate={food.foodCarbohydratesG}
-          protein={food.foodProteinG}
-          fat={food.foodFatG}
-        />
+        <div className="flex h-full flex-col justify-center gap-1 text-sm">
+          <FoodDetailInfoField
+            label={profile.language === "ko" ? "칼로리" : "Calories"}
+            value={food.foodCaloriesKcal.toString()}
+          />
+          <FoodDetailInfoField
+            label={profile.language === "ko" ? "탄수화물" : "Carbs"}
+            value={food.foodCarbohydratesG.toString()}
+          />
+          <FoodDetailInfoField
+            label={profile.language === "ko" ? "단백질" : "Protein"}
+            value={food.foodProteinG.toString()}
+          />
+          <FoodDetailInfoField
+            label={profile.language === "ko" ? "지방" : "Fat"}
+            value={food.foodFatG.toString()}
+          />
+        </div>
       </CollapsibleContent>
     </Collapsible>
   );

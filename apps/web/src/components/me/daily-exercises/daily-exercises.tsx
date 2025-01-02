@@ -22,7 +22,7 @@ export function DailyExercisesCard({
   );
 
   return (
-    <div className="flex flex-col gap-1 rounded-md border border-border p-2">
+    <div className="flex flex-col gap-1 rounded-md p-2">
       <div className="flex items-center justify-between">
         <div className="flex gap-1">
           <BicepsFlexed />

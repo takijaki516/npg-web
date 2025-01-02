@@ -53,6 +53,8 @@ export function AddFoodDialog({ mealForm, profile }: AddFoodDialogProps) {
 
       const data = await res.json();
 
+      console.log("🚀 ~ file: add-food-dialog.tsx:55 ~ data:", data);
+
       setIsLLMLoading(false);
       setFoodName(data.foodName);
       setFoodCalories(data.calories);
@@ -96,7 +98,7 @@ export function AddFoodDialog({ mealForm, profile }: AddFoodDialogProps) {
       foodName: foodName,
       foodCaloriesKcal: foodCalories,
       foodCarbohydratesG: foodCarbohydrates,
-      foodProteinG: foodCalories,
+      foodProteinG: foodProteins,
       foodFatG: foodFats,
       foodPicFile: foodImageFile,
     });

@@ -15,8 +15,7 @@ const router = createRouter({
   routeTree,
   context: {
     queryClient,
-    session: null,
-    user: null,
+    profile: null,
   },
   defaultPreload: "intent",
 });

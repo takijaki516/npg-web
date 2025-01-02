@@ -1,6 +1,7 @@
+import { queryOptions } from "@tanstack/react-query";
 import { honoClient } from "@/lib/hono";
 
-export const getLatestHealthInfo = async () => {
+const getLatestHealthInfo = async () => {
   const res = await honoClient.user["latest-health-info"].$get();
 
   if (!res.ok) {
@@ -11,6 +12,12 @@ export const getLatestHealthInfo = async () => {
 
   return body.healthInfo;
 };
+
+export const getLatestHealthInfoOptions = queryOptions({
+  queryKey: ["latest-health-info"],
+  queryFn: getLatestHealthInfo,
+  staleTime: 1000 * 60 * 5,
+});
 
 export type HealthInfo = NonNullable<
   Awaited<ReturnType<typeof getLatestHealthInfo>>

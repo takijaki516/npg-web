@@ -1,7 +1,7 @@
 import { Link, useRouter, createLazyFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
-import { toast } from "sonner";
+
 import { Loader2 } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { authClient } from "@/lib/better-auth";
