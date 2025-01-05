@@ -3,7 +3,7 @@ import { ChevronDown, ChevronRight } from "lucide-react";
 
 import type { DailyMealsWithFoods, Profile } from "@/lib/queries";
 import { FoodImage } from "@/components/food/food-image";
-import { FoodDetailInfoField } from "@/components/food/food-detail";
+import { InfoField } from "@/components/info-field";
 import {
   Collapsible,
   CollapsibleContent,
@@ -35,19 +35,19 @@ export function DailyFood({ food, profile }: DailyFoodProps) {
         </div>
 
         <div className="flex flex-col gap-1 text-sm">
-          <FoodDetailInfoField
+          <InfoField
             label={profile.language === "ko" ? "칼로리" : "Calories"}
             value={food.foodCaloriesKcal.toString()}
           />
-          <FoodDetailInfoField
+          <InfoField
             label={profile.language === "ko" ? "탄수화물" : "Carbs"}
             value={food.foodCarbohydratesG.toString()}
           />
-          <FoodDetailInfoField
+          <InfoField
             label={profile.language === "ko" ? "단백질" : "Protein"}
             value={food.foodProteinG.toString()}
           />
-          <FoodDetailInfoField
+          <InfoField
             label={profile.language === "ko" ? "지방" : "Fat"}
             value={food.foodFatG.toString()}
           />

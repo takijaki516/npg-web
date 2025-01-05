@@ -19,7 +19,7 @@ export function SetInfo({ setInfoData }: SetInfoProps) {
 
       <div className="flex items-center gap-[2px]">
         <span>무게:</span>
-        <span>{setInfoData.weight}</span>
+        <span>{setInfoData.weight}Kg</span>
       </div>
     </div>
   );

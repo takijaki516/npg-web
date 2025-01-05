@@ -1,12 +1,10 @@
 import * as React from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
-import { insertFoodSchema, insertMealSchema } from "@repo/shared-schema";
+import { insertFoodSchema } from "@repo/shared-schema";
 
-import { type Profile } from "@/lib/queries";
 import { FoodImage } from "@/components/food/food-image";
-import { FoodDetailInfoField } from "@/components/food/food-detail";
+import { InfoField } from "@/components/info-field";
 import { DeleteButton } from "@/components/delete-button";
 import {
   Collapsible,
@@ -16,19 +14,14 @@ import {
 
 interface SingleFoodProps {
   food: z.infer<typeof insertFoodSchema>;
-  mealForm: UseFormReturn<z.infer<typeof insertMealSchema>>;
-  profile: Profile;
+  foodIdx: number;
+  removeFood: (idx: number) => void;
 }
 
-export function SingleFood({ food, mealForm, profile }: SingleFoodProps) {
+export function SingleFood({ food, foodIdx, removeFood }: SingleFoodProps) {
   const [isCollapsibleOpen, setIsCollapsibleOpen] = React.useState(false);
 
-  function onRemoveFood() {
-    const foods = mealForm.getValues("foods");
-    const newFoods = foods.filter((f) => f.foodName !== food.foodName);
-    mealForm.setValue("foods", newFoods);
-  }
-
+  // TODO: revoke
   const foodPicUrl = food.foodPicFile
     ? URL.createObjectURL(food.foodPicFile)
     : "";
@@ -43,7 +36,7 @@ export function SingleFood({ food, mealForm, profile }: SingleFoodProps) {
           </div>
         </CollapsibleTrigger>
 
-        <DeleteButton onClick={onRemoveFood} />
+        <DeleteButton onClick={() => removeFood(foodIdx)} />
       </div>
 
       <CollapsibleContent className="ml-3 mt-1 flex items-center gap-2 border-l pl-4">
@@ -52,22 +45,16 @@ export function SingleFood({ food, mealForm, profile }: SingleFoodProps) {
         </div>
 
         <div className="flex h-full flex-col justify-center gap-1 text-sm">
-          <FoodDetailInfoField
-            label={profile.language === "ko" ? "칼로리" : "Calories"}
+          <InfoField
+            label={"칼로리"}
             value={food.foodCaloriesKcal.toString()}
           />
-          <FoodDetailInfoField
-            label={profile.language === "ko" ? "탄수화물" : "Carbs"}
+          <InfoField
+            label={"탄수화물"}
             value={food.foodCarbohydratesG.toString()}
           />
-          <FoodDetailInfoField
-            label={profile.language === "ko" ? "단백질" : "Protein"}
-            value={food.foodProteinG.toString()}
-          />
-          <FoodDetailInfoField
-            label={profile.language === "ko" ? "지방" : "Fat"}
-            value={food.foodFatG.toString()}
-          />
+          <InfoField label={"단백질"} value={food.foodProteinG.toString()} />
+          <InfoField label={"지방"} value={food.foodFatG.toString()} />
         </div>
       </CollapsibleContent>
     </Collapsible>

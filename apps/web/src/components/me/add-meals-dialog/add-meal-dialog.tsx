@@ -1,17 +1,21 @@
 import * as React from "react";
-import { Plus, Utensils } from "lucide-react";
-import { Controller, useForm } from "react-hook-form";
+import { Loader2, Plus, Utensils } from "lucide-react";
+import { Controller, useFieldArray, useForm } from "react-hook-form";
 import { z } from "zod";
 import { v4 as uuidv4 } from "uuid";
-import { toast } from "sonner";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { insertMealSchema } from "@repo/shared-schema";
 
-import { DAILY_MEALS_WITH_FOODS_QUERY_KEY, type Profile } from "@/lib/queries";
+import {
+  GET_DAILY_MEALS_WITH_FOODS_QUERY_KEY,
+  type Profile,
+} from "@/lib/queries";
 import { honoClient } from "@/lib/hono";
 import { AddFoodDialog } from "./add-food-dialog";
 import { SingleFood } from "./single-food";
+import { TimePicker } from "@/components/time-picker";
+import { InfoField } from "@/components/info-field";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -19,11 +23,8 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { TimePicker } from "@/components/time-picker";
-import { FoodDetailInfoField } from "@/components/food/food-detail";
 
 interface AddMealDialogProps {
-  className?: string;
   profile: Profile;
   currentLocalDateTime: string;
 }
@@ -36,6 +37,7 @@ export function AddMealDialog({
 
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+
   const mealForm = useForm<z.infer<typeof insertMealSchema>>({
     resolver: zodResolver(insertMealSchema),
     defaultValues: {
@@ -47,6 +49,22 @@ export function AddMealDialog({
       totalProteinG: 0,
       totalFatG: 0,
       foods: [],
+    },
+  });
+
+  // TODO: add error handling
+  const mutateMeal = useMutation({
+    mutationFn: mealSubmitHandler,
+    onMutate: async () => {
+      console.log(mealForm.watch());
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: [GET_DAILY_MEALS_WITH_FOODS_QUERY_KEY],
+      });
+
+      setIsDialogOpen(false);
+      mealForm.reset();
     },
   });
 
@@ -109,16 +127,6 @@ export function AddMealDialog({
       // TODO: proper error handle
       throw new Error("failed to add meal");
     }
-
-    await queryClient.invalidateQueries({
-      queryKey: [DAILY_MEALS_WITH_FOODS_QUERY_KEY],
-    });
-
-    mealForm.reset();
-    toast.success(
-      profile.language === "ko" ? "식단 추가 완료" : "Meal added successfully",
-    );
-    setIsDialogOpen(false);
   }
 
   React.useEffect(() => {
@@ -141,7 +149,16 @@ export function AddMealDialog({
     mealForm.setValue("totalCarbohydratesG", totalCarbohydrate);
     mealForm.setValue("totalFatG", totalFat);
     mealForm.setValue("totalProteinG", totalProtein);
-  }, [mealForm.watch("foods")]);
+  }, [mealForm, mealForm.watch("foods")]);
+
+  const foodsArrForm = useFieldArray({
+    control: mealForm.control,
+    name: "foods",
+  });
+
+  function handleRemoveFood(foodIdx: number) {
+    foodsArrForm.remove(foodIdx);
+  }
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -161,8 +178,8 @@ export function AddMealDialog({
 
         <div className="flex flex-col gap-2">
           <div className="flex w-fit cursor-pointer items-center gap-1 rounded-lg bg-muted/50 px-3 py-1">
-            <span className="peer flex items-center gap-1 whitespace-nowrap text-muted-foreground">
-              {profile.language === "ko" ? "식사 시간" : "Meal Time"}
+            <span className="flex items-center gap-1 whitespace-nowrap text-muted-foreground">
+              식사 시간
             </span>
 
             <Controller
@@ -179,24 +196,21 @@ export function AddMealDialog({
             />
           </div>
 
-          <div className="grid w-fit grid-cols-2 gap-2">
-            <FoodDetailInfoField
-              label={profile.language === "ko" ? "총 칼로리" : "Total Calories"}
+          <div className="grid w-fit grid-cols-2 gap-1">
+            <InfoField
+              label={"총 칼로리"}
               value={mealForm.watch("totalCaloriesKcal").toString()}
             />
-
-            <FoodDetailInfoField
-              label={profile.language === "ko" ? "총 탄수화물" : "Total Carbs"}
+            <InfoField
+              label={"총 탄수화물"}
               value={mealForm.watch("totalCarbohydratesG").toString()}
             />
-
-            <FoodDetailInfoField
-              label={profile.language === "ko" ? "총 지방" : "Total Fat"}
+            <InfoField
+              label={"총 지방"}
               value={mealForm.watch("totalFatG").toString()}
             />
-
-            <FoodDetailInfoField
-              label={profile.language === "ko" ? "총 단백질" : "Total Protein"}
+            <InfoField
+              label={"총 단백질"}
               value={mealForm.watch("totalProteinG").toString()}
             />
           </div>
@@ -206,28 +220,33 @@ export function AddMealDialog({
           <AddFoodDialog mealForm={mealForm} profile={profile} />
 
           <div className="flex max-h-[300px] flex-col gap-4 overflow-y-auto">
-            {mealForm.getValues("foods").length > 0 &&
-              mealForm.getValues("foods").map((foodItem) => {
-                return (
-                  <SingleFood
-                    key={foodItem.foodName}
-                    food={foodItem}
-                    mealForm={mealForm}
-                    profile={profile}
-                  />
-                );
-              })}
+            {mealForm.watch("foods").map((foodItem, foodIdx) => {
+              return (
+                <SingleFood
+                  key={foodIdx}
+                  food={foodItem}
+                  foodIdx={foodIdx}
+                  removeFood={handleRemoveFood}
+                />
+              );
+            })}
           </div>
         </div>
 
         <div className="flex justify-end gap-2">
-          <Button onClick={mealForm.handleSubmit(mealSubmitHandler)}>
-            {profile.language === "ko" ? "추가" : "Add"}
+          <Button
+            disabled={mutateMeal.isPending}
+            onClick={mealForm.handleSubmit((data) => {
+              mutateMeal.mutate(data);
+            })}
+          >
+            {mutateMeal.isPending ? (
+              <Loader2 size={20} className="animate-spin" />
+            ) : (
+              "추가"
+            )}
           </Button>
-
-          <Button onClick={() => setIsDialogOpen(false)}>
-            {profile.language === "ko" ? "취소" : "Cancel"}
-          </Button>
+          <Button onClick={() => setIsDialogOpen(false)}>취소</Button>
         </div>
       </DialogContent>
     </Dialog>

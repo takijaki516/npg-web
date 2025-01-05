@@ -2,21 +2,13 @@ import * as React from "react";
 import { ChevronDown, ChevronRight } from "lucide-react";
 import { useFieldArray, type UseFormReturn } from "react-hook-form";
 import { z } from "zod";
-import {
-  insertDailyWeightsExerciseSchema,
-  ARM_WORKOUT_NAMES,
-  BACK_WORKOUT_NAMES,
-  CHEST_WORKOUT_NAMES,
-  LEG_WORKOUT_NAMES,
-  SHOULDER_WORKOUT_NAMES,
-  WEIGHT_BODY_PARTS,
-  type WORKOUT_OPTIONS,
-} from "@repo/shared-schema";
+import { insertDailyWeightsExerciseSchema } from "@repo/shared-schema";
 
 import { cn } from "@/lib/utils";
 import { WeightsWorkoutSetForm } from "@/components/me/add-exercises-dialog/add-workout-set";
 import { DeleteButton } from "@/components/delete-button";
-import { Combobox } from "./workout-combobox";
+import { WorkoutSelector } from "./workout-selector";
+import { BodyPartSelector } from "./body-part-selector";
 import {
   Collapsible,
   CollapsibleContent,
@@ -36,24 +28,6 @@ export function WeightWorkoutForm({
   handleRemoveWorkout,
 }: WeightWorkoutFormProps) {
   const [isCollapsibleOpen, setIsCollapsibleOpen] = React.useState(false);
-  const [latestSelectedBodyPart, setLatestSelectedBodyPart] =
-    React.useState<(typeof WEIGHT_BODY_PARTS)[number]>("arms");
-  const [workoutOptions, setWorkoutOptions] =
-    React.useState<WORKOUT_OPTIONS>(ARM_WORKOUT_NAMES);
-
-  React.useEffect(() => {
-    if (latestSelectedBodyPart === "arms") {
-      setWorkoutOptions(ARM_WORKOUT_NAMES);
-    } else if (latestSelectedBodyPart === "chests") {
-      setWorkoutOptions(CHEST_WORKOUT_NAMES);
-    } else if (latestSelectedBodyPart === "back") {
-      setWorkoutOptions(BACK_WORKOUT_NAMES);
-    } else if (latestSelectedBodyPart === "legs") {
-      setWorkoutOptions(LEG_WORKOUT_NAMES);
-    } else if (latestSelectedBodyPart === "shoulders") {
-      setWorkoutOptions(SHOULDER_WORKOUT_NAMES);
-    }
-  }, [latestSelectedBodyPart]);
 
   const weightsWorkoutSetsArrForm = useFieldArray({
     control: form.control,
@@ -63,10 +37,26 @@ export function WeightWorkoutForm({
   function handleAddWorkoutSet() {
     setIsCollapsibleOpen(true);
 
+    const latestSetIdx = weightsWorkoutSetsArrForm.fields.length;
+
+    if (latestSetIdx === 0) {
+      weightsWorkoutSetsArrForm.append({
+        setNumber: 1,
+        reps: 0,
+        weightKg: 0,
+      });
+
+      return;
+    }
+
     weightsWorkoutSetsArrForm.append({
-      weightKg: 0,
-      reps: 0,
-      setNumber: weightsWorkoutSetsArrForm.fields.length + 1,
+      setNumber: latestSetIdx + 1, // 1 based index
+      reps: form.getValues(
+        `weightsWorkouts.${workoutIdx}.weightsWorkoutsSets.${latestSetIdx - 1}.reps`,
+      ),
+      weightKg: form.getValues(
+        `weightsWorkouts.${workoutIdx}.weightsWorkoutsSets.${latestSetIdx - 1}.weightKg`,
+      ),
     });
   }
 
@@ -76,25 +66,10 @@ export function WeightWorkoutForm({
 
   return (
     <div className="flex flex-col gap-4 rounded-md border p-2">
-      <div className="flex justify-between gap-2">
-        <div className="flex w-full flex-col gap-1 overflow-x-auto sm:flex-row">
-          <Combobox
-            placeholder="운동부위"
-            options={{
-              field: "body_part",
-              select_options: WEIGHT_BODY_PARTS,
-              setLatestSelectedBodyPart: setLatestSelectedBodyPart,
-            }}
-            form={form}
-            workoutIdx={workoutIdx}
-          />
-
-          <Combobox
-            placeholder="운동이름"
-            options={{ field: "workout_name", select_options: workoutOptions }}
-            form={form}
-            workoutIdx={workoutIdx}
-          />
+      <div className="flex items-center justify-between gap-2">
+        <div className="flex w-full flex-col gap-1 overflow-x-auto xs:flex-row">
+          <BodyPartSelector form={form} workoutIdx={workoutIdx} />
+          <WorkoutSelector form={form} workoutIdx={workoutIdx} />
         </div>
 
         <DeleteButton
@@ -109,11 +84,15 @@ export function WeightWorkoutForm({
         className="flex flex-col"
       >
         <div className="flex items-center gap-1">
-          <CollapsibleTrigger>
+          <CollapsibleTrigger className="text-foreground/80 hover:text-foreground">
             {isCollapsibleOpen ? <ChevronDown /> : <ChevronRight />}
           </CollapsibleTrigger>
 
-          <Button variant={"outline"} onClick={() => handleAddWorkoutSet()}>
+          <Button
+            variant={"outline"}
+            className="px-2 py-1"
+            onClick={() => handleAddWorkoutSet()}
+          >
             세트 추가
           </Button>
 
@@ -121,7 +100,7 @@ export function WeightWorkoutForm({
             <span>
               {
                 form.watch(`weightsWorkouts.${workoutIdx}.weightsWorkoutsSets`)
-                  .length
+                  ?.length
               }
             </span>
             <span className="pl-1">세트 추가됨</span>
@@ -129,11 +108,11 @@ export function WeightWorkoutForm({
         </div>
 
         <CollapsibleContent>
-          <div className={cn("ml-3 flex flex-col gap-4 border-l pl-2 pt-2")}>
-            {weightsWorkoutSetsArrForm.fields.map((_, setIdx) => {
+          <div className={cn("ml-3 mt-1 flex flex-col border-l pl-2")}>
+            {weightsWorkoutSetsArrForm.fields.map((field, setIdx) => {
               return (
                 <WeightsWorkoutSetForm
-                  key={setIdx}
+                  key={field.id}
                   workoutIdx={workoutIdx}
                   setIdx={setIdx}
                   form={form}

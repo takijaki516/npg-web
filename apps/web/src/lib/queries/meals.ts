@@ -1,6 +1,8 @@
 import { queryOptions } from "@tanstack/react-query";
 import { honoClient } from "@/lib/hono";
 
+export const GET_DAILY_MEALS_WITH_FOODS_QUERY_KEY = "DAILY_MEALS_WITH_FOODS";
+
 const getDailyMealsWithFoods = async ({
   currentLocalDateTime,
   timezone,
@@ -15,8 +17,6 @@ const getDailyMealsWithFoods = async ({
     },
   });
 
-  console.log("🚀 ~ file: meals.ts:17 ~ res:", res);
-
   if (!res.ok) {
     throw new Error("failed to get daily meals with foods");
   }
@@ -26,9 +26,6 @@ const getDailyMealsWithFoods = async ({
   return body.meals;
 };
 
-export const DAILY_MEALS_WITH_FOODS_QUERY_KEY =
-  "DAILY_MEALS_WITH_FOODS_QUERY_KEY";
-
 export function getDailyMealsWithFoodsOptions({
   currentLocalDateTime,
   timezone,
@@ -37,13 +34,13 @@ export function getDailyMealsWithFoodsOptions({
   timezone: string;
 }) {
   return queryOptions({
-    queryKey: [DAILY_MEALS_WITH_FOODS_QUERY_KEY],
+    queryKey: [GET_DAILY_MEALS_WITH_FOODS_QUERY_KEY],
     queryFn: () =>
       getDailyMealsWithFoods({
         currentLocalDateTime,
         timezone,
       }),
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 10,
   });
 }
 

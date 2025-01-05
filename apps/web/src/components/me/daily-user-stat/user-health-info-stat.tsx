@@ -1,22 +1,25 @@
 import { CircleAlert, CircleMinus, Smile, Frown } from "lucide-react";
 import { DateTime } from "luxon";
 
+import type { HealthInfo, Profile } from "@/lib/queries";
 import {
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
-import type { HealthInfo, Profile } from "@/lib/queries";
 
 interface UserHealthInfoStatProps {
   healthInfo?: HealthInfo | null | undefined;
   profile: Profile;
 }
 
-export function UserHealthInfoStat({
-  healthInfo,
-  profile,
-}: UserHealthInfoStatProps) {
+// TODO:
+export function UserHealthInfoStat({ healthInfo }: UserHealthInfoStatProps) {
+  console.log(
+    "🚀 ~ file: user-health-info-stat.tsx:17 ~ UserHealthInfoStat ~ healthInfo:",
+    healthInfo,
+  );
+
   if (!healthInfo) {
     return (
       <Tooltip delayDuration={0} disableHoverableContent={true}>
@@ -25,9 +28,7 @@ export function UserHealthInfoStat({
         </TooltipTrigger>
 
         <TooltipContent className="bg-muted-foreground text-sm">
-          {profile.language === "ko"
-            ? "내 건강정보가 없어요. 건강정보를 입력해주세요."
-            : "Your health information is missing. Please enter your health information."}
+          "내 건강정보가 없어요. 건강정보를 입력해주세요."
         </TooltipContent>
       </Tooltip>
     );
@@ -63,24 +64,17 @@ export function UserHealthInfoStat({
 
   if (healthInfoFreshness === "fresh") {
     ConditionalIcon = <Smile size={20} className="text-green-500" />;
-    conditionalTooltipMessage =
-      profile.language === "ko"
-        ? "최적화된 조언을 받을 수 있어요"
-        : "You can get optimized advice.";
+    conditionalTooltipMessage = "최적화된 조언을 받을 수 있어요";
   } else if (healthInfoFreshness === "moderate") {
     ConditionalIcon = <CircleMinus size={20} className="text-yellow-500" />;
     conditionalTooltipMessage =
-      profile.language === "ko"
-        ? "건강정보를 수정해보세요. 최적화된 조언을 받을 수 있어요."
-        : "Please update your health information. You can get optimized advice.";
+      "건강정보를 수정해보세요. 최적화된 조언을 받을 수 있어요.";
   } else {
     ConditionalIcon = (
       <CircleAlert size={20} className="animate-pulse text-red-500" />
     );
     conditionalTooltipMessage =
-      profile.language === "ko"
-        ? "내 건강정보를 수정한지 2주가 지났어요. 건강정보를 수정해주세요. 최적화된 조언을 받을 수 있어요."
-        : "Your health information has been updated more than 2 weeks ago. Please update your health information. You can get optimized advice.";
+      "내 건강정보를 수정한지 2주가 지났어요. 건강정보를 수정해주세요. 최적화된 조언을 받을 수 있어요.";
   }
 
   return (

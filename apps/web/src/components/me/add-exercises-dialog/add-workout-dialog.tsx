@@ -1,15 +1,19 @@
 import * as React from "react";
 import { z } from "zod";
 import { useFieldArray, useForm, Controller } from "react-hook-form";
-import { Plus } from "lucide-react";
+import { Loader2, Plus } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useQueryClient } from "@tanstack/react-query";
+import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { insertDailyWeightsExerciseSchema } from "@repo/shared-schema";
 
 import { honoClient } from "@/lib/hono";
-import type { Profile } from "@/lib/queries";
+import {
+  GET_DAILY_WEIGHTS_EXERCISES_QUERY_KEY,
+  type Profile,
+} from "@/lib/queries";
 import { WeightWorkoutForm } from "./add-workout-weights";
 import { TimePicker } from "@/components/time-picker";
+import { MinuteSelector } from "@/components/minute-selector";
 import {
   Dialog,
   DialogContent,
@@ -17,7 +21,6 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
-import { MinuteSelector } from "@/components/minute-selector";
 
 interface AddWorkoutDialogProps {
   profile: Profile;
@@ -32,6 +35,7 @@ export function AddWorkoutDialog({
 
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+
   const workoutForm = useForm<z.infer<typeof insertDailyWeightsExerciseSchema>>(
     {
       resolver: zodResolver(insertDailyWeightsExerciseSchema),
@@ -45,38 +49,57 @@ export function AddWorkoutDialog({
     },
   );
 
+  // TODO: add error handling
+  const mutateDailyWeights = useMutation({
+    mutationFn: async (
+      data: z.infer<typeof insertDailyWeightsExerciseSchema>,
+    ) => {
+      await honoClient.weights.$post({
+        json: data,
+      });
+    },
+    onMutate: async () => {
+      console.log(workoutForm.watch());
+    },
+    onSettled: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: [GET_DAILY_WEIGHTS_EXERCISES_QUERY_KEY],
+      });
+
+      setIsDialogOpen(false);
+      workoutForm.reset();
+    },
+  });
+
   const weightsWorkoutsArrForm = useFieldArray({
     control: workoutForm.control,
     name: `weightsWorkouts`,
   });
 
   function handleAddWorkout() {
+    const latestWorkoutIdx = weightsWorkoutsArrForm.fields.length;
+
+    if (latestWorkoutIdx === 0) {
+      weightsWorkoutsArrForm.append({
+        bodyPart: "가슴",
+        workoutName: "",
+        weightsWorkoutsSets: [],
+      });
+
+      return;
+    }
+
     weightsWorkoutsArrForm.append({
-      bodyPart: "arms",
-      workoutName: "barbell-curl",
+      bodyPart: workoutForm.getValues(
+        `weightsWorkouts.${latestWorkoutIdx - 1}.bodyPart`,
+      ),
+      workoutName: "",
       weightsWorkoutsSets: [],
     });
   }
 
   function handleRemoveWorkout(idx: number) {
     weightsWorkoutsArrForm.remove(idx);
-  }
-
-  async function handleSubmitWorkout(
-    data: z.infer<typeof insertDailyWeightsExerciseSchema>,
-  ) {
-    console.log("🚀 ~ file: add-workout-dialog.tsx:75 ~ data:", data);
-
-    const res = await honoClient.weights.$post({
-      json: data,
-    });
-
-    if (res.status === 200) {
-      await queryClient.invalidateQueries({ queryKey: ["weights"] });
-    }
-
-    workoutForm.reset();
-    setIsDialogOpen(false);
   }
 
   return (
@@ -88,48 +111,52 @@ export function AddWorkoutDialog({
       <DialogContent
         onPointerDownOutside={(e) => e.preventDefault()}
         onInteractOutside={(e) => e.preventDefault()}
-        className="flex h-full max-h-[calc(100dvh-80px)] w-full max-w-xl flex-col gap-4 overflow-y-auto"
+        className="flex h-full max-h-[calc(100dvh-80px)] w-full max-w-xl flex-col gap-4 overflow-y-auto rounded-lg"
       >
         <DialogTitle>
           <div className="text-2xl">{justDate}</div>
         </DialogTitle>
 
-        <div className="group flex w-fit cursor-pointer items-center gap-2 rounded-lg bg-muted/50 px-3 py-1">
-          <span className="whitespace-nowrap text-muted-foreground">
-            운동 시간
-          </span>
+        {/*  */}
+        <div className="flex flex-col gap-1">
+          <div className="flex w-[190px] items-center gap-2 rounded-md bg-muted/50 px-2 py-1">
+            <span className="whitespace-nowrap text-muted-foreground">
+              시작 시간
+            </span>
 
-          <Controller
-            name="startTime"
-            control={workoutForm.control}
-            render={({ field }) => (
-              <TimePicker
-                value={field.value}
-                setValue={field.onChange}
-                userLanguage={profile.language}
-                timezone={profile.timezone}
-              />
-            )}
-          />
+            <Controller
+              name="startTime"
+              control={workoutForm.control}
+              render={({ field }) => (
+                <TimePicker
+                  value={field.value}
+                  setValue={field.onChange}
+                  userLanguage={profile.language}
+                  timezone={profile.timezone}
+                />
+              )}
+            />
+          </div>
+
+          <div className="flex w-[190px] items-center gap-2 rounded-md bg-muted/50 px-2 py-1">
+            <span className="whitespace-nowrap text-muted-foreground">
+              운동 시간
+            </span>
+
+            <Controller
+              name="durationMinutes"
+              control={workoutForm.control}
+              render={({ field }) => (
+                <MinuteSelector
+                  setValue={field.onChange}
+                  value={field.value.toString()}
+                />
+              )}
+            />
+          </div>
         </div>
 
-        <div className="group flex w-fit cursor-pointer items-center gap-2 rounded-lg bg-muted/50 px-3 py-1">
-          <span className="whitespace-nowrap text-muted-foreground">
-            운동 시간:
-          </span>
-
-          <Controller
-            name="durationMinutes"
-            control={workoutForm.control}
-            render={({ field }) => (
-              <MinuteSelector
-                setValue={field.onChange}
-                value={field.value.toString()}
-              />
-            )}
-          />
-        </div>
-
+        {/*  */}
         <div className="flex flex-1 flex-col gap-2 rounded-md">
           <Button
             variant={"outline"}
@@ -141,10 +168,10 @@ export function AddWorkoutDialog({
           </Button>
 
           <div className="flex max-h-[500px] flex-col gap-4 overflow-y-auto">
-            {workoutForm.getValues("weightsWorkouts").map((_, workoutIdx) => {
+            {weightsWorkoutsArrForm.fields.map((field, workoutIdx) => {
               return (
                 <WeightWorkoutForm
-                  key={workoutIdx}
+                  key={field.id}
                   workoutIdx={workoutIdx}
                   form={workoutForm}
                   handleRemoveWorkout={handleRemoveWorkout}
@@ -155,10 +182,23 @@ export function AddWorkoutDialog({
         </div>
 
         <div className="flex justify-end gap-2">
-          <Button onClick={workoutForm.handleSubmit(handleSubmitWorkout)}>
-            추가
+          <Button
+            disabled={mutateDailyWeights.isPending}
+            onClick={workoutForm.handleSubmit((data) => {
+              mutateDailyWeights.mutate(data);
+            })}
+          >
+            {mutateDailyWeights.isPending ? (
+              <Loader2 size={20} className="animate-spin" />
+            ) : profile.language === "ko" ? (
+              "추가"
+            ) : (
+              "Add"
+            )}
           </Button>
-          <Button onClick={() => setIsDialogOpen(false)}>취소</Button>
+          <Button onClick={() => setIsDialogOpen(false)}>
+            {profile.language === "ko" ? "취소" : "Cancel"}
+          </Button>
         </div>
       </DialogContent>
     </Dialog>

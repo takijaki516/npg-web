@@ -77,7 +77,7 @@ export function TimePicker({
   return (
     <div
       className={cn(
-        "relative flex items-center rounded-lg bg-muted/50 px-1 hover:cursor-pointer hover:bg-background/50 peer-hover:bg-background/50",
+        "relative flex items-center rounded-md bg-background px-1 hover:cursor-pointer hover:bg-accent",
         className,
       )}
       ref={dropdownRef}
@@ -94,12 +94,9 @@ export function TimePicker({
           className="w-12 cursor-pointer bg-transparent text-center outline-none"
         />
       </div>
-      {/* TODO: fix UI */}
-      <button
-        className="rounded-md p-1 text-muted-foreground hover:bg-background/80"
-        onClick={handleNowClick}
-      >
-        <Clock className="h-4 w-4" />
+
+      <button className="rounded-md p-1" onClick={handleNowClick}>
+        <Clock className="h-4 w-4 text-muted-foreground hover:text-foreground" />
       </button>
 
       {isOpen && (

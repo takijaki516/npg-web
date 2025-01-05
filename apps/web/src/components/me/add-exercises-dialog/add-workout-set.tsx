@@ -2,6 +2,7 @@ import { UseFormReturn } from "react-hook-form";
 import { z } from "zod";
 import { insertDailyWeightsExerciseSchema } from "@repo/shared-schema";
 
+import { cn } from "@/lib/utils";
 import { DeleteButton } from "@/components/delete-button";
 
 interface WeightsWorkoutSetFormProps {
@@ -18,18 +19,23 @@ export function WeightsWorkoutSetForm({
   removeWorkoutSet,
 }: WeightsWorkoutSetFormProps) {
   return (
-    <div className="flex w-fit items-center gap-1 overflow-x-auto">
+    <div className="flex w-min items-center gap-2 p-1">
       <span>
         #
-        {form.getValues(
+        {form.watch(
           `weightsWorkouts.${workoutIdx}.weightsWorkoutsSets.${setIdx}.setNumber`,
         )}
       </span>
 
-      <div className="flex items-center gap-1">
+      <div className="inline-flex items-center gap-[2px]">
         <label className="break-keep">횟수</label>
         <input
-          className="w-10 rounded-md px-1"
+          className={cn(
+            "w-[5ch] border text-end",
+            "rounded-md bg-transparent px-1 pr-[6px]",
+            "focus:outline-none",
+            "[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
+          )}
           type="number"
           {...form.register(
             `weightsWorkouts.${workoutIdx}.weightsWorkoutsSets.${setIdx}.reps`,
@@ -40,18 +46,26 @@ export function WeightsWorkoutSetForm({
         />
       </div>
 
-      <div className="flex items-center gap-1">
+      <div className="inline-flex items-center gap-[2px]">
         <label className="break-keep">무게</label>
-        <input
-          className="w-14 rounded-md px-1"
-          type="number"
-          {...form.register(
-            `weightsWorkouts.${workoutIdx}.weightsWorkoutsSets.${setIdx}.weightKg`,
-            {
-              valueAsNumber: true,
-            },
-          )}
-        />
+        <div className="flex items-center">
+          <input
+            className={cn(
+              "w-[6ch] border text-end",
+              "rounded-md bg-transparent px-1 pr-[6px]",
+              "focus:outline-none",
+              "[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
+            )}
+            type="number"
+            {...form.register(
+              `weightsWorkouts.${workoutIdx}.weightsWorkoutsSets.${setIdx}.weightKg`,
+              {
+                valueAsNumber: true,
+              },
+            )}
+          />
+          <span>kg</span>
+        </div>
       </div>
 
       <DeleteButton

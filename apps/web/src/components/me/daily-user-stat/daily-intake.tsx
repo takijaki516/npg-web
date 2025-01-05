@@ -1,9 +1,14 @@
-import { Bot, Loader2 } from "lucide-react";
+import { Bot, Loader2, Info } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 import { cn } from "@/lib/utils";
 import { honoClient } from "@/lib/hono";
-import type { DailyMealsWithFoods, DailyIntake, Profile } from "@/lib/queries";
+import {
+  type DailyMealsWithFoods,
+  type DailyIntake,
+  type Profile,
+  GET_OR_CREATE_DAILY_INTAKE_QUERY_KEY,
+} from "@/lib/queries";
 import { useMealHoverStore } from "@/lib/zustand/meal-hover-store";
 import { useFoodHoverStore } from "@/lib/zustand/food-hover-store";
 
@@ -35,15 +40,12 @@ export function DailyIntake({
         },
       });
     },
-    onMutate: async () => {
-      // TODO: snapshot previous intake
-    },
     onError: () => {
       // TODO: error handling
     },
     onSettled: async () => {
       await queryClient.invalidateQueries({
-        queryKey: ["dailyIntake"],
+        queryKey: [GET_OR_CREATE_DAILY_INTAKE_QUERY_KEY],
       });
     },
   });
@@ -68,39 +70,43 @@ export function DailyIntake({
   }, 0);
 
   return (
-    <div className={cn("grid auto-rows-min grid-cols-5 gap-2 pt-2")}>
-      <div className="col-span-3 grid h-fit grid-cols-7">
+    <div className={cn("h-[148px] pt-2 sm:grid sm:grid-cols-5 sm:gap-2")}>
+      <div className="grid grid-cols-6 sm:col-span-3">
         <div className="col-span-2 col-start-2 flex items-center">
-          <div>cur/goal</div>
+          <div>현재/목표</div>
         </div>
 
-        <div className="col-span-1 col-start-4 flex h-fit cursor-pointer items-center">
-          <div className="rounded-full p-2 hover:bg-muted">
+        <div className="col-span-3 col-start-4 flex items-center justify-between">
+          <div className="cursor-pointer rounded-md p-1 hover:bg-muted">
             {mutateIntake.isPending ? (
               <Loader2 size={20} className="animate-spin" />
             ) : (
               <Bot onClick={() => mutateIntake.mutate()} size={20} />
             )}
           </div>
+
+          <div className="rounded-md p-1 hover:bg-muted sm:hidden">
+            <Info size={20} />
+          </div>
         </div>
 
-        <div className="col-span-full space-y-1.5">
-          <div className="grid grid-cols-7 items-center gap-2">
-            <div className="col-span-1 w-16 whitespace-nowrap">칼로리</div>
+        <div className="col-span-full space-y-1 pt-1">
+          <div className="grid grid-cols-6">
+            <div className="col-span-1 whitespace-nowrap">칼로리</div>
 
-            <div className="w-26 col-span-2 flex gap-1">
+            <div className="col-span-2 flex items-center gap-1">
               <span>{intakeTotalKCal ?? "0"}</span>
               <span>/</span>
               <span>{goalCaloriesKcal ?? "?"}</span>
               <span>Kcal</span>
             </div>
 
-            {goalCaloriesKcal && (
-              <div
-                className={cn(
-                  "col-span-4 h-5 flex-1 overflow-hidden rounded-full bg-muted",
-                )}
-              >
+            <div
+              className={cn(
+                "col-span-3 h-5 overflow-hidden rounded-full bg-muted",
+              )}
+            >
+              {goalCaloriesKcal && (
                 <div className="flex h-full w-full items-center">
                   {dailyMealsWithFoods.map((meal) => {
                     const width =
@@ -111,7 +117,7 @@ export function DailyIntake({
                     return (
                       <div
                         key={meal.id}
-                        className={cn("flex h-full bg-red-500")}
+                        className={cn("flex h-full")}
                         style={{
                           width: `${width}%`,
                         }}
@@ -128,7 +134,7 @@ export function DailyIntake({
                               key={food.id}
                               className={cn(
                                 "z-10 h-full bg-green-500",
-                                isMealHovered && "bg-red-400",
+                                isMealHovered && "bg-red-500",
                                 isFoodHovered && "bg-red-600",
                               )}
                               style={{
@@ -141,35 +147,37 @@ export function DailyIntake({
                     );
                   })}
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
 
-          <div className="grid grid-cols-7 items-center gap-2">
-            <div className="col-span-1 w-16 whitespace-nowrap">탄수화물</div>
+          <div className="grid grid-cols-6 gap-1">
+            <div className="col-span-1 whitespace-nowrap">탄수화물</div>
 
-            <div className="w-26 col-span-2 flex gap-1">
+            <div className="col-span-2 flex items-center gap-1">
               <span>{intakeTotalCarbohydratesG ?? "0"}</span>
               <span>/</span>
               <span>{goalCarbohydratesG ?? "?"}</span>
               <span>g</span>
             </div>
 
-            {goalCarbohydratesG && (
-              <div
-                className={cn(
-                  "col-span-4 h-5 flex-1 overflow-hidden rounded-full bg-muted",
-                )}
-              >
+            <div
+              className={cn(
+                "col-span-3 h-5 overflow-hidden rounded-full bg-muted",
+              )}
+            >
+              {goalCarbohydratesG && (
                 <div className="flex h-full w-full items-center">
                   {dailyMealsWithFoods.map((meal) => {
                     const width =
                       (meal.totalCarbohydratesG / goalCarbohydratesG) * 100;
 
+                    const isMealHovered = hoveredMealId === meal.id;
+
                     return (
                       <div
                         key={meal.id}
-                        className={cn("flex h-full bg-green-500")}
+                        className={cn("flex h-full")}
                         style={{
                           width: `${width}%`,
                         }}
@@ -180,10 +188,16 @@ export function DailyIntake({
                               meal.totalCarbohydratesG) *
                             100;
 
+                          const isFoodHovered = hoveredFoodId === food.id;
+
                           return (
                             <div
                               key={food.id}
-                              className="h-full bg-green-500"
+                              className={cn(
+                                "z-10 h-full bg-green-500",
+                                isMealHovered && "bg-red-500",
+                                isFoodHovered && "bg-red-600",
+                              )}
                               style={{
                                 width: `${width}%`,
                               }}
@@ -194,29 +208,31 @@ export function DailyIntake({
                     );
                   })}
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
 
-          <div className="grid grid-cols-7 items-center gap-2">
-            <div className="col-span-1 w-16 whitespace-nowrap">단백질</div>
+          <div className="grid grid-cols-6">
+            <div className="col-span-1 whitespace-nowrap">단백질</div>
 
-            <div className="w-26 col-span-2 flex gap-1">
+            <div className="col-span-2 flex items-center gap-1">
               <span>{intakeTotalProteinG ?? "0"}</span>
               <span>/</span>
               <span>{goalProteinG ?? "?"}</span>
               <span>g</span>
             </div>
 
-            {goalProteinG && (
-              <div
-                className={cn(
-                  "col-span-4 h-5 flex-1 overflow-hidden rounded-full bg-muted",
-                )}
-              >
+            <div
+              className={cn(
+                "col-span-3 h-5 overflow-hidden rounded-full bg-muted",
+              )}
+            >
+              {goalProteinG && (
                 <div className="flex h-full w-full items-center">
                   {dailyMealsWithFoods.map((meal) => {
                     const width = (meal.totalProteinG / goalProteinG) * 100;
+
+                    const isMealHovered = hoveredMealId === meal.id;
 
                     return (
                       <div
@@ -230,10 +246,16 @@ export function DailyIntake({
                           const width =
                             (food.foodProteinG / meal.totalProteinG) * 100;
 
+                          const isFoodHovered = hoveredFoodId === food.id;
+
                           return (
                             <div
                               key={food.id}
-                              className="h-full bg-green-500"
+                              className={cn(
+                                "z-10 h-full bg-green-500",
+                                isMealHovered && "bg-red-500",
+                                isFoodHovered && "bg-red-600",
+                              )}
                               style={{
                                 width: `${width}%`,
                               }}
@@ -244,29 +266,31 @@ export function DailyIntake({
                     );
                   })}
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
 
-          <div className="grid grid-cols-7 items-center gap-2">
-            <div className="col-span-1 w-16 whitespace-nowrap">지방</div>
+          <div className="grid grid-cols-6">
+            <div className="col-span-1 whitespace-nowrap">지방</div>
 
-            <div className="w-26 col-span-2 flex gap-1">
+            <div className="col-span-2 flex items-center gap-1">
               <span>{intakeTotalFatG ?? "0"}</span>
               <span>/</span>
               <span>{goalFatG ?? "?"}</span>
               <span>g</span>
             </div>
 
-            {goalFatG && (
-              <div
-                className={cn(
-                  "col-span-4 h-5 flex-1 overflow-hidden rounded-full bg-muted",
-                )}
-              >
+            <div
+              className={cn(
+                "col-span-3 h-5 overflow-hidden rounded-full bg-muted",
+              )}
+            >
+              {goalFatG && (
                 <div className="flex h-full w-full items-center">
                   {dailyMealsWithFoods.map((meal) => {
                     const width = (meal.totalFatG / goalFatG) * 100;
+
+                    const isMealHovered = hoveredMealId === meal.id;
 
                     return (
                       <div
@@ -279,10 +303,16 @@ export function DailyIntake({
                         {meal.foods.map((food) => {
                           const width = (food.foodFatG / meal.totalFatG) * 100;
 
+                          const isFoodHovered = hoveredFoodId === food.id;
+
                           return (
                             <div
                               key={food.id}
-                              className="h-full bg-green-500"
+                              className={cn(
+                                "z-10 h-full bg-green-500",
+                                isMealHovered && "bg-red-500",
+                                isFoodHovered && "bg-red-600",
+                              )}
                               style={{
                                 width: `${width}%`,
                               }}
@@ -293,13 +323,13 @@ export function DailyIntake({
                     );
                   })}
                 </div>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="col-span-2 max-h-fit min-h-0 overflow-y-auto whitespace-pre-wrap rounded-md border border-border p-1">
+      <div className="hidden h-full min-h-0 overflow-y-auto whitespace-pre-wrap rounded-md border border-border p-1 sm:col-span-2 sm:flex">
         {dailyIntake.llmDescription}
       </div>
     </div>

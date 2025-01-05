@@ -27,13 +27,13 @@ export function AddFoodDialog({ mealForm, profile }: AddFoodDialogProps) {
   const [foodImageFile, setFoodImageFile] = React.useState<File>();
   const [isLLMLoading, setIsLLMLoading] = React.useState(false);
 
-  //
   const [foodName, setFoodName] = React.useState("");
   const [foodCalories, setFoodCalories] = React.useState(0);
   const [foodCarbohydrates, setFoodCarbohydrates] = React.useState(0);
   const [foodProteins, setFoodProteins] = React.useState(0);
   const [foodFats, setFoodFats] = React.useState(0);
 
+  // calculate calories on image drop
   const onDrop = React.useCallback(
     async (acceptedFiles: File[]) => {
       if (!acceptedFiles[0]) return;
@@ -41,6 +41,7 @@ export function AddFoodDialog({ mealForm, profile }: AddFoodDialogProps) {
       setFoodImageFile(acceptedFiles[0]);
 
       setIsLLMLoading(true);
+
       const formData = new FormData();
       formData.append("image", acceptedFiles[0]);
       formData.append("language", profile.language);
@@ -53,9 +54,8 @@ export function AddFoodDialog({ mealForm, profile }: AddFoodDialogProps) {
 
       const data = await res.json();
 
-      console.log("🚀 ~ file: add-food-dialog.tsx:55 ~ data:", data);
-
       setIsLLMLoading(false);
+
       setFoodName(data.foodName);
       setFoodCalories(data.calories);
       setFoodCarbohydrates(data.carbohydrate);
@@ -87,10 +87,9 @@ export function AddFoodDialog({ mealForm, profile }: AddFoodDialogProps) {
       !foodImageFile
     ) {
       toast.error(
-        profile.language === "ko"
-          ? "모든 정보를 입력해주세요. AI를 활용해 보세요 편리하게 추가할 수 있어요"
-          : "Please fill in all information. You can easily add it using AI",
+        "모든 정보를 입력해주세요. AI를 활용해 보세요 편리하게 추가할 수 있어요",
       );
+
       return;
     }
 
@@ -103,6 +102,9 @@ export function AddFoodDialog({ mealForm, profile }: AddFoodDialogProps) {
       foodPicFile: foodImageFile,
     });
 
+    // close dialog
+    setIsFoodDialogOpen(false);
+
     // reset field
     setFoodName("");
     setFoodCalories(0);
@@ -110,9 +112,6 @@ export function AddFoodDialog({ mealForm, profile }: AddFoodDialogProps) {
     setFoodProteins(0);
     setFoodFats(0);
     setFoodImageFile(undefined);
-
-    // close dialog
-    setIsFoodDialogOpen(false);
   }
 
   return (
@@ -120,7 +119,7 @@ export function AddFoodDialog({ mealForm, profile }: AddFoodDialogProps) {
       <DialogTrigger asChild>
         <Button variant={"outline"} className="flex items-center">
           <Plus className="h-9 w-9" />
-          {profile.language === "ko" ? "음식 추가" : "Add Food"}
+          음식 추가
         </Button>
       </DialogTrigger>
 
@@ -129,9 +128,7 @@ export function AddFoodDialog({ mealForm, profile }: AddFoodDialogProps) {
         onInteractOutside={(e) => e.preventDefault()}
         className="flex max-h-[calc(100dvh-80px)] w-full max-w-xl flex-col gap-4 overflow-y-auto"
       >
-        <DialogTitle>
-          {profile.language === "ko" ? "음식 추가" : "Add Food"}
-        </DialogTitle>
+        <DialogTitle>음식 추가</DialogTitle>
 
         <div className="flex w-full flex-col items-center gap-2">
           {foodImageFile ? (
@@ -152,22 +149,24 @@ export function AddFoodDialog({ mealForm, profile }: AddFoodDialogProps) {
             </div>
           ) : (
             <div
-              className="flex h-60 w-60 cursor-pointer items-center justify-center rounded-md border border-border bg-muted/40"
+              className="flex h-60 w-60 cursor-pointer flex-col items-center justify-center gap-2 rounded-md border border-border bg-muted/40"
               {...getRootProps()}
             >
               <input {...getInputProps()} />
+
               <ImageUp className="size-12" />
+              <div className="w-40 text-center">
+                음식 이미지를 업로드해주세요. 칼로리 계산을 위해 필요해요
+              </div>
             </div>
           )}
 
           <div className="grid w-full max-w-lg grid-cols-1 gap-2 py-2 sm:grid-cols-2">
             <div className="flex items-center gap-1">
-              <Label className="w-16 break-keep text-center">
-                {profile.language === "ko" ? "이름" : "Name"}
-              </Label>
+              <Label className="w-16 break-keep text-center">이름</Label>
 
               {isLLMLoading ? (
-                <RotateCw className="animate-spin" />
+                <RotateCw className="animate-spin text-muted-foreground" />
               ) : (
                 <Input
                   value={foodName}
@@ -177,12 +176,10 @@ export function AddFoodDialog({ mealForm, profile }: AddFoodDialogProps) {
             </div>
 
             <div className="flex items-center gap-1">
-              <Label className="w-16 break-keep text-center">
-                {profile.language === "ko" ? "칼로리" : "Calories"}
-              </Label>
+              <Label className="w-16 break-keep text-center">칼로리</Label>
 
               {isLLMLoading ? (
-                <RotateCw className="animate-spin" />
+                <RotateCw className="animate-spin text-muted-foreground" />
               ) : (
                 <Input
                   value={foodCalories}
@@ -192,12 +189,10 @@ export function AddFoodDialog({ mealForm, profile }: AddFoodDialogProps) {
             </div>
 
             <div className="flex items-center gap-1">
-              <Label className="w-16 break-keep text-center">
-                {profile.language === "ko" ? "탄수화물" : "Carbs"}
-              </Label>
+              <Label className="w-16 break-keep text-center">탄수화물</Label>
 
               {isLLMLoading ? (
-                <RotateCw className="animate-spin" />
+                <RotateCw className="animate-spin text-muted-foreground" />
               ) : (
                 <Input
                   value={foodCarbohydrates}
@@ -207,12 +202,10 @@ export function AddFoodDialog({ mealForm, profile }: AddFoodDialogProps) {
             </div>
 
             <div className="flex items-center gap-1">
-              <Label className="w-16 break-keep text-center">
-                {profile.language === "ko" ? "단백질" : "Protein"}
-              </Label>
+              <Label className="w-16 break-keep text-center">단백질</Label>
 
               {isLLMLoading ? (
-                <RotateCw className="animate-spin" />
+                <RotateCw className="animate-spin text-muted-foreground" />
               ) : (
                 <Input
                   value={foodProteins}
@@ -222,12 +215,10 @@ export function AddFoodDialog({ mealForm, profile }: AddFoodDialogProps) {
             </div>
 
             <div className="flex items-center gap-1">
-              <Label className="w-16 break-keep text-center">
-                {profile.language === "ko" ? "지방" : "Fat"}
-              </Label>
+              <Label className="w-16 break-keep text-center">지방</Label>
 
               {isLLMLoading ? (
-                <RotateCw className="animate-spin" />
+                <RotateCw className="animate-spin text-muted-foreground" />
               ) : (
                 <Input
                   value={foodFats}
@@ -237,8 +228,16 @@ export function AddFoodDialog({ mealForm, profile }: AddFoodDialogProps) {
             </div>
           </div>
 
-          <Button className="w-full max-w-lg" onClick={handleAddFood}>
-            <Check />
+          <Button
+            className="w-full max-w-lg"
+            onClick={handleAddFood}
+            disabled={isLLMLoading}
+          >
+            {isLLMLoading ? (
+              <RotateCw className="animate-spin text-muted-foreground" />
+            ) : (
+              <Check />
+            )}
           </Button>
         </div>
       </DialogContent>

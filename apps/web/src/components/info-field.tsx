@@ -1,6 +1,6 @@
 import { cn } from "@/lib/utils";
 
-export function FoodDetailInfoField({
+export function InfoField({
   label,
   value,
   className,

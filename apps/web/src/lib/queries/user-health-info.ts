@@ -16,7 +16,7 @@ const getLatestHealthInfo = async () => {
 export const getLatestHealthInfoOptions = queryOptions({
   queryKey: ["latest-health-info"],
   queryFn: getLatestHealthInfo,
-  staleTime: 1000 * 60 * 5,
+  staleTime: 1000 * 60 * 10,
 });
 
 export type HealthInfo = NonNullable<

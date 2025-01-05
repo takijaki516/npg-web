@@ -6,6 +6,7 @@ import { BentoGrid, BentoGridItem } from "@/components/me/bento-grid";
 import { DailyUserStat } from "./daily-user-stat/daily-user-stat";
 import { DailyExercisesCard } from "./daily-exercises/daily-exercises";
 import { DailyMealsCard } from "./daily-meals/daily-meals";
+import { MobileBentoGrid } from "./mobile-bento-grid";
 
 export function BentoDashboard() {
   const { profile } = useRouteContext({ from: "/(user)/_layout" });
@@ -14,8 +15,8 @@ export function BentoDashboard() {
   );
 
   return (
-    <BentoGrid className="grid w-full gap-4 md:grid-cols-2">
-      <BentoGridItem className="rounded-xl md:col-span-full">
+    <BentoGrid className="grid h-full w-full grid-rows-[auto_1fr] gap-4 sm:grid-cols-2">
+      <BentoGridItem className="h-fit rounded-md border sm:col-span-full">
         <React.Suspense fallback={<div>Loading...</div>}>
           <DailyUserStat
             profile={profile}
@@ -24,7 +25,7 @@ export function BentoDashboard() {
         </React.Suspense>
       </BentoGridItem>
 
-      <BentoGridItem className="hidden rounded-xl md:inline-block">
+      <BentoGridItem className="hidden overflow-y-auto rounded-md sm:inline-block">
         <React.Suspense fallback={<div>Loading...</div>}>
           <DailyExercisesCard
             profile={profile}
@@ -33,7 +34,7 @@ export function BentoDashboard() {
         </React.Suspense>
       </BentoGridItem>
 
-      <BentoGridItem className="hidden rounded-xl md:inline-block">
+      <BentoGridItem className="hidden overflow-y-auto rounded-md sm:inline-block">
         <React.Suspense fallback={<div>Loading...</div>}>
           <DailyMealsCard
             profile={profile}
@@ -42,7 +43,25 @@ export function BentoDashboard() {
         </React.Suspense>
       </BentoGridItem>
 
-      <BentoGridItem className="md:hidden">MobileBottomGrid</BentoGridItem>
+      <MobileBentoGrid
+        className="overflow-y-auto rounded-md sm:hidden"
+        exercises={
+          <React.Suspense fallback={<div>Loading...</div>}>
+            <DailyExercisesCard
+              profile={profile}
+              currentLocalDateTime={currentLocalDateTime}
+            />
+          </React.Suspense>
+        }
+        meals={
+          <React.Suspense fallback={<div>Loading...</div>}>
+            <DailyMealsCard
+              profile={profile}
+              currentLocalDateTime={currentLocalDateTime}
+            />
+          </React.Suspense>
+        }
+      />
     </BentoGrid>
   );
 }

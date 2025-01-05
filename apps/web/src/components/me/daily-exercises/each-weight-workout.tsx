@@ -6,14 +6,14 @@ import {
   ChevronRight,
 } from "lucide-react";
 
+import { cn } from "@/lib/utils";
 import { type DailyWeightsExercisesWithAllInfos } from "@/lib/queries";
+import { SetInfo } from "@/components/me/daily-exercises/set-info";
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
 } from "@/components/ui/collapsible";
-import { SetInfo } from "@/components/me/daily-exercises/set-info";
-import { cn } from "@/lib/utils";
 
 interface EachWeightWorkoutProps {
   eachWeightWorkoutData: DailyWeightsExercisesWithAllInfos[number]["eachWeightsExercises"][number];
@@ -27,18 +27,22 @@ export function EachWeightWorkout({
   return (
     <div className="flex flex-col rounded-md border p-1">
       <Collapsible open={isCollapsibleOpen} onOpenChange={setIsCollapsibleOpen}>
-        <CollapsibleTrigger className="flex items-center">
+        <CollapsibleTrigger className="flex w-full items-center">
           {isCollapsibleOpen ? <ChevronDown /> : <ChevronRight />}
 
-          <div className="flex items-center gap-6">
-            <div className="flex items-center">
-              <PersonStanding />
-              {eachWeightWorkoutData.bodyPart}
+          <div className="flex w-full flex-1 items-center gap-6">
+            <div className="flex flex-[1_1_0%] items-center gap-[2px]">
+              <PersonStanding size={18} />
+              <span className="break-keep">
+                {eachWeightWorkoutData.bodyPart}
+              </span>
             </div>
 
-            <div className="flex items-center gap-1">
-              <Dumbbell />
-              {eachWeightWorkoutData.workoutName}
+            <div className="flex flex-[3_1_0%] items-center gap-[2px]">
+              <Dumbbell size={18} />
+              <span className="break-keep">
+                {eachWeightWorkoutData.workoutName}
+              </span>
             </div>
           </div>
         </CollapsibleTrigger>

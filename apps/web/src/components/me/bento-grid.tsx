@@ -18,13 +18,6 @@ interface BentoGridItemProps {
 
 export function BentoGridItem({ children, className }: BentoGridItemProps) {
   return (
-    <div
-      className={cn(
-        "group relative flex flex-col border border-border",
-        className,
-      )}
-    >
-      {children}
-    </div>
+    <div className={cn("border border-border", className)}>{children}</div>
   );
 }

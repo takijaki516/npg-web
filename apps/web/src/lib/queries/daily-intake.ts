@@ -1,6 +1,9 @@
 import { queryOptions } from "@tanstack/react-query";
 import { honoClient } from "@/lib/hono";
 
+export const GET_OR_CREATE_DAILY_INTAKE_QUERY_KEY =
+  "GET_OR_CREATE_DAILY_INTAKE";
+
 const getOrCreateDailyIntake = async ({
   currentLocalDateTime,
   timezone,
@@ -32,9 +35,9 @@ export function getOrCreateDailyIntakeOptions({
   timezone: string;
 }) {
   return queryOptions({
-    queryKey: ["dailyIntake"],
+    queryKey: [GET_OR_CREATE_DAILY_INTAKE_QUERY_KEY],
     queryFn: () => getOrCreateDailyIntake({ currentLocalDateTime, timezone }),
-    staleTime: 1000 * 60 * 5,
+    staleTime: 1000 * 60 * 10,
   });
 }
 

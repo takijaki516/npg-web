@@ -1,7 +1,5 @@
-"use client";
-
-import { cn } from "@/lib/utils";
 import { X } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface DeleteButtonProps {
   onClick: () => void;
@@ -10,14 +8,8 @@ interface DeleteButtonProps {
 
 export function DeleteButton({ onClick, className }: DeleteButtonProps) {
   return (
-    <button
-      onClick={onClick}
-      className={cn(
-        "group flex items-center justify-center rounded-full transition-colors hover:bg-red-500/80",
-        className,
-      )}
-    >
-      <X className="text-red-500/80 transition-colors group-hover:text-white/80" />
+    <button onClick={onClick} className={cn(className)}>
+      <X className="text-red-500/60 transition-colors hover:text-red-500" />
     </button>
   );
 }

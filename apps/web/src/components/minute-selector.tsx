@@ -53,35 +53,33 @@ export function MinuteSelector({ setValue, value }: MinuteSelectorProps) {
   }, []);
 
   return (
-    <div className="relative w-40" ref={dropdownRef}>
-      <div className="flex items-center rounded-md border border-gray-300">
-        <div className="relative flex-grow">
-          <input
-            type="number"
-            value={value}
-            onChange={handleInputChange}
-            className="w-full rounded-l-md px-3 py-2 pr-6 text-end text-sm focus:outline-none"
-            aria-label="Select or enter minutes"
-          />
-        </div>
+    <div className="relative w-24" ref={dropdownRef}>
+      <div className="flex items-center rounded-md border bg-background">
+        <input
+          type="number"
+          value={value}
+          onChange={handleInputChange}
+          className="w-full rounded-l-md bg-transparent text-center text-sm focus:outline-none"
+          aria-label="Select or enter minutes"
+        />
 
         <button
           onClick={toggleDropdown}
-          className="rounded-r-md border-l border-gray-300 bg-white px-2 py-2 focus:outline-none"
+          className="rounded-r-md border-l border-border px-2 py-1 hover:bg-accent focus:outline-none"
           aria-haspopup="listbox"
           aria-expanded={isOpen}
         >
-          <ChevronDownIcon className="h-4 w-4 text-gray-500" />
+          <ChevronDownIcon className="size-4 text-muted-foreground" />
         </button>
       </div>
 
       {isOpen && (
-        <div className="absolute z-10 mt-1 max-h-60 w-full overflow-auto rounded-md border border-gray-300 bg-white shadow-lg">
+        <div className="absolute right-0 z-10 mt-1 max-h-60 w-20 divide-y overflow-y-auto rounded-md border border-border bg-background shadow-lg">
           {minuteOptions.map((minutes) => (
             <div
               key={minutes}
               onClick={() => handleOptionClick(minutes)}
-              className="cursor-pointer px-3 py-2 text-sm hover:bg-gray-100"
+              className="cursor-pointer px-3 py-2 text-center text-sm hover:bg-muted"
               role="option"
               aria-selected={value === minutes.toString()}
             >

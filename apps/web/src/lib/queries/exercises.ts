@@ -1,6 +1,9 @@
 import { queryOptions } from "@tanstack/react-query";
 import { honoClient } from "@/lib/hono";
 
+export const GET_DAILY_WEIGHTS_EXERCISES_QUERY_KEY =
+  "GET_DAILY_WEIGHTS_EXERCISES";
+
 const getDailyWeightsExerciseWithAllInfos = async ({
   currentLocalDateTime,
   timezone,
@@ -32,7 +35,7 @@ export function getDailyWeightsExerciseOptions({
   timezone: string;
 }) {
   return queryOptions({
-    queryKey: ["dailyWeightsExercises"],
+    queryKey: [GET_DAILY_WEIGHTS_EXERCISES_QUERY_KEY],
     queryFn: () =>
       getDailyWeightsExerciseWithAllInfos({
         currentLocalDateTime,

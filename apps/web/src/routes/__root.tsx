@@ -1,9 +1,8 @@
-import * as React from "react";
 import { Outlet, createRootRouteWithContext } from "@tanstack/react-router";
 import { type QueryClient } from "@tanstack/react-query";
 
-import { TanStackRouterDevtools } from "@/components/tanstack-router-devtool";
 import { type AuthClient, authClient } from "@/lib/better-auth";
+import { TanStackRouterDevtools } from "@/components/tanstack-router-devtool";
 
 interface RootRouteContext {
   queryClient: QueryClient;
@@ -14,10 +13,7 @@ export const Route = createRootRouteWithContext<RootRouteContext>()({
   component: () => (
     <>
       <Outlet />
-
-      <React.Suspense>
-        <TanStackRouterDevtools position="bottom-right" initialIsOpen={false} />
-      </React.Suspense>
+      <TanStackRouterDevtools position="bottom-right" initialIsOpen={false} />
     </>
   ),
   // TODO: add caching

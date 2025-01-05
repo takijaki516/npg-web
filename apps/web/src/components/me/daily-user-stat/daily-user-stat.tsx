@@ -40,16 +40,11 @@ export function DailyUserStat({
     ],
   });
 
-  const justDate = currentLocalDateTime.split(" ")[0];
-
   return (
     <div className="flex flex-col rounded-md p-2">
       <div className="flex items-center gap-4 text-lg font-semibold">
         <div className="flex items-center">
-          <span>{justDate}</span>
-          <span>
-            @{profile.timezone === "Asia/Seoul" ? "Seoul" : "New York"}
-          </span>
+          {currentLocalDateTime.split(" ")[0]}
         </div>
 
         <div className="flex items-center gap-1">
