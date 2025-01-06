@@ -16,7 +16,10 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as IndexImport } from './routes/index'
 import { Route as userLayoutImport } from './routes/(user)/_layout'
 import { Route as authAuthImport } from './routes/(auth)/_auth'
+import { Route as userLayoutSettingImport } from './routes/(user)/_layout/setting'
+import { Route as userLayoutMealImport } from './routes/(user)/_layout/meal'
 import { Route as userLayoutMeImport } from './routes/(user)/_layout/me'
+import { Route as userLayoutExerciseImport } from './routes/(user)/_layout/exercise'
 
 // Create Virtual Routes
 
@@ -70,9 +73,27 @@ const authAuthLoginLazyRoute = authAuthLoginLazyImport
   } as any)
   .lazy(() => import('./routes/(auth)/_auth.login.lazy').then((d) => d.Route))
 
+const userLayoutSettingRoute = userLayoutSettingImport.update({
+  id: '/setting',
+  path: '/setting',
+  getParentRoute: () => userLayoutRoute,
+} as any)
+
+const userLayoutMealRoute = userLayoutMealImport.update({
+  id: '/meal',
+  path: '/meal',
+  getParentRoute: () => userLayoutRoute,
+} as any)
+
 const userLayoutMeRoute = userLayoutMeImport.update({
   id: '/me',
   path: '/me',
+  getParentRoute: () => userLayoutRoute,
+} as any)
+
+const userLayoutExerciseRoute = userLayoutExerciseImport.update({
+  id: '/exercise',
+  path: '/exercise',
   getParentRoute: () => userLayoutRoute,
 } as any)
 
@@ -115,11 +136,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof userLayoutImport
       parentRoute: typeof userRoute
     }
+    '/(user)/_layout/exercise': {
+      id: '/(user)/_layout/exercise'
+      path: '/exercise'
+      fullPath: '/exercise'
+      preLoaderRoute: typeof userLayoutExerciseImport
+      parentRoute: typeof userLayoutImport
+    }
     '/(user)/_layout/me': {
       id: '/(user)/_layout/me'
       path: '/me'
       fullPath: '/me'
       preLoaderRoute: typeof userLayoutMeImport
+      parentRoute: typeof userLayoutImport
+    }
+    '/(user)/_layout/meal': {
+      id: '/(user)/_layout/meal'
+      path: '/meal'
+      fullPath: '/meal'
+      preLoaderRoute: typeof userLayoutMealImport
+      parentRoute: typeof userLayoutImport
+    }
+    '/(user)/_layout/setting': {
+      id: '/(user)/_layout/setting'
+      path: '/setting'
+      fullPath: '/setting'
+      preLoaderRoute: typeof userLayoutSettingImport
       parentRoute: typeof userLayoutImport
     }
     '/(auth)/_auth/login': {
@@ -166,11 +208,17 @@ const authRouteChildren: authRouteChildren = {
 const authRouteWithChildren = authRoute._addFileChildren(authRouteChildren)
 
 interface userLayoutRouteChildren {
+  userLayoutExerciseRoute: typeof userLayoutExerciseRoute
   userLayoutMeRoute: typeof userLayoutMeRoute
+  userLayoutMealRoute: typeof userLayoutMealRoute
+  userLayoutSettingRoute: typeof userLayoutSettingRoute
 }
 
 const userLayoutRouteChildren: userLayoutRouteChildren = {
+  userLayoutExerciseRoute: userLayoutExerciseRoute,
   userLayoutMeRoute: userLayoutMeRoute,
+  userLayoutMealRoute: userLayoutMealRoute,
+  userLayoutSettingRoute: userLayoutSettingRoute,
 }
 
 const userLayoutRouteWithChildren = userLayoutRoute._addFileChildren(
@@ -189,14 +237,20 @@ const userRouteWithChildren = userRoute._addFileChildren(userRouteChildren)
 
 export interface FileRoutesByFullPath {
   '/': typeof userLayoutRouteWithChildren
+  '/exercise': typeof userLayoutExerciseRoute
   '/me': typeof userLayoutMeRoute
+  '/meal': typeof userLayoutMealRoute
+  '/setting': typeof userLayoutSettingRoute
   '/login': typeof authAuthLoginLazyRoute
   '/signup': typeof authAuthSignupLazyRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof userLayoutRouteWithChildren
+  '/exercise': typeof userLayoutExerciseRoute
   '/me': typeof userLayoutMeRoute
+  '/meal': typeof userLayoutMealRoute
+  '/setting': typeof userLayoutSettingRoute
   '/login': typeof authAuthLoginLazyRoute
   '/signup': typeof authAuthSignupLazyRoute
 }
@@ -208,16 +262,26 @@ export interface FileRoutesById {
   '/(auth)/_auth': typeof authAuthRouteWithChildren
   '/(user)': typeof userRouteWithChildren
   '/(user)/_layout': typeof userLayoutRouteWithChildren
+  '/(user)/_layout/exercise': typeof userLayoutExerciseRoute
   '/(user)/_layout/me': typeof userLayoutMeRoute
+  '/(user)/_layout/meal': typeof userLayoutMealRoute
+  '/(user)/_layout/setting': typeof userLayoutSettingRoute
   '/(auth)/_auth/login': typeof authAuthLoginLazyRoute
   '/(auth)/_auth/signup': typeof authAuthSignupLazyRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/me' | '/login' | '/signup'
+  fullPaths:
+    | '/'
+    | '/exercise'
+    | '/me'
+    | '/meal'
+    | '/setting'
+    | '/login'
+    | '/signup'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/me' | '/login' | '/signup'
+  to: '/' | '/exercise' | '/me' | '/meal' | '/setting' | '/login' | '/signup'
   id:
     | '__root__'
     | '/'
@@ -225,7 +289,10 @@ export interface FileRouteTypes {
     | '/(auth)/_auth'
     | '/(user)'
     | '/(user)/_layout'
+    | '/(user)/_layout/exercise'
     | '/(user)/_layout/me'
+    | '/(user)/_layout/meal'
+    | '/(user)/_layout/setting'
     | '/(auth)/_auth/login'
     | '/(auth)/_auth/signup'
   fileRoutesById: FileRoutesById
@@ -285,11 +352,26 @@ export const routeTree = rootRoute
       "filePath": "(user)/_layout.tsx",
       "parent": "/(user)",
       "children": [
-        "/(user)/_layout/me"
+        "/(user)/_layout/exercise",
+        "/(user)/_layout/me",
+        "/(user)/_layout/meal",
+        "/(user)/_layout/setting"
       ]
+    },
+    "/(user)/_layout/exercise": {
+      "filePath": "(user)/_layout/exercise.tsx",
+      "parent": "/(user)/_layout"
     },
     "/(user)/_layout/me": {
       "filePath": "(user)/_layout/me.tsx",
+      "parent": "/(user)/_layout"
+    },
+    "/(user)/_layout/meal": {
+      "filePath": "(user)/_layout/meal.tsx",
+      "parent": "/(user)/_layout"
+    },
+    "/(user)/_layout/setting": {
+      "filePath": "(user)/_layout/setting.tsx",
       "parent": "/(user)/_layout"
     },
     "/(auth)/_auth/login": {

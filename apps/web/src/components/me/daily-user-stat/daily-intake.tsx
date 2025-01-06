@@ -110,8 +110,7 @@ export function DailyIntake({
             <div className="col-span-2 flex items-center gap-1">
               <span>{intakeTotalKCal ?? "0"}</span>
               <span>/</span>
-              <span>{goalCaloriesKcal ?? "?"}</span>
-              <span>Kcal</span>
+              <span>{goalCaloriesKcal ?? "?"}Kcal</span>
             </div>
 
             <div
@@ -170,8 +169,7 @@ export function DailyIntake({
             <div className="col-span-2 flex items-center gap-1">
               <span>{intakeTotalCarbohydratesG ?? "0"}</span>
               <span>/</span>
-              <span>{goalCarbohydratesG ?? "?"}</span>
-              <span>g</span>
+              <span>{goalCarbohydratesG ?? "?"}g</span>
             </div>
 
             <div
@@ -231,8 +229,7 @@ export function DailyIntake({
             <div className="col-span-2 flex items-center gap-1">
               <span>{intakeTotalProteinG ?? "0"}</span>
               <span>/</span>
-              <span>{goalProteinG ?? "?"}</span>
-              <span>g</span>
+              <span>{goalProteinG ?? "?"}g</span>
             </div>
 
             <div
@@ -289,8 +286,7 @@ export function DailyIntake({
             <div className="col-span-2 flex items-center gap-1">
               <span>{intakeTotalFatG ?? "0"}</span>
               <span>/</span>
-              <span>{goalFatG ?? "?"}</span>
-              <span>g</span>
+              <span>{goalFatG ?? "?"}g</span>
             </div>
 
             <div

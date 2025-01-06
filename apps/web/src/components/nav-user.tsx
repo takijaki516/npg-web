@@ -16,10 +16,14 @@ export function NavUser() {
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Avatar className="size-12 rounded-lg">
-          <AvatarImage src={profile.image ?? undefined} alt={profile.email} />
-          <AvatarFallback className="rounded-lg">CN</AvatarFallback>
+      <DropdownMenuTrigger className="rounded-md p-1 hover:bg-accent/80">
+        <Avatar className="size-10 cursor-pointer rounded-md">
+          <AvatarImage
+            src={profile.image ?? undefined}
+            alt={profile.email}
+            className="size-full"
+          />
+          <AvatarFallback className="rounded-md">CN</AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>
 
@@ -30,24 +34,13 @@ export function NavUser() {
         sideOffset={4}
       >
         <DropdownMenuLabel className="p-0 font-normal">
-          <div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
-            <Avatar className="h-8 w-8 rounded-lg">
-              <AvatarImage
-                src={profile.image ?? undefined}
-                alt={profile.email}
-              />
-
-              <AvatarFallback className="rounded-lg">CN</AvatarFallback>
-            </Avatar>
-
-            <div className="grid flex-1 text-left text-sm leading-tight">
-              <span className="truncate font-semibold">{profile.email}</span>
-            </div>
+          <div className="flex items-center gap-2 truncate px-1 py-1.5 text-left text-sm font-semibold">
+            {profile.email}
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem className="cursor-pointer bg-red-500 hover:bg-red-600 focus:bg-red-600">
+        <DropdownMenuItem className="cursor-pointer bg-red-600/60 hover:bg-red-600/80 focus:bg-red-600/80">
           <LogOut />
           Log out
         </DropdownMenuItem>
