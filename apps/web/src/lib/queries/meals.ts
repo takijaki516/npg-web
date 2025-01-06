@@ -47,3 +47,16 @@ export function getDailyMealsWithFoodsOptions({
 export type DailyMealsWithFoods = NonNullable<
   Awaited<ReturnType<typeof getDailyMealsWithFoods>>
 >;
+
+// delete meal
+export async function deleteMealMutationFn({ id }: { id: string }) {
+  const res = await honoClient.meals.$delete({
+    json: { id },
+  });
+
+  if (!res.ok) {
+    throw new Error("failed to delete meal");
+  }
+
+  return res.json();
+}

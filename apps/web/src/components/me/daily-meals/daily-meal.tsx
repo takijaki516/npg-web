@@ -1,38 +1,128 @@
-import { SearchX } from "lucide-react";
+import * as React from "react";
+import { Clock, CookingPot } from "lucide-react";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import type { DailyMealsWithFoods, Profile } from "@/lib/queries";
-import { DailyMealInfo } from "./daily-meal-dialog";
+import {
+  GET_DAILY_MEALS_WITH_FOODS_QUERY_KEY,
+  deleteMealMutationFn,
+  type DailyMealsWithFoods,
+  type Profile,
+} from "@/lib/queries";
+import { useMealHoverStore } from "@/lib/zustand/meal-hover-store";
+import { useFoodHoverStore } from "@/lib/zustand/food-hover-store";
+import { cn, utcToLocalTime } from "@/lib/utils";
+import { DailyFood } from "./daily-food";
+import { InfoField } from "@/components/info-field";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { DeleteButton } from "@/components/delete-button";
 
-interface DailyMealsProps {
-  dailyMealsWithFoods: DailyMealsWithFoods;
+interface DailyMealProps {
   profile: Profile;
+  dailyMealData: DailyMealsWithFoods[number];
 }
 
-export function DailyMeals({ dailyMealsWithFoods, profile }: DailyMealsProps) {
-  if (dailyMealsWithFoods.length === 0) {
-    return (
-      <div className="flex flex-1 flex-col items-center justify-center gap-8 rounded-md border p-2 text-muted-foreground">
-        <SearchX size={48} className="animate-[pulse_3s_infinite]" />
-        <div>
-          {profile.language === "ko"
-            ? "아직 등록된 음식이 없어요"
-            : "No food registered yet"}
-        </div>
-      </div>
-    );
-  }
+export function DailyMeal({ dailyMealData, profile }: DailyMealProps) {
+  const currentLocalTime = utcToLocalTime({
+    utcTime: dailyMealData.mealTime,
+    timezone: profile.timezone,
+  });
+  const [hh, mm] = currentLocalTime.split(" ")[1].split(":");
+
+  const dailyFoods = dailyMealData.foods.slice(0, 3);
+
+  const [isDialogOpen, setIsDialogOpen] = React.useState(false);
+  const setHoveredMealId = useMealHoverStore((state) => state.setHoveredMealId);
+  const setHoveredFoodId = useFoodHoverStore((state) => state.setHoveredFoodId);
+
+  const queryClient = useQueryClient();
+
+  const deleteMealMutation = useMutation({
+    mutationFn: (id: string) => deleteMealMutationFn({ id }),
+    onSettled: async () => {
+      await queryClient.invalidateQueries({
+        queryKey: [GET_DAILY_MEALS_WITH_FOODS_QUERY_KEY],
+      });
+    },
+    onError: (error) => {
+      console.error(error);
+    },
+  });
 
   return (
-    <div className="flex flex-1 flex-col gap-4">
-      {dailyMealsWithFoods.map((dailyMealWithFood) => {
-        return (
-          <DailyMealInfo
-            key={dailyMealWithFood.id}
-            dailyMealData={dailyMealWithFood}
-            profile={profile}
+    <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+      <div
+        className={cn(
+          "flex cursor-pointer flex-col gap-2 rounded-md border border-border p-2 hover:bg-muted/40",
+        )}
+        onMouseEnter={() => setHoveredMealId(dailyMealData.id)}
+        onMouseLeave={() => setHoveredMealId(null)}
+        onClick={() => setIsDialogOpen(true)}
+      >
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-1">
+            <Clock className="size-5" />
+            <span>{`${hh}:${mm}`}</span>
+          </div>
+
+          <DeleteButton
+            onClick={() => {
+              deleteMealMutation.mutate(dailyMealData.id);
+            }}
+            isPending={deleteMealMutation.isPending}
           />
-        );
-      })}
-    </div>
+        </div>
+
+        <div className="flex h-[140px] gap-4">
+          <div className="flex h-full w-fit flex-col gap-1">
+            <InfoField
+              label={profile.language === "ko" ? "총칼로리" : "Total Calories"}
+              value={dailyMealData.totalCaloriesKcal.toString()}
+            />
+            <InfoField
+              label={profile.language === "ko" ? "총탄수화물" : "Total Carbs"}
+              value={dailyMealData.totalCarbohydratesG.toString()}
+            />
+            <InfoField
+              label={profile.language === "ko" ? "총단백질" : "Total Protein"}
+              value={dailyMealData.totalProteinG.toString()}
+            />
+            <InfoField
+              label={profile.language === "ko" ? "총지방" : "Total Fat"}
+              value={dailyMealData.totalFatG.toString()}
+            />
+          </div>
+
+          <div className="flex h-full w-28 flex-col gap-2 overflow-y-auto">
+            {dailyFoods.map((food) => {
+              return (
+                <div
+                  className="flex aspect-square w-full items-center justify-center rounded-md border border-border/50 bg-background"
+                  key={food.id}
+                  onMouseEnter={() => setHoveredFoodId(food.id)}
+                  onMouseLeave={() => setHoveredFoodId(null)}
+                >
+                  {food.foodPic ? (
+                    <img
+                      className="object-cover"
+                      src={`https://coach247.taekgogo.com/${food.foodPic}`}
+                      alt={food.foodName}
+                    />
+                  ) : (
+                    <CookingPot size={40} />
+                  )}
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      </div>
+
+      {/* TODO: */}
+      <DialogContent className="flex max-h-[calc(100dvh-80px)] w-full max-w-xl flex-col gap-2 overflow-y-auto">
+        {dailyMealData.foods.map((eachFood) => {
+          return <DailyFood key={eachFood.id} food={eachFood} />;
+        })}
+      </DialogContent>
+    </Dialog>
   );
 }

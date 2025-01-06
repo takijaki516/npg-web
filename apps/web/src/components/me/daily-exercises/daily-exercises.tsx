@@ -1,41 +1,39 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { SearchX } from "lucide-react";
 
-import { getDailyWeightsExerciseOptions, type Profile } from "@/lib/queries";
+import {
+  type DailyWeightsExercisesWithAllInfos,
+  type Profile,
+} from "@/lib/queries";
 import { DailyExercise } from "./daily-exercise";
-import { AddWorkoutDialog } from "../add-exercises-dialog/add-workout-dialog";
 
-interface DailyExercisesCardProps {
+interface DailyExercisesProps {
   profile: Profile;
-  currentLocalDateTime: string;
-  className?: string;
+  dailyWeightsExercises: DailyWeightsExercisesWithAllInfos;
 }
 
-export function DailyExercisesCard({
+export function DailyExercises({
   profile,
-  currentLocalDateTime,
-}: DailyExercisesCardProps) {
-  const { data: dailyWeightsExercises } = useSuspenseQuery(
-    getDailyWeightsExerciseOptions({
-      currentLocalDateTime,
-      timezone: profile.timezone,
-    }),
-  );
+  dailyWeightsExercises,
+}: DailyExercisesProps) {
+  if (dailyWeightsExercises.length === 0) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center gap-8 rounded-md border p-2 text-muted-foreground">
+        <SearchX size={48} className="animate-[pulse_3s_infinite]" />
+
+        <div>아직 등록된 운동이 없어요</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex flex-col gap-1 overflow-y-auto rounded-md p-2">
-      <div className="flex items-center justify-between px-1">
-        <div className="text-lg font-semibold">오늘의 운동</div>
-
-        <AddWorkoutDialog
+    <div className="flex flex-1 flex-col gap-4">
+      {dailyWeightsExercises.map((dailyExerciseItem) => (
+        <DailyExercise
+          key={dailyExerciseItem.id}
           profile={profile}
-          currentLocalDateTime={currentLocalDateTime}
+          dailyWeightsExercise={dailyExerciseItem}
         />
-      </div>
-
-      <DailyExercise
-        profile={profile}
-        dailyWeightsExercises={dailyWeightsExercises}
-      />
+      ))}
     </div>
   );
 }

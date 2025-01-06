@@ -4,8 +4,8 @@ import { useDateTimeStore } from "@/lib/zustand/time-store";
 
 import { BentoGrid, BentoGridItem } from "@/components/me/bento-grid";
 import { DailyUserStat } from "./daily-user-stat/daily-user-stat";
-import { DailyExercisesCard } from "./daily-exercises/daily-exercises";
-import { DailyMealsCard } from "./daily-meals/daily-meals";
+import { DailyExercisesSection } from "./daily-exercises/daily-exercises-section";
+import { DailyMealsSection } from "./daily-meals/daily-meals-section";
 import { MobileBentoGrid } from "./mobile-bento-grid";
 
 export function BentoDashboard() {
@@ -25,18 +25,18 @@ export function BentoDashboard() {
         </React.Suspense>
       </BentoGridItem>
 
-      <BentoGridItem className="hidden overflow-y-auto rounded-md sm:inline-block">
+      <BentoGridItem className="hidden overflow-y-auto rounded-md p-2 sm:inline-block">
         <React.Suspense fallback={<div>Loading...</div>}>
-          <DailyExercisesCard
+          <DailyExercisesSection
             profile={profile}
             currentLocalDateTime={currentLocalDateTime}
           />
         </React.Suspense>
       </BentoGridItem>
 
-      <BentoGridItem className="hidden overflow-y-auto rounded-md sm:inline-block">
+      <BentoGridItem className="hidden overflow-y-auto rounded-md p-2 sm:inline-block">
         <React.Suspense fallback={<div>Loading...</div>}>
-          <DailyMealsCard
+          <DailyMealsSection
             profile={profile}
             currentLocalDateTime={currentLocalDateTime}
           />
@@ -44,10 +44,10 @@ export function BentoDashboard() {
       </BentoGridItem>
 
       <MobileBentoGrid
-        className="overflow-y-auto rounded-md sm:hidden"
+        className="overflow-y-auto rounded-md p-2 sm:hidden"
         exercises={
           <React.Suspense fallback={<div>Loading...</div>}>
-            <DailyExercisesCard
+            <DailyExercisesSection
               profile={profile}
               currentLocalDateTime={currentLocalDateTime}
             />
@@ -55,7 +55,7 @@ export function BentoDashboard() {
         }
         meals={
           <React.Suspense fallback={<div>Loading...</div>}>
-            <DailyMealsCard
+            <DailyMealsSection
               profile={profile}
               currentLocalDateTime={currentLocalDateTime}
             />

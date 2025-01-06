@@ -1,38 +1,35 @@
-import { useSuspenseQuery } from "@tanstack/react-query";
+import { SearchX } from "lucide-react";
 
-import { getDailyMealsWithFoodsOptions, type Profile } from "@/lib/queries";
-import { DailyMeals } from "./daily-meal";
-import { AddMealDialog } from "../add-meals-dialog/add-meal-dialog";
+import type { DailyMealsWithFoods, Profile } from "@/lib/queries";
+import { DailyMeal } from "./daily-meal";
 
-interface DailyMealsCardProps {
+interface DailyMealsProps {
+  dailyMealsWithFoods: DailyMealsWithFoods;
   profile: Profile;
-  currentLocalDateTime: string;
-  className?: string;
 }
 
-export function DailyMealsCard({
-  profile,
-  currentLocalDateTime,
-}: DailyMealsCardProps) {
-  const { data: dailyMealsWithFoods } = useSuspenseQuery(
-    getDailyMealsWithFoodsOptions({
-      currentLocalDateTime,
-      timezone: profile.timezone,
-    }),
-  );
+export function DailyMeals({ dailyMealsWithFoods, profile }: DailyMealsProps) {
+  if (dailyMealsWithFoods.length === 0) {
+    return (
+      <div className="flex flex-1 flex-col items-center justify-center gap-8 rounded-md border p-2 text-muted-foreground">
+        <SearchX size={48} className="animate-[pulse_3s_infinite]" />
+
+        <div>아직 등록된 음식이 없어요</div>
+      </div>
+    );
+  }
 
   return (
-    <div className="flex h-full flex-col gap-1 overflow-y-auto rounded-md p-2">
-      <div className="flex items-center justify-between px-1">
-        <div className="text-lg font-semibold">오늘의 식단</div>
-
-        <AddMealDialog
-          profile={profile}
-          currentLocalDateTime={currentLocalDateTime}
-        />
-      </div>
-
-      <DailyMeals dailyMealsWithFoods={dailyMealsWithFoods} profile={profile} />
+    <div className="flex flex-1 flex-col gap-4">
+      {dailyMealsWithFoods.map((dailyMealWithFood) => {
+        return (
+          <DailyMeal
+            key={dailyMealWithFood.id}
+            dailyMealData={dailyMealWithFood}
+            profile={profile}
+          />
+        );
+      })}
     </div>
   );
 }

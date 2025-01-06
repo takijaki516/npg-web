@@ -48,3 +48,22 @@ export function getDailyWeightsExerciseOptions({
 export type DailyWeightsExercisesWithAllInfos = NonNullable<
   Awaited<ReturnType<typeof getDailyWeightsExerciseWithAllInfos>>
 >;
+
+// delete query
+export async function deleteDailyWeightsExerciseMutationFn({
+  id,
+}: {
+  id: string;
+}) {
+  const res = await honoClient.weights.$delete({
+    json: {
+      id,
+    },
+  });
+
+  if (!res.ok) {
+    throw new Error("failed to delete daily weights exercise");
+  }
+
+  return res.json();
+}
