@@ -119,6 +119,11 @@ export function AddMealDialog({
 
     values.foods = foodsWithPic;
 
+    console.log(
+      "🚀 ~ file: add-meal-dialog.tsx:121 ~ mealSubmitHandler ~ values:",
+      values,
+    );
+
     const res = await honoClient.meals.$post({
       json: values,
     });
@@ -162,7 +167,7 @@ export function AddMealDialog({
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <DialogTrigger className="rounded-full p-1 hover:bg-muted">
+      <DialogTrigger className="rounded-md p-1 transition-colors hover:bg-muted">
         <Plus />
       </DialogTrigger>
 
@@ -185,14 +190,16 @@ export function AddMealDialog({
             <Controller
               name="localMealDateTime"
               control={mealForm.control}
-              render={({ field }) => (
-                <TimePicker
-                  value={field.value}
-                  setValue={field.onChange}
-                  userLanguage={profile.language}
-                  timezone={profile.timezone}
-                />
-              )}
+              render={({ field }) => {
+                return (
+                  <TimePicker
+                    value={field.value}
+                    setValue={field.onChange}
+                    userLanguage={profile.language}
+                    timezone={profile.timezone}
+                  />
+                );
+              }}
             />
           </div>
 

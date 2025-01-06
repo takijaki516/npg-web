@@ -1,5 +1,6 @@
 import * as React from "react";
 import { ChevronDownIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
 
 interface MinuteSelectorProps {
   setValue: React.Dispatch<React.SetStateAction<string>>;
@@ -53,19 +54,22 @@ export function MinuteSelector({ setValue, value }: MinuteSelectorProps) {
   }, []);
 
   return (
-    <div className="relative w-24" ref={dropdownRef}>
+    <div className="relative flex-1" ref={dropdownRef}>
       <div className="flex items-center rounded-md border bg-background">
         <input
           type="number"
           value={value}
           onChange={handleInputChange}
-          className="w-full rounded-l-md bg-transparent text-center text-sm focus:outline-none"
-          aria-label="Select or enter minutes"
+          className={cn(
+            "w-full rounded-l-md bg-transparent text-center text-sm",
+            "focus:outline-none",
+            "[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
+          )}
         />
 
         <button
           onClick={toggleDropdown}
-          className="rounded-r-md border-l border-border px-2 py-1 hover:bg-accent focus:outline-none"
+          className="rounded-r-md border-l border-border px-2 py-1 transition-colors hover:bg-accent focus:outline-none"
           aria-haspopup="listbox"
           aria-expanded={isOpen}
         >
@@ -79,7 +83,7 @@ export function MinuteSelector({ setValue, value }: MinuteSelectorProps) {
             <div
               key={minutes}
               onClick={() => handleOptionClick(minutes)}
-              className="cursor-pointer px-3 py-2 text-center text-sm hover:bg-muted"
+              className="cursor-pointer px-3 py-2 text-center text-sm transition-colors hover:bg-muted"
               role="option"
               aria-selected={value === minutes.toString()}
             >

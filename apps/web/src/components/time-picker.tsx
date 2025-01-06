@@ -29,7 +29,7 @@ export function TimePicker({
   const currentLocalDateTime = DateTime.fromFormat(
     value,
     "yyyy-MM-dd HH:mm:ss",
-  ).setZone(timezone);
+  );
 
   const [isOpen, setIsOpen] = React.useState(false);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
@@ -42,15 +42,18 @@ export function TimePicker({
   );
 
   function handleTimeChange(hourOrMinute: "hour" | "minute", value: string) {
+    // NOTE: luxon DateTime is immutable, returns a new instance
+    let updatedDateTime = currentLocalDateTime;
+
     if (hourOrMinute === "hour") {
-      currentLocalDateTime.set({ hour: parseInt(value) });
+      updatedDateTime = currentLocalDateTime.set({ hour: parseInt(value) });
       setSelectedHour(value);
     } else {
-      currentLocalDateTime.set({ minute: parseInt(value) });
+      updatedDateTime = currentLocalDateTime.set({ minute: parseInt(value) });
       setSelectedMinute(value);
     }
 
-    setValue(currentLocalDateTime.toFormat("yyyy-MM-dd HH:mm:ss"));
+    setValue(updatedDateTime.toFormat("yyyy-MM-dd HH:mm:ss"));
   }
 
   function handleNowClick() {
@@ -77,7 +80,8 @@ export function TimePicker({
   return (
     <div
       className={cn(
-        "relative flex items-center rounded-md bg-background px-1 hover:cursor-pointer hover:bg-accent",
+        "relative flex flex-1 items-center justify-around rounded-md px-1",
+        "bg-background transition-colors hover:cursor-pointer hover:bg-accent",
         className,
       )}
       ref={dropdownRef}
@@ -96,12 +100,12 @@ export function TimePicker({
       </div>
 
       <button className="rounded-md p-1" onClick={handleNowClick}>
-        <Clock className="h-4 w-4 text-muted-foreground hover:text-foreground" />
+        <Clock className="h-4 w-4 text-muted-foreground transition-colors hover:text-foreground" />
       </button>
 
       {isOpen && (
-        <div className="absolute left-0 top-8 z-50 mt-1 rounded-lg bg-muted">
-          <div className="flex px-2 py-1 text-muted-foreground">
+        <div className="absolute left-0 top-8 z-50 mt-1 rounded-md border border-background bg-muted">
+          <div className="flex border-b border-background px-2 py-1 text-muted-foreground">
             <div className="flex-1">
               {userLanguage === "ko" ? "시" : "Hour"}
             </div>
@@ -115,11 +119,11 @@ export function TimePicker({
               {HOURS.map((hour) => (
                 <div
                   key={hour}
-                  className={`cursor-pointer px-2 py-1 ${
-                    selectedHour === hour
-                      ? "bg-background/60 text-foreground"
-                      : "text-muted-foreground hover:bg-background/80"
-                  }`}
+                  className={cn(
+                    "cursor-pointer px-2 py-1",
+                    "text-muted-foreground transition-colors hover:bg-background/80",
+                    selectedHour === hour && "bg-background/60 text-foreground",
+                  )}
                   onClick={() => handleTimeChange("hour", hour)}
                 >
                   {hour}
@@ -146,7 +150,7 @@ export function TimePicker({
 
           <div className="flex w-36 items-center justify-between border-t border-background px-[2px] py-[2px]">
             <button
-              className="flex flex-1 justify-center rounded-md py-1 text-muted-foreground hover:bg-background/80"
+              className="flex flex-1 justify-center rounded-md py-1 text-muted-foreground transition-colors hover:bg-background/80"
               onClick={() => setIsOpen(false)}
             >
               <Check className="h-4 w-4" />

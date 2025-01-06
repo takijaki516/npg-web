@@ -11,6 +11,11 @@ import {
 } from "@/lib/queries";
 import { useMealHoverStore } from "@/lib/zustand/meal-hover-store";
 import { useFoodHoverStore } from "@/lib/zustand/food-hover-store";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface DailyIntakeProps {
   profile: Profile;
@@ -77,7 +82,7 @@ export function DailyIntake({
         </div>
 
         <div className="col-span-3 col-start-4 flex items-center justify-between">
-          <div className="cursor-pointer rounded-md p-1 hover:bg-muted">
+          <div className="cursor-pointer rounded-md p-1 transition-colors hover:bg-muted">
             {mutateIntake.isPending ? (
               <Loader2 size={20} className="animate-spin" />
             ) : (
@@ -85,9 +90,17 @@ export function DailyIntake({
             )}
           </div>
 
-          <div className="rounded-md p-1 hover:bg-muted sm:hidden">
-            <Info size={20} />
-          </div>
+          <Tooltip>
+            <TooltipTrigger className="rounded-md p-1 transition-colors hover:bg-muted sm:hidden">
+              <Info size={20} />
+            </TooltipTrigger>
+            <TooltipContent
+              align="end"
+              className="text-md flex max-h-[200px] max-w-[180px] overflow-y-auto rounded-md border border-background bg-muted p-2 text-muted-foreground"
+            >
+              {dailyIntake.llmDescription}
+            </TooltipContent>
+          </Tooltip>
         </div>
 
         <div className="col-span-full space-y-1 pt-1">
@@ -133,7 +146,7 @@ export function DailyIntake({
                             <div
                               key={food.id}
                               className={cn(
-                                "z-10 h-full bg-green-500",
+                                "z-10 h-full bg-green-500 transition-colors",
                                 isMealHovered && "bg-red-500",
                                 isFoodHovered && "bg-red-600",
                               )}
@@ -194,7 +207,7 @@ export function DailyIntake({
                             <div
                               key={food.id}
                               className={cn(
-                                "z-10 h-full bg-green-500",
+                                "z-10 h-full bg-green-500 transition-colors",
                                 isMealHovered && "bg-red-500",
                                 isFoodHovered && "bg-red-600",
                               )}
@@ -237,7 +250,7 @@ export function DailyIntake({
                     return (
                       <div
                         key={meal.id}
-                        className={cn("flex h-full bg-green-500")}
+                        className={cn("flex h-full")}
                         style={{
                           width: `${width}%`,
                         }}
@@ -252,7 +265,7 @@ export function DailyIntake({
                             <div
                               key={food.id}
                               className={cn(
-                                "z-10 h-full bg-green-500",
+                                "z-10 h-full bg-green-500 transition-colors",
                                 isMealHovered && "bg-red-500",
                                 isFoodHovered && "bg-red-600",
                               )}
@@ -295,7 +308,7 @@ export function DailyIntake({
                     return (
                       <div
                         key={meal.id}
-                        className={cn("flex h-full bg-green-500")}
+                        className={cn("flex h-full")}
                         style={{
                           width: `${width}%`,
                         }}
@@ -309,7 +322,7 @@ export function DailyIntake({
                             <div
                               key={food.id}
                               className={cn(
-                                "z-10 h-full bg-green-500",
+                                "z-10 h-full bg-green-500 transition-colors",
                                 isMealHovered && "bg-red-500",
                                 isFoodHovered && "bg-red-600",
                               )}

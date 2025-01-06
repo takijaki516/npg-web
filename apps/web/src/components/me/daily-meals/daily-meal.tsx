@@ -13,7 +13,7 @@ import { useFoodHoverStore } from "@/lib/zustand/food-hover-store";
 import { cn, utcToLocalTime } from "@/lib/utils";
 import { DailyFood } from "./daily-food";
 import { InfoField } from "@/components/info-field";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { DeleteButton } from "@/components/delete-button";
 
 interface DailyMealProps {
@@ -52,7 +52,7 @@ export function DailyMeal({ dailyMealData, profile }: DailyMealProps) {
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <div
         className={cn(
-          "flex cursor-pointer flex-col gap-2 rounded-md border border-border p-2 hover:bg-muted/40",
+          "flex cursor-pointer flex-col gap-2 rounded-md border border-border p-2 transition-colors hover:bg-muted/40",
         )}
         onMouseEnter={() => setHoveredMealId(dailyMealData.id)}
         onMouseLeave={() => setHoveredMealId(null)}
@@ -119,6 +119,8 @@ export function DailyMeal({ dailyMealData, profile }: DailyMealProps) {
 
       {/* TODO: */}
       <DialogContent className="flex max-h-[calc(100dvh-80px)] w-full max-w-xl flex-col gap-2 overflow-y-auto">
+        <DialogTitle>음식들</DialogTitle>
+
         {dailyMealData.foods.map((eachFood) => {
           return <DailyFood key={eachFood.id} food={eachFood} />;
         })}

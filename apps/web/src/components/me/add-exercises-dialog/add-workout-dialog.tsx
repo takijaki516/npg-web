@@ -104,7 +104,7 @@ export function AddWorkoutDialog({
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-      <DialogTrigger className="rounded-full p-1 hover:bg-muted">
+      <DialogTrigger className="rounded-md p-1 transition-colors hover:bg-muted">
         <Plus />
       </DialogTrigger>
 
@@ -119,7 +119,7 @@ export function AddWorkoutDialog({
 
         {/*  */}
         <div className="flex flex-col gap-1">
-          <div className="flex w-[190px] items-center gap-2 rounded-md bg-muted/50 px-2 py-1">
+          <div className="flex w-[180px] items-center justify-between gap-2 rounded-md bg-muted/50 px-2 py-1">
             <span className="whitespace-nowrap text-muted-foreground">
               시작 시간
             </span>
@@ -138,7 +138,7 @@ export function AddWorkoutDialog({
             />
           </div>
 
-          <div className="flex w-[190px] items-center gap-2 rounded-md bg-muted/50 px-2 py-1">
+          <div className="flex w-[180px] items-center justify-between gap-2 rounded-md bg-muted/50 px-2 py-1">
             <span className="whitespace-nowrap text-muted-foreground">
               운동 시간
             </span>
