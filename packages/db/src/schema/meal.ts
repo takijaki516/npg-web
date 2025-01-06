@@ -8,7 +8,7 @@ export const foods = pgTable("foods", {
     .references(() => profile.email)
     .notNull(),
   mealId: uuid("meal_id")
-    .references(() => meals.id)
+    .references(() => meals.id, { onDelete: "cascade" })
     .notNull(),
 
   foodName: text("food_name").notNull(),

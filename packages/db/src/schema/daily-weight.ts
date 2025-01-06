@@ -40,7 +40,7 @@ export const eachWeightsExercises = pgTable("each_weights_exercises", {
     .references(() => profile.email)
     .notNull(),
   weightsExerciseId: uuid("weights_exercise_id")
-    .references(() => dailyWeightsExercises.id)
+    .references(() => dailyWeightsExercises.id, { onDelete: "cascade" })
     .notNull(),
 
   workoutName: text("workout_name").notNull(),
@@ -71,7 +71,7 @@ export const weightsSetInfo = pgTable("weights_set_info", {
     .references(() => profile.email)
     .notNull(),
   eachWeightsExerciseId: uuid("each_weights_exercise_id")
-    .references(() => eachWeightsExercises.id)
+    .references(() => eachWeightsExercises.id, { onDelete: "cascade" })
     .notNull(),
 
   reps: smallint().notNull(),
