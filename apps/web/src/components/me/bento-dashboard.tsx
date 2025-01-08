@@ -10,7 +10,7 @@ import { MobileBentoGrid } from "./mobile-bento-grid";
 import { DailyUserStatSkeleton } from "@/components/skeletons/daily-user-stat-skeleton";
 import { DailyMealsSkeleton } from "@/components/skeletons/daily-meals-skeleton";
 import { DailyExercisesSkeleton } from "@/components/skeletons/daily-exercises-skeleton";
-import { DailyMobileSkeleton } from "../skeletons/daily-mobile-skeleton";
+import { DailyMobileSkeleton } from "@/components/skeletons/daily-mobile-skeleton";
 
 export function BentoDashboard() {
   const { profile } = useRouteContext({ from: "/(user)/_layout" });

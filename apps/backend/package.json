@@ -6,12 +6,18 @@
         "default": "./dist/hc.js",
         "types": "./dist/hc.d.ts"
       }
+    },
+    "./auth": {
+      "import": {
+        "default": "./dist/lib/auth.js",
+        "types": "./dist/lib/auth.d.ts"
+      }
     }
   },
   "scripts": {
     "dev": "pnpm --filter @repo/backend --parallel \"/^dev:.*/\"",
     "dev:tsc": "tsc -p tsconfig.build.json --watch",
-    "dev:wrangler": "wrangler dev --remote src/index.ts",
+    "dev:wrangler": "wrangler dev src/index.ts",
     "build": "tsc -p tsconfig.build.json",
     "deploy": "wrangler deploy src/index.ts",
     "start": "wrangler dev",

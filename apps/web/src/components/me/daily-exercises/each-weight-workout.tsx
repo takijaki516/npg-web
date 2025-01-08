@@ -25,7 +25,7 @@ export function EachWeightWorkout({
   const [isCollapsibleOpen, setIsCollapsibleOpen] = React.useState(false);
 
   return (
-    <div className="flex flex-col rounded-md border p-1">
+    <div className="flex flex-col rounded-md border p-1 transition-colors hover:bg-muted/50">
       <Collapsible open={isCollapsibleOpen} onOpenChange={setIsCollapsibleOpen}>
         <CollapsibleTrigger className="flex w-full items-center">
           {isCollapsibleOpen ? <ChevronDown /> : <ChevronRight />}

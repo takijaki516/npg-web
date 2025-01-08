@@ -50,6 +50,13 @@
       "when": 1735643189732,
       "tag": "0006_calm_nova",
       "breakpoints": true
+    },
+    {
+      "idx": 7,
+      "version": "7",
+      "when": 1736148454512,
+      "tag": "0007_spooky_frightful_four",
+      "breakpoints": true
     }
   ]
 }

@@ -4,3 +4,5 @@ node_modules
 
 # turborepo
 .turbo
+
+from-next

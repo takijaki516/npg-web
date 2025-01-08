@@ -74,6 +74,7 @@ export const weightsRoute = new Hono<AuthMiddlewareContext>()
     zValidator("json", insertDailyWeightsExerciseSchema),
     async (c) => {
       const user = c.get("user");
+
       if (!user) {
         return c.json({ error: "Unauthorized" }, 401);
       }
@@ -140,4 +141,35 @@ export const weightsRoute = new Hono<AuthMiddlewareContext>()
 
       return c.json({ message: "Weights inserted successfully" }, 200);
     }
-  );
+  )
+  .delete("/", zValidator("json", z.object({ id: z.string() })), async (c) => {
+    const user = c.get("user");
+
+    if (!user) {
+      return c.json({ error: "Unauthorized" }, 401);
+    }
+
+    const { id } = c.req.valid("json");
+
+    const db = createDb({
+      DATABASE_URL: c.env.DATABASE_URL,
+      NODE_ENV: c.env.NODE_ENV,
+    });
+
+    // TODO: add cascade delete
+    const result = await db
+      .delete(dailyWeightsExercises)
+      .where(
+        and(
+          eq(dailyWeightsExercises.id, id),
+          eq(dailyWeightsExercises.profileEmail, user.email)
+        )
+      )
+      .returning({ id: dailyWeightsExercises.id });
+
+    if (result.length === 0) {
+      return c.json({ error: "Weights not found" }, 404);
+    }
+
+    return c.json({ message: "Weights deleted successfully" }, 200);
+  });

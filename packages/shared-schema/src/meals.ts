@@ -13,7 +13,8 @@ export const insertFoodSchema = z.object({
 
 export const insertMealSchema = z.object({
   profileEmail: z.string(),
-  mealTime: z.string(),
+  localMealDateTime: z.string(),
+  timezone:z.string(),
 
   totalCaloriesKcal: z.number(),
   totalCarbohydratesG: z.number(),

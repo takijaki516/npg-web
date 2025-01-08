@@ -29,13 +29,18 @@ export type AppContext = {
 // Start a Hono app
 export const app = new Hono<AppContext>();
 
+// REVIEW:
 app
   .use(
     "*",
     cors({
-      origin: "http://localhost:5173",
-      allowHeaders: ["Content-Type", "Authorization"],
-      allowMethods: ["POST", "GET", "OPTIONS"],
+      origin: ["http://localhost:5173", "http://localhost:4173"],
+      allowHeaders: [
+        "Content-Type",
+        "Authorization",
+        "Access-Control-Allow-Origin",
+      ],
+      allowMethods: ["POST", "GET", "OPTIONS", "DELETE", "PATCH", "PUT"],
       exposeHeaders: ["Content-Length"],
       maxAge: 600,
       credentials: true,
@@ -52,26 +57,3 @@ export const routes = app
   .route("/meals", mealsRoute)
   .route("/ai", aiRoute)
   .route("/presign", presignRoute);
-
-// app.post("/upload", async (c) => {
-//   try {
-//     const formData = await c.req.formData();
-//     const file = formData.get("image") as File;
-
-//     if (!file) {
-//       return c.json({ error: "No image provided" }, 400);
-//     }
-
-//     const filename = `${Date.now()}-${file.name}`;
-
-//     await c.env.MY_BUCKET.put(filename, file.stream(), {
-//       httpMetadata: { contentType: file.type },
-//     });
-
-//     return c.json({
-//       url: `https://${c.env.BUCKET_NAME}.r2.cloudflarestorage.com/${filename}`,
-//     });
-//   } catch (error) {
-//     return c.json({ error: "Upload failed" }, 500);
-//   }
-// });

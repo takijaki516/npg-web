@@ -13,13 +13,7 @@ interface UserHealthInfoStatProps {
   profile: Profile;
 }
 
-// TODO:
 export function UserHealthInfoStat({ healthInfo }: UserHealthInfoStatProps) {
-  console.log(
-    "🚀 ~ file: user-health-info-stat.tsx:17 ~ UserHealthInfoStat ~ healthInfo:",
-    healthInfo,
-  );
-
   if (!healthInfo) {
     return (
       <Tooltip delayDuration={0} disableHoverableContent={true}>
@@ -28,7 +22,7 @@ export function UserHealthInfoStat({ healthInfo }: UserHealthInfoStatProps) {
         </TooltipTrigger>
 
         <TooltipContent className="bg-muted-foreground text-sm">
-          "내 건강정보가 없어요. 건강정보를 입력해주세요."
+          내 건강정보가 없어요. 건강정보를 입력해주세요
         </TooltipContent>
       </Tooltip>
     );

@@ -1,16 +1,18 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
+import { customSession } from "better-auth/plugins";
 import type { Context } from "hono";
-import type { AppContext } from "../app";
-
+import { eq } from "drizzle-orm";
 import {
-  profile,
   account,
   createDb,
   session,
   user,
   verification,
+  profile,
 } from "@repo/db";
+
+import type { AppContext } from "../app";
 
 export function initBetterAuth(env: Context<AppContext>["env"]) {
   const db = createDb({
@@ -28,6 +30,7 @@ export function initBetterAuth(env: Context<AppContext>["env"]) {
         session,
       },
     }),
+    // REVIEW:
     databaseHooks: {
       user: {
         create: {
@@ -48,7 +51,27 @@ export function initBetterAuth(env: Context<AppContext>["env"]) {
     },
     baseURL: env.BETTER_AUTH_URL,
     secret: env.BETTER_AUTH_SECRET,
-    trustedOrigins: ["http://localhost:5173"],
+    trustedOrigins: ["http://localhost:5173", "http://localhost:4173"],
+    plugins: [
+      customSession(async ({ user, session }) => {
+        const profileRes = await db
+          .select()
+          .from(profile)
+          .where(eq(profile.email, user.email))
+          .limit(1);
+
+        // TODO:
+        if (!profileRes[0]) {
+          throw new Error("Profile not found");
+        }
+
+        return {
+          user,
+          session,
+          profile: profileRes[0],
+        };
+      }),
+    ],
   });
 }
 

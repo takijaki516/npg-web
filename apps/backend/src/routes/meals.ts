@@ -114,4 +114,30 @@ export const mealsRoute = new Hono<AuthMiddlewareContext>()
     });
 
     return c.json({ message: "meal added" }, 201);
+  })
+  .delete("/", zValidator("json", z.object({ id: z.string() })), async (c) => {
+    const user = c.get("user");
+
+    if (!user) {
+      return c.json({ error: "Unauthorized" }, 401);
+    }
+
+    const { id } = c.req.valid("json");
+
+    const db = createDb({
+      DATABASE_URL: c.env.DATABASE_URL,
+      NODE_ENV: c.env.NODE_ENV,
+    });
+
+    // TODO: add cascade delete
+    const result = await db
+      .delete(meals)
+      .where(and(eq(meals.id, id), eq(meals.profileEmail, user.email)))
+      .returning({ id: meals.id });
+
+    if (result.length === 0) {
+      return c.json({ error: "Weights not found" }, 404);
+    }
+
+    return c.json({ message: "Weights deleted successfully" }, 200);
   });
