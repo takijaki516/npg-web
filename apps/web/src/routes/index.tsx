@@ -1,8 +1,6 @@
 import { createFileRoute, useRouteContext } from "@tanstack/react-router";
 import { Brain, Camera, Dumbbell, PieChart, Sparkles } from "lucide-react";
 
-// import Iphone15Pro from "@/components/ui/iphone-15-pro";
-// import Safari from "@/components/ui/safari";
 import { Card, CardContent } from "@/components/ui/card";
 import { Navbar } from "@/components/navbar";
 
@@ -11,13 +9,13 @@ export const Route = createFileRoute("/")({
 });
 
 function Index() {
-  const { profile } = useRouteContext({ from: "/" });
+  const { profile, session } = useRouteContext({ from: "/" });
 
   return (
     <div className="relative flex min-h-dvh w-full flex-col items-center bg-background">
-      <Navbar profile={profile} />
+      <Navbar profile={profile} session={session} />
 
-      <section className="container mt-12 px-4">
+      <section className="container mt-12 w-full max-w-3xl px-4">
         <div className="grid gap-12 md:grid-cols-2">
           <div className="flex flex-col justify-center space-y-4">
             <h2 className="font-heading text-3xl font-bold sm:text-4xl md:text-5xl">
@@ -40,14 +38,7 @@ function Index() {
         </div>
       </section>
 
-      {/* <section className="container mt-12 px-4">
-          <div className="grid gap-12 md:grid-cols-2">
-            <Iphone15Pro />
-            <Safari />
-          </div>
-        </section> */}
-
-      <section className="container mt-12 px-4">
+      <section className="container mt-12 w-full max-w-3xl px-4 pb-20">
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
           <Card>
             <CardContent className="flex flex-col items-center space-y-4 p-6">

@@ -6,6 +6,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { insertDailyWeightsExerciseSchema } from "@repo/shared-schema";
 
+import { useDateTimeStore } from "@/lib/zustand/time-store";
+import { getCurrentTimeInTimezone } from "@/lib/utils";
 import { honoClient } from "@/lib/hono";
 import {
   GET_DAILY_WEIGHTS_EXERCISES_QUERY_KEY,
@@ -33,6 +35,9 @@ export function AddWorkoutDialog({
 }: AddWorkoutDialogProps) {
   const justDate = currentLocalDateTime.split(" ")[0];
 
+  const setCurrentDateTime = useDateTimeStore(
+    (state) => state.setCurrentDateTime,
+  );
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
 
@@ -58,12 +63,13 @@ export function AddWorkoutDialog({
         json: data,
       });
     },
-    onMutate: async () => {
-      console.log(workoutForm.watch());
-    },
+    onMutate: async () => {},
     onSettled: async () => {
+      const currentTime = getCurrentTimeInTimezone(profile.timezone);
+      setCurrentDateTime(currentTime);
+
       await queryClient.invalidateQueries({
-        queryKey: [GET_DAILY_WEIGHTS_EXERCISES_QUERY_KEY],
+        queryKey: [GET_DAILY_WEIGHTS_EXERCISES_QUERY_KEY, currentTime],
       });
 
       setIsDialogOpen(false);
@@ -111,7 +117,7 @@ export function AddWorkoutDialog({
       <DialogContent
         onPointerDownOutside={(e) => e.preventDefault()}
         onInteractOutside={(e) => e.preventDefault()}
-        className="flex h-full max-h-[calc(100dvh-80px)] w-full max-w-xl flex-col gap-4 overflow-y-auto rounded-lg"
+        className="flex max-h-[calc(100dvh-80px)] w-full max-w-xl flex-col gap-4 overflow-y-auto rounded-md"
       >
         <DialogTitle>
           <div className="text-2xl">{justDate}</div>
@@ -131,7 +137,6 @@ export function AddWorkoutDialog({
                 <TimePicker
                   value={field.value}
                   setValue={field.onChange}
-                  userLanguage={profile.language}
                   timezone={profile.timezone}
                 />
               )}
@@ -147,10 +152,7 @@ export function AddWorkoutDialog({
               name="durationMinutes"
               control={workoutForm.control}
               render={({ field }) => (
-                <MinuteSelector
-                  setValue={field.onChange}
-                  value={field.value.toString()}
-                />
+                <MinuteSelector setValue={field.onChange} value={field.value} />
               )}
             />
           </div>

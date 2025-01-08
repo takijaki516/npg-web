@@ -12,7 +12,6 @@ const MINUTES = Array.from({ length: 60 }, (_, i) =>
 );
 
 interface TimePickerProps {
-  userLanguage: string;
   timezone: string;
   className?: string;
   value: string;
@@ -20,7 +19,6 @@ interface TimePickerProps {
 }
 
 export function TimePicker({
-  userLanguage,
   timezone,
   className,
   value,
@@ -106,12 +104,8 @@ export function TimePicker({
       {isOpen && (
         <div className="absolute left-0 top-8 z-50 mt-1 rounded-md border border-background bg-muted">
           <div className="flex border-b border-background px-2 py-1 text-muted-foreground">
-            <div className="flex-1">
-              {userLanguage === "ko" ? "시" : "Hour"}
-            </div>
-            <div className="flex-1">
-              {userLanguage === "ko" ? "분" : "Minute"}
-            </div>
+            <div className="flex-1">시</div>
+            <div className="flex-1">분</div>
           </div>
 
           <div className="flex h-48">

@@ -1,12 +1,13 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+import { getCurrentTimeInTimezone, utcToLocalTime } from "@/lib/utils";
+import { useDateTimeStore } from "@/lib/zustand/time-store";
 import {
   deleteDailyWeightsExerciseMutationFn,
   GET_DAILY_WEIGHTS_EXERCISES_QUERY_KEY,
   type DailyWeightsExercisesWithAllInfos,
   type Profile,
 } from "@/lib/queries";
-import { utcToLocalTime } from "@/lib/utils";
 import { EachWeightWorkout } from "@/components/me/daily-exercises/each-weight-workout";
 import { DeleteButton } from "@/components/delete-button";
 
@@ -26,13 +27,20 @@ export function DailyExercise({
 
   const [hh, mm] = localDateTime.split(" ")[1].split(":");
 
+  const setCurrentDateTime = useDateTimeStore(
+    (state) => state.setCurrentDateTime,
+  );
+
   const queryClient = useQueryClient();
 
   const dailyExerciseMutate = useMutation({
     mutationFn: (id: string) => deleteDailyWeightsExerciseMutationFn({ id }),
     onSettled: async () => {
+      const currentTime = getCurrentTimeInTimezone(profile.timezone);
+      setCurrentDateTime(currentTime);
+
       await queryClient.invalidateQueries({
-        queryKey: [GET_DAILY_WEIGHTS_EXERCISES_QUERY_KEY],
+        queryKey: [GET_DAILY_WEIGHTS_EXERCISES_QUERY_KEY, currentTime],
       });
     },
     // TODO: error handling
@@ -42,17 +50,17 @@ export function DailyExercise({
   });
 
   return (
-    <div className="flex flex-col gap-1 rounded-md border p-2">
+    <div className="flex w-full flex-col gap-1 overflow-x-auto rounded-md border p-2">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-grow flex-wrap items-center gap-1">
           <div className="flex items-center gap-1 rounded-md bg-muted/80 px-2 py-1">
-            <span>시작 시간</span>
-            <span>{`${hh}:${mm}`}</span>
+            <span className="truncate">시작 시간</span>
+            <span className="">{`${hh}:${mm}`}</span>
           </div>
 
           <div className="flex items-center gap-1 rounded-md bg-muted/80 px-2 py-1">
-            <span>운동 시간</span>
-            <span>{dailyWeightsExercise.durationMinutes}분</span>
+            <span className="truncate">운동 시간</span>
+            <span className="">{dailyWeightsExercise.durationMinutes}분</span>
           </div>
         </div>
 

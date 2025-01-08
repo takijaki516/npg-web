@@ -9,7 +9,7 @@ import {
   LaptopMinimal,
   LogOut,
 } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import { Link, useRouter } from "@tanstack/react-router";
 
 import { useIsMobile } from "@/lib/hooks/use-mobile";
 import { cn } from "@/lib/utils";
@@ -22,33 +22,34 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { authClient } from "@/lib/better-auth";
 
 const NAVS = [
   {
     title: "운동",
-    url: "/me/exercise",
+    url: "/exercise",
     icon: BicepsFlexed,
-    isActive: true,
   },
   {
     title: "식단",
-    url: "/me/meals",
+    url: "/meal",
     icon: Utensils,
   },
   {
     title: "설정",
-    url: "/me/settings",
+    url: "/setting",
     icon: Settings2,
   },
 ];
 
-interface MobileSidebarProps {
+export interface MobileSidebarProps {
   profile: Profile;
 }
 
-export function MobileSidebar({}: MobileSidebarProps) {
+export function MobileSidebar() {
   const isMobile = useIsMobile();
   const { setTheme, theme } = useTheme();
+  const router = useRouter();
 
   if (!isMobile) return null;
 
@@ -65,7 +66,9 @@ export function MobileSidebar({}: MobileSidebarProps) {
           <SheetHeader>
             <SheetTitle className="hidden">Sidebar</SheetTitle>
           </SheetHeader>
+
           <Link
+            preload={false}
             href="/me"
             className="flex w-full cursor-pointer items-center gap-2 rounded-md p-1.5 transition-colors hover:bg-accent/80"
           >
@@ -75,6 +78,7 @@ export function MobileSidebar({}: MobileSidebarProps) {
 
           {NAVS.map((nav) => (
             <Link
+              preload={false}
               key={nav.title}
               href={nav.url}
               className="flex w-full cursor-pointer items-center gap-2 rounded-md p-1.5 transition-colors hover:bg-accent/80"
@@ -122,6 +126,17 @@ export function MobileSidebar({}: MobileSidebarProps) {
             className={cn(
               "group flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-full border-[1.5px] border-border bg-muted/40 py-1.5",
             )}
+            onClick={async () => {
+              await authClient.signOut({
+                fetchOptions: {
+                  onSuccess: () => {
+                    router.navigate({
+                      href: "/",
+                    });
+                  },
+                },
+              });
+            }}
           >
             <LogOut
               size={20}

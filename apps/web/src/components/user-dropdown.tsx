@@ -1,7 +1,7 @@
-import { User2, Settings } from "lucide-react";
+import { User2 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
-import type { Profile } from "@/lib/queries";
 
+import type { Profile } from "@/lib/queries";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -27,26 +27,20 @@ export function UserDropdown({ align, profile }: UserDropdownProps) {
         </Button>
       </DropdownMenuTrigger>
 
-      <DropdownMenuContent align={align} className="space-y-1">
-        <DropdownMenuLabel>Hello, {profile.email}</DropdownMenuLabel>
+      <DropdownMenuContent align={align} className="w-full max-w-40 space-y-1">
+        <DropdownMenuLabel className="truncate">
+          {profile.email}
+        </DropdownMenuLabel>
 
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem>
+        <DropdownMenuItem className="cursor-pointer">
           <Link href={"/me"} className="flex items-center gap-2">
-            <User2 className="size-4" />
-            My Page
+            <User2 className="size-4" />내 페이지
           </Link>
         </DropdownMenuItem>
 
-        <DropdownMenuItem>
-          <Link href="/settings" className="flex items-center gap-2">
-            <Settings className="size-4" />
-            Settings
-          </Link>
-        </DropdownMenuItem>
-
-        <DropdownMenuItem className="bg-destructive/50 focus:bg-destructive">
+        <DropdownMenuItem className="">
           <UserSignoutButton />
         </DropdownMenuItem>
       </DropdownMenuContent>

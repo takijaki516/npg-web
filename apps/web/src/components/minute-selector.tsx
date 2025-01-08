@@ -3,8 +3,8 @@ import { ChevronDownIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface MinuteSelectorProps {
-  setValue: React.Dispatch<React.SetStateAction<string>>;
-  value: string;
+  setValue: React.Dispatch<React.SetStateAction<number>>;
+  value: number;
 }
 
 export function MinuteSelector({ setValue, value }: MinuteSelectorProps) {
@@ -13,6 +13,7 @@ export function MinuteSelector({ setValue, value }: MinuteSelectorProps) {
 
   const minuteOptions = Array.from({ length: 18 }, (_, i) => (i + 1) * 5);
 
+  // REVIEW:
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     let inputValue = e.target.value;
     // Remove 'm' if it's the last character
@@ -24,12 +25,12 @@ export function MinuteSelector({ setValue, value }: MinuteSelectorProps) {
       inputValue === "" ||
       (/^\d+$/.test(inputValue) && parseInt(inputValue) > 0)
     ) {
-      setValue(inputValue);
+      setValue(parseInt(inputValue));
     }
   };
 
   const handleOptionClick = (minutes: number) => {
-    setValue(minutes.toString());
+    setValue(minutes);
     setIsOpen(false);
   };
 
@@ -56,16 +57,19 @@ export function MinuteSelector({ setValue, value }: MinuteSelectorProps) {
   return (
     <div className="relative flex-1" ref={dropdownRef}>
       <div className="flex items-center rounded-md border bg-background">
-        <input
-          type="number"
-          value={value}
-          onChange={handleInputChange}
-          className={cn(
-            "w-full rounded-l-md bg-transparent text-center text-sm",
-            "focus:outline-none",
-            "[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
-          )}
-        />
+        <div className="flex w-full items-center rounded-l-md bg-transparent">
+          <input
+            type="number"
+            value={value}
+            onChange={handleInputChange}
+            className={cn(
+              "w-full flex-1 rounded-l-md bg-transparent text-end text-sm",
+              "focus:outline-none",
+              "[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
+            )}
+          />
+          <span className="px-1">분</span>
+        </div>
 
         <button
           onClick={toggleDropdown}
@@ -85,9 +89,9 @@ export function MinuteSelector({ setValue, value }: MinuteSelectorProps) {
               onClick={() => handleOptionClick(minutes)}
               className="cursor-pointer px-3 py-2 text-center text-sm transition-colors hover:bg-muted"
               role="option"
-              aria-selected={value === minutes.toString()}
+              aria-selected={value === minutes}
             >
-              {minutes} m
+              {minutes} 분
             </div>
           ))}
         </div>

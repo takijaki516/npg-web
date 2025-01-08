@@ -1,6 +1,7 @@
 import { LogOut } from "lucide-react";
-import { useRouteContext } from "@tanstack/react-router";
+import { useRouteContext, useRouter } from "@tanstack/react-router";
 
+import { authClient } from "@/lib/better-auth";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   DropdownMenu,
@@ -13,6 +14,7 @@ import {
 
 export function NavUser() {
   const { profile } = useRouteContext({ from: "/(user)/_layout" });
+  const router = useRouter();
 
   return (
     <DropdownMenu>
@@ -40,7 +42,20 @@ export function NavUser() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
 
-        <DropdownMenuItem className="cursor-pointer bg-red-600/60 hover:bg-red-600/80 focus:bg-red-600/80">
+        <DropdownMenuItem
+          className="cursor-pointer bg-red-600/60 hover:bg-red-600/80 focus:bg-red-600/80"
+          onClick={async () => {
+            await authClient.signOut({
+              fetchOptions: {
+                onSuccess: () => {
+                  router.navigate({
+                    href: "/",
+                  });
+                },
+              },
+            });
+          }}
+        >
           <LogOut />
           Log out
         </DropdownMenuItem>

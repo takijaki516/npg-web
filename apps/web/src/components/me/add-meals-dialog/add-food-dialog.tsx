@@ -126,7 +126,7 @@ export function AddFoodDialog({ mealForm, profile }: AddFoodDialogProps) {
       <DialogContent
         onPointerDownOutside={(e) => e.preventDefault()}
         onInteractOutside={(e) => e.preventDefault()}
-        className="flex max-h-[calc(100dvh-80px)] w-full max-w-xl flex-col gap-4 overflow-y-auto"
+        className="flex max-h-[calc(100dvh-80px)] w-full max-w-xl flex-col gap-4 overflow-y-auto rounded-md"
       >
         <DialogTitle>음식 추가</DialogTitle>
 

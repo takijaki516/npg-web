@@ -19,9 +19,12 @@ export function UserSignoutButton() {
           },
         });
       }}
-      className="flex cursor-pointer items-center gap-2"
+      className="group flex w-full cursor-pointer items-center gap-2"
     >
-      <LogOut className="size-4" />
+      <LogOut
+        size={20}
+        className="transition-colors group-hover:text-red-600/80"
+      />
       로그아웃
     </button>
   );

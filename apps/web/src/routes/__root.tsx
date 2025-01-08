@@ -7,6 +7,7 @@ import { TanStackRouterDevtools } from "@/components/tanstack-router-devtool";
 interface RootRouteContext {
   queryClient: QueryClient;
   profile: AuthClient["$Infer"]["Session"]["profile"] | null;
+  session: AuthClient["$Infer"]["Session"]["session"] | null;
 }
 
 export const Route = createRootRouteWithContext<RootRouteContext>()({
@@ -18,8 +19,8 @@ export const Route = createRootRouteWithContext<RootRouteContext>()({
   ),
   // TODO: add caching
   beforeLoad: async ({ context }) => {
-    if (context.profile) {
-      return { profile: context.profile };
+    if (context.session && context.profile) {
+      return { profile: context.profile, session: context.session };
     }
 
     // NOTE: for first render
@@ -33,11 +34,13 @@ export const Route = createRootRouteWithContext<RootRouteContext>()({
     if (!data) {
       return {
         profile: null,
+        session: null,
       };
     }
 
     return {
       profile: data.profile,
+      session: data.session,
     };
   },
   onError: (error) => {

@@ -44,7 +44,7 @@ export function DailyUserStat({
   return (
     <div className="flex flex-col rounded-md p-2">
       <div className="flex items-center gap-4 text-lg font-semibold">
-        <MobileSidebar profile={profile} />
+        <MobileSidebar />
 
         <div className="flex items-center">
           {currentLocalDateTime.split(" ")[0]}

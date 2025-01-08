@@ -98,3 +98,11 @@ export function utcToLocalTime({
 
   return dateTime.toFormat("yyyy-MM-dd HH:mm:ss");
 }
+
+export function getCurrentTimeInTimezone(timezone: string) {
+  const dateTime = DateTime.now()
+    .setZone(timezone)
+    .toFormat("yyyy-MM-dd HH:mm:ss");
+
+  return dateTime;
+}

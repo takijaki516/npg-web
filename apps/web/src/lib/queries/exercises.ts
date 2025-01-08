@@ -35,13 +35,13 @@ export function getDailyWeightsExerciseOptions({
   timezone: string;
 }) {
   return queryOptions({
-    queryKey: [GET_DAILY_WEIGHTS_EXERCISES_QUERY_KEY],
-    queryFn: () =>
+    queryKey: [GET_DAILY_WEIGHTS_EXERCISES_QUERY_KEY, currentLocalDateTime],
+    queryFn: ({ queryKey }) =>
       getDailyWeightsExerciseWithAllInfos({
-        currentLocalDateTime,
+        currentLocalDateTime: queryKey[1],
         timezone,
       }),
-    staleTime: 1000 * 60 * 5,
+    staleTime: Infinity,
   });
 }
 

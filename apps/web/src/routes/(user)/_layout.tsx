@@ -4,7 +4,7 @@ import { Sidebar } from "@/components/sidebar";
 
 export const Route = createFileRoute("/(user)/_layout")({
   beforeLoad: ({ context }) => {
-    if (!context.profile) {
+    if (!context.session || !context.profile) {
       throw redirect({ to: "/login" });
     }
 
@@ -17,7 +17,10 @@ function MeLayout() {
   return (
     <div className="relative flex">
       <Sidebar />
-      <Outlet />
+
+      <div className="flex-1">
+        <Outlet />
+      </div>
     </div>
   );
 }

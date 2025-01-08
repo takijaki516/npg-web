@@ -35,9 +35,10 @@ export function getOrCreateDailyIntakeOptions({
   timezone: string;
 }) {
   return queryOptions({
-    queryKey: [GET_OR_CREATE_DAILY_INTAKE_QUERY_KEY],
-    queryFn: () => getOrCreateDailyIntake({ currentLocalDateTime, timezone }),
-    staleTime: 1000 * 60 * 10,
+    queryKey: [GET_OR_CREATE_DAILY_INTAKE_QUERY_KEY, currentLocalDateTime],
+    queryFn: ({ queryKey }) =>
+      getOrCreateDailyIntake({ currentLocalDateTime: queryKey[1], timezone }),
+    staleTime: Infinity,
   });
 }
 

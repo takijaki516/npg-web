@@ -1,7 +1,8 @@
+import * as React from "react";
 import { Bot, Loader2, Info } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
-import { cn } from "@/lib/utils";
+import { cn, getCurrentTimeInTimezone } from "@/lib/utils";
 import { honoClient } from "@/lib/hono";
 import {
   type DailyMealsWithFoods,
@@ -16,6 +17,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { useDateTimeStore } from "@/lib/zustand/time-store";
 
 interface DailyIntakeProps {
   profile: Profile;
@@ -30,6 +32,12 @@ export function DailyIntake({
   dailyIntake,
   dailyMealsWithFoods,
 }: DailyIntakeProps) {
+  const setCurrentDateTime = useDateTimeStore(
+    (state) => state.setCurrentDateTime,
+  );
+
+  const [isTooltipOpen, setIsTooltipOpen] = React.useState<boolean>(false);
+
   const hoveredMealId = useMealHoverStore((state) => state.hoveredMealId);
   const hoveredFoodId = useFoodHoverStore((state) => state.hoveredFoodId);
 
@@ -49,8 +57,11 @@ export function DailyIntake({
       // TODO: error handling
     },
     onSettled: async () => {
+      const currentDateTime = getCurrentTimeInTimezone(profile.timezone);
+      setCurrentDateTime(currentDateTime);
+
       await queryClient.invalidateQueries({
-        queryKey: [GET_OR_CREATE_DAILY_INTAKE_QUERY_KEY],
+        queryKey: [GET_OR_CREATE_DAILY_INTAKE_QUERY_KEY, currentDateTime],
       });
     },
   });
@@ -75,9 +86,9 @@ export function DailyIntake({
   }, 0);
 
   return (
-    <div className={cn("h-[148px] pt-2 sm:grid sm:grid-cols-5 sm:gap-2")}>
+    <div className={cn("min-h-[148px] pt-2 sm:grid sm:grid-cols-5 sm:gap-2")}>
       <div className="grid grid-cols-6 sm:col-span-3">
-        <div className="col-span-2 col-start-2 flex items-center">
+        <div className="col-span-2 col-start-2 flex items-center truncate">
           <div>현재/목표</div>
         </div>
 
@@ -90,8 +101,11 @@ export function DailyIntake({
             )}
           </div>
 
-          <Tooltip>
-            <TooltipTrigger className="rounded-md p-1 transition-colors hover:bg-muted sm:hidden">
+          <Tooltip open={isTooltipOpen} onOpenChange={setIsTooltipOpen}>
+            <TooltipTrigger
+              onClick={() => setIsTooltipOpen(true)}
+              className="rounded-md p-1 transition-colors hover:bg-muted sm:hidden"
+            >
               <Info size={20} />
             </TooltipTrigger>
             <TooltipContent
@@ -105,17 +119,20 @@ export function DailyIntake({
 
         <div className="col-span-full space-y-1 pt-1">
           <div className="grid grid-cols-6">
-            <div className="col-span-1 whitespace-nowrap">칼로리</div>
+            <div className="col-span-1 truncate">칼로리</div>
 
-            <div className="col-span-2 flex items-center gap-1">
+            <div className="col-span-2 flex flex-wrap items-center truncate">
               <span>{intakeTotalKCal ?? "0"}</span>
               <span>/</span>
-              <span>{goalCaloriesKcal ?? "?"}Kcal</span>
+              <span className="truncate">{goalCaloriesKcal ?? "?"}kcal</span>
             </div>
 
             <div
               className={cn(
-                "col-span-3 h-5 overflow-hidden rounded-full bg-muted",
+                "col-span-3 h-5 overflow-hidden rounded-full",
+                goalCaloriesKcal
+                  ? "bg-muted"
+                  : "border border-dashed border-border bg-background",
               )}
             >
               {goalCaloriesKcal && (
@@ -163,10 +180,10 @@ export function DailyIntake({
             </div>
           </div>
 
-          <div className="grid grid-cols-6 gap-1">
-            <div className="col-span-1 whitespace-nowrap">탄수화물</div>
+          <div className="grid grid-cols-6">
+            <div className="col-span-1 truncate">탄수화물</div>
 
-            <div className="col-span-2 flex items-center gap-1">
+            <div className="col-span-2 flex flex-wrap items-center truncate">
               <span>{intakeTotalCarbohydratesG ?? "0"}</span>
               <span>/</span>
               <span>{goalCarbohydratesG ?? "?"}g</span>
@@ -174,7 +191,10 @@ export function DailyIntake({
 
             <div
               className={cn(
-                "col-span-3 h-5 overflow-hidden rounded-full bg-muted",
+                "col-span-3 h-5 overflow-hidden rounded-full",
+                goalCaloriesKcal
+                  ? "bg-muted"
+                  : "border border-dashed border-border bg-background",
               )}
             >
               {goalCarbohydratesG && (
@@ -224,9 +244,9 @@ export function DailyIntake({
           </div>
 
           <div className="grid grid-cols-6">
-            <div className="col-span-1 whitespace-nowrap">단백질</div>
+            <div className="col-span-1 truncate">단백질</div>
 
-            <div className="col-span-2 flex items-center gap-1">
+            <div className="col-span-2 flex flex-wrap items-center truncate">
               <span>{intakeTotalProteinG ?? "0"}</span>
               <span>/</span>
               <span>{goalProteinG ?? "?"}g</span>
@@ -234,7 +254,10 @@ export function DailyIntake({
 
             <div
               className={cn(
-                "col-span-3 h-5 overflow-hidden rounded-full bg-muted",
+                "col-span-3 h-5 overflow-hidden rounded-full",
+                goalCaloriesKcal
+                  ? "bg-muted"
+                  : "border border-dashed border-border bg-background",
               )}
             >
               {goalProteinG && (
@@ -281,9 +304,9 @@ export function DailyIntake({
           </div>
 
           <div className="grid grid-cols-6">
-            <div className="col-span-1 whitespace-nowrap">지방</div>
+            <div className="col-span-1 truncate">지방</div>
 
-            <div className="col-span-2 flex items-center gap-1">
+            <div className="col-span-2 flex flex-wrap items-center truncate">
               <span>{intakeTotalFatG ?? "0"}</span>
               <span>/</span>
               <span>{goalFatG ?? "?"}g</span>
@@ -291,7 +314,10 @@ export function DailyIntake({
 
             <div
               className={cn(
-                "col-span-3 h-5 overflow-hidden rounded-full bg-muted",
+                "col-span-3 h-5 overflow-hidden rounded-full",
+                goalCaloriesKcal
+                  ? "bg-muted"
+                  : "border border-dashed border-border bg-background",
               )}
             >
               {goalFatG && (
@@ -338,7 +364,7 @@ export function DailyIntake({
         </div>
       </div>
 
-      <div className="hidden h-full min-h-0 overflow-y-auto whitespace-pre-wrap rounded-md border border-border p-1 sm:col-span-2 sm:flex">
+      <div className="hidden h-[140px] overflow-y-auto whitespace-pre-wrap rounded-md border border-border p-1 sm:col-span-2 sm:flex">
         {dailyIntake.llmDescription}
       </div>
     </div>

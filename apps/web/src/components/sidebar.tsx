@@ -7,18 +7,17 @@ import { ModeToggle } from "./mode-toggle";
 const NAVS = [
   {
     title: "운동",
-    url: "/me/exercise",
+    url: "/exercise",
     icon: BicepsFlexed,
-    isActive: true,
   },
   {
     title: "식단",
-    url: "/me/meals",
+    url: "/meal",
     icon: Utensils,
   },
   {
     title: "설정",
-    url: "/me/settings",
+    url: "/setting",
     icon: Settings2,
   },
 ];
@@ -28,6 +27,7 @@ export function Sidebar() {
     <div className="sticky top-0 hidden h-dvh w-[60px] flex-col items-center justify-between overflow-hidden border-r border-border py-4 md:flex">
       <div className="flex w-full flex-col items-center gap-3 px-2">
         <Link
+          preload={false}
           href="/me"
           className="flex cursor-pointer items-center justify-center rounded-md p-1.5 transition-colors hover:bg-accent/80"
         >
@@ -36,6 +36,7 @@ export function Sidebar() {
 
         {NAVS.map((nav) => (
           <Link
+            preload={false}
             key={nav.title}
             href={nav.url}
             className="flex cursor-pointer items-center justify-center rounded-md p-1.5 transition-colors hover:bg-accent/80"

@@ -28,7 +28,7 @@ const getOrCreateGoal = async () => {
 export const getOrCreateGoalOptions = queryOptions({
   queryKey: ["user-goal"],
   queryFn: getOrCreateGoal,
-  staleTime: 1000 * 60 * 10,
+  staleTime: Infinity,
 });
 
 export type UserGoal = NonNullable<Awaited<ReturnType<typeof getOrCreateGoal>>>;

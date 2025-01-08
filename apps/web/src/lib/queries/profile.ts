@@ -16,7 +16,7 @@ async function getProfile() {
 export const getProfileOptions = queryOptions({
   queryKey: ["profile"],
   queryFn: getProfile,
-  staleTime: 5000,
+  staleTime: Infinity,
 });
 
 export type Profile = NonNullable<Awaited<ReturnType<typeof getProfile>>>;

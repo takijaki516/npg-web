@@ -2,6 +2,7 @@ import * as React from "react";
 import { Clock, CookingPot } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 
+import { useDateTimeStore } from "@/lib/zustand/time-store";
 import {
   GET_DAILY_MEALS_WITH_FOODS_QUERY_KEY,
   deleteMealMutationFn,
@@ -10,7 +11,7 @@ import {
 } from "@/lib/queries";
 import { useMealHoverStore } from "@/lib/zustand/meal-hover-store";
 import { useFoodHoverStore } from "@/lib/zustand/food-hover-store";
-import { cn, utcToLocalTime } from "@/lib/utils";
+import { cn, getCurrentTimeInTimezone, utcToLocalTime } from "@/lib/utils";
 import { DailyFood } from "./daily-food";
 import { InfoField } from "@/components/info-field";
 import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
@@ -30,6 +31,9 @@ export function DailyMeal({ dailyMealData, profile }: DailyMealProps) {
 
   const dailyFoods = dailyMealData.foods.slice(0, 3);
 
+  const setCurrentDateTime = useDateTimeStore(
+    (state) => state.setCurrentDateTime,
+  );
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
   const setHoveredMealId = useMealHoverStore((state) => state.setHoveredMealId);
   const setHoveredFoodId = useFoodHoverStore((state) => state.setHoveredFoodId);
@@ -39,8 +43,11 @@ export function DailyMeal({ dailyMealData, profile }: DailyMealProps) {
   const deleteMealMutation = useMutation({
     mutationFn: (id: string) => deleteMealMutationFn({ id }),
     onSettled: async () => {
+      const currentTime = getCurrentTimeInTimezone(profile.timezone);
+      setCurrentDateTime(currentTime);
+
       await queryClient.invalidateQueries({
-        queryKey: [GET_DAILY_MEALS_WITH_FOODS_QUERY_KEY],
+        queryKey: [GET_DAILY_MEALS_WITH_FOODS_QUERY_KEY, currentTime],
       });
     },
     onError: (error) => {
@@ -96,14 +103,17 @@ export function DailyMeal({ dailyMealData, profile }: DailyMealProps) {
             {dailyFoods.map((food) => {
               return (
                 <div
-                  className="flex aspect-square w-full items-center justify-center rounded-md border border-border/50 bg-background"
+                  className={cn(
+                    "relative flex aspect-square w-full items-center justify-center rounded-md border border-border/50 bg-background transition-colors",
+                    "hover:border-primary/20",
+                  )}
                   key={food.id}
                   onMouseEnter={() => setHoveredFoodId(food.id)}
                   onMouseLeave={() => setHoveredFoodId(null)}
                 >
                   {food.foodPic ? (
                     <img
-                      className="object-cover"
+                      className="aspect-square w-full object-contain"
                       src={`https://coach247.taekgogo.com/${food.foodPic}`}
                       alt={food.foodName}
                     />

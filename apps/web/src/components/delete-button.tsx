@@ -18,7 +18,7 @@ export function DeleteButton({
         e.stopPropagation();
         onClick();
       }}
-      className={cn(className)}
+      className={cn("", className)}
       disabled={isPending}
     >
       {isPending ? (

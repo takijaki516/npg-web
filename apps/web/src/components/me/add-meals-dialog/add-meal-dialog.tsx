@@ -7,6 +7,8 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { insertMealSchema } from "@repo/shared-schema";
 
+import { useDateTimeStore } from "@/lib/zustand/time-store";
+import { getCurrentTimeInTimezone } from "@/lib/utils";
 import {
   GET_DAILY_MEALS_WITH_FOODS_QUERY_KEY,
   type Profile,
@@ -35,6 +37,10 @@ export function AddMealDialog({
 }: AddMealDialogProps) {
   const justDate = currentLocalDateTime.split(" ")[0];
 
+  const setCurrentDateTime = useDateTimeStore(
+    (state) => state.setCurrentDateTime,
+  );
+
   const queryClient = useQueryClient();
   const [isDialogOpen, setIsDialogOpen] = React.useState(false);
 
@@ -55,12 +61,13 @@ export function AddMealDialog({
   // TODO: add error handling
   const mutateMeal = useMutation({
     mutationFn: mealSubmitHandler,
-    onMutate: async () => {
-      console.log(mealForm.watch());
-    },
+    onMutate: async () => {},
     onSettled: async () => {
+      const currentTime = getCurrentTimeInTimezone(profile.timezone);
+      setCurrentDateTime(currentTime);
+
       await queryClient.invalidateQueries({
-        queryKey: [GET_DAILY_MEALS_WITH_FOODS_QUERY_KEY],
+        queryKey: [GET_DAILY_MEALS_WITH_FOODS_QUERY_KEY, currentTime],
       });
 
       setIsDialogOpen(false);
@@ -119,11 +126,6 @@ export function AddMealDialog({
 
     values.foods = foodsWithPic;
 
-    console.log(
-      "🚀 ~ file: add-meal-dialog.tsx:121 ~ mealSubmitHandler ~ values:",
-      values,
-    );
-
     const res = await honoClient.meals.$post({
       json: values,
     });
@@ -174,7 +176,7 @@ export function AddMealDialog({
       <DialogContent
         onPointerDownOutside={(e) => e.preventDefault()}
         onInteractOutside={(e) => e.preventDefault()}
-        className="flex max-h-[calc(100dvh-80px)] w-full max-w-xl flex-col gap-4 overflow-y-auto"
+        className="flex max-h-[calc(100dvh-80px)] w-full max-w-xl flex-col gap-4 overflow-y-auto rounded-md"
       >
         <DialogTitle className="flex items-center gap-2">
           <Utensils />
@@ -195,7 +197,6 @@ export function AddMealDialog({
                   <TimePicker
                     value={field.value}
                     setValue={field.onChange}
-                    userLanguage={profile.language}
                     timezone={profile.timezone}
                   />
                 );

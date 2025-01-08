@@ -40,9 +40,7 @@ export function SingleFood({ food, foodIdx, removeFood }: SingleFoodProps) {
       </div>
 
       <CollapsibleContent className="ml-3 mt-1 flex items-center gap-2 border-l pl-4">
-        <div className="aspect-square h-32">
-          <FoodImage src={foodPicUrl} />
-        </div>
+        <FoodImage src={foodPicUrl} className="size-32" />
 
         <div className="flex h-full flex-col justify-center gap-1 text-sm">
           <InfoField

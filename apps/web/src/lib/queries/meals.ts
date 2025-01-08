@@ -34,13 +34,13 @@ export function getDailyMealsWithFoodsOptions({
   timezone: string;
 }) {
   return queryOptions({
-    queryKey: [GET_DAILY_MEALS_WITH_FOODS_QUERY_KEY],
-    queryFn: () =>
+    queryKey: [GET_DAILY_MEALS_WITH_FOODS_QUERY_KEY, currentLocalDateTime],
+    queryFn: ({ queryKey }) =>
       getDailyMealsWithFoods({
-        currentLocalDateTime,
+        currentLocalDateTime: queryKey[1],
         timezone,
       }),
-    staleTime: 1000 * 60 * 10,
+    staleTime: Infinity,
   });
 }
 

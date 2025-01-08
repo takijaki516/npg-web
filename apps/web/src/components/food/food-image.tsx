@@ -10,14 +10,18 @@ export function FoodImage({ className, src }: FoodImageProps) {
   return (
     <div
       className={cn(
-        "flex aspect-square w-full items-center justify-center rounded-md border",
+        "relative flex items-center justify-center rounded-md border",
         className,
       )}
     >
       {!src || src === "" ? (
         <Soup size={48} className="text-muted-foreground" />
       ) : (
-        <img src={src} alt="food" className="object-cover" />
+        <img
+          src={src}
+          alt="food"
+          className="aspect-square w-full object-contain"
+        />
       )}
     </div>
   );
