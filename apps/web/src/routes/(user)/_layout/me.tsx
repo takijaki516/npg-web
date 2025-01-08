@@ -52,8 +52,8 @@ export const Route = createFileRoute("/(user)/_layout/me")({
 
 function RouteComponent() {
   return (
-    <div className="flex h-dvh w-full flex-col items-center justify-center overflow-hidden p-4 lg:py-10">
-      <main className="flex h-full w-full max-w-3xl flex-col items-center overflow-hidden">
+    <div className="flex h-dvh w-full flex-col items-center justify-center overflow-y-auto p-4 lg:py-10">
+      <main className="flex h-full w-full max-w-3xl flex-col items-center">
         <BentoDashboard />
       </main>
     </div>

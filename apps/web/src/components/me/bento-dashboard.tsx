@@ -29,7 +29,7 @@ export function BentoDashboard() {
         </React.Suspense>
       </BentoGridItem>
 
-      <BentoGridItem className="hidden overflow-y-auto rounded-md p-2 sm:inline-block">
+      <BentoGridItem className="hidden min-h-60 overflow-y-auto rounded-md p-2 sm:inline-block">
         <React.Suspense fallback={<DailyExercisesSkeleton />}>
           <DailyExercisesSection
             profile={profile}
@@ -38,7 +38,7 @@ export function BentoDashboard() {
         </React.Suspense>
       </BentoGridItem>
 
-      <BentoGridItem className="hidden overflow-y-auto rounded-md p-2 sm:inline-block">
+      <BentoGridItem className="hidden min-h-60 overflow-y-auto rounded-md p-2 sm:inline-block">
         <React.Suspense fallback={<DailyMealsSkeleton />}>
           <DailyMealsSection
             profile={profile}
@@ -49,7 +49,7 @@ export function BentoDashboard() {
 
       <React.Suspense fallback={<DailyMobileSkeleton />}>
         <MobileBentoGrid
-          className="overflow-y-auto rounded-md p-2 sm:hidden"
+          className="min-h-60 overflow-y-auto rounded-md p-2 sm:hidden"
           exercises={
             <DailyExercisesSection
               profile={profile}

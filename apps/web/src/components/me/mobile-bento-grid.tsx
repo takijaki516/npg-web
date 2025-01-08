@@ -18,8 +18,8 @@ export function MobileBentoGrid({
       className={cn("flex h-full flex-col border border-border", className)}
     >
       <TabsList className="flex items-center">
-        <TabsTrigger value="exercises">Exercises</TabsTrigger>
-        <TabsTrigger value="meals">Meals</TabsTrigger>
+        <TabsTrigger value="exercises">운동</TabsTrigger>
+        <TabsTrigger value="meals">식단</TabsTrigger>
       </TabsList>
 
       <TabsContent value="exercises" className="flex-1 overflow-y-auto">

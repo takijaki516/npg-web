@@ -114,7 +114,7 @@ export function DailyMeal({ dailyMealData, profile }: DailyMealProps) {
                   {food.foodPic ? (
                     <img
                       className="aspect-square w-full object-contain"
-                      src={`https://coach247.taekgogo.com/${food.foodPic}`}
+                      src={`https://coach247.taekgogo.com/cdn-cgi/image/width=110,quality=70/${food.foodPic}`}
                       alt={food.foodName}
                     />
                   ) : (
