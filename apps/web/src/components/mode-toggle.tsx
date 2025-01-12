@@ -9,7 +9,15 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 
-export function ModeToggle() {
+interface ModeToggleProps {
+  align?: "start" | "end" | "center";
+  side?: "top" | "right" | "bottom" | "left";
+}
+
+export function ModeToggle({
+  align = "end",
+  side = "bottom",
+}: ModeToggleProps) {
   const { setTheme, theme } = useTheme();
 
   return (
@@ -27,7 +35,7 @@ export function ModeToggle() {
           <span className="sr-only">Toggle theme</span>
         </Button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="border-none">
+      <DropdownMenuContent side={side} align={align} className="border-none">
         <div className="flex w-full items-center justify-around overflow-hidden rounded-md border border-border bg-background transition-colors">
           <div
             className={cn(

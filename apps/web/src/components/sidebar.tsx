@@ -1,9 +1,9 @@
-import { Home, Settings, ChartArea } from "lucide-react";
+import { Home, Settings, ChartArea, Bot } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
+import { useDateTimeStore } from "@/lib/zustand/time-store";
 import { NavUser } from "./nav-user";
 import { ModeToggle } from "./mode-toggle";
-import { useDateTimeStore } from "@/lib/zustand/time-store";
 
 export function Sidebar() {
   const currentDateTime = useDateTimeStore((state) => state.currentDateTime);
@@ -30,6 +30,14 @@ export function Sidebar() {
 
         <Link
           preload={false}
+          href="/ai"
+          className="flex cursor-pointer items-center justify-center rounded-md p-1.5 transition-colors hover:bg-accent/80"
+        >
+          <Bot size={24} />
+        </Link>
+
+        <Link
+          preload={false}
           href="/setting"
           className="flex cursor-pointer items-center justify-center rounded-md p-1.5 transition-colors hover:bg-accent/80"
         >
@@ -38,7 +46,7 @@ export function Sidebar() {
       </div>
 
       <div className="flex flex-col items-center justify-center gap-2">
-        <ModeToggle />
+        <ModeToggle align="start" side="right" />
         <NavUser />
       </div>
     </div>

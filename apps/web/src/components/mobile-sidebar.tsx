@@ -1,16 +1,18 @@
 import {
   PanelLeft,
-  BicepsFlexed,
   Home,
   Settings,
-  Utensils,
   Sun,
   Moon,
   LaptopMinimal,
   LogOut,
+  ChartArea,
+  Bot,
 } from "lucide-react";
 import { Link, useRouter } from "@tanstack/react-router";
 
+import { authClient } from "@/lib/better-auth";
+import { useDateTimeStore } from "@/lib/zustand/time-store";
 import { useIsMobile } from "@/lib/hooks/use-mobile";
 import { cn } from "@/lib/utils";
 import { type Profile } from "@/lib/queries";
@@ -22,25 +24,6 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { authClient } from "@/lib/better-auth";
-
-const NAVS = [
-  {
-    title: "운동",
-    url: "/exercise",
-    icon: BicepsFlexed,
-  },
-  {
-    title: "식단",
-    url: "/meal",
-    icon: Utensils,
-  },
-  {
-    title: "설정",
-    url: "/setting",
-    icon: Settings,
-  },
-];
 
 export interface MobileSidebarProps {
   profile: Profile;
@@ -50,6 +33,8 @@ export function MobileSidebar() {
   const isMobile = useIsMobile();
   const { setTheme, theme } = useTheme();
   const router = useRouter();
+  const currentDateTime = useDateTimeStore((state) => state.currentDateTime);
+  const yearMonth = currentDateTime.split(" ")[0].slice(0, 7);
 
   if (!isMobile) return null;
 
@@ -73,23 +58,39 @@ export function MobileSidebar() {
             className="flex w-full cursor-pointer items-center gap-2 rounded-md p-1.5 transition-colors hover:bg-accent/80"
           >
             <Home size={24} />
-            <div>메인 화면</div>
+            <span>메인</span>
           </Link>
 
-          {NAVS.map((nav) => (
-            <Link
-              preload={false}
-              key={nav.title}
-              href={nav.url}
-              className="flex w-full cursor-pointer items-center gap-2 rounded-md p-1.5 transition-colors hover:bg-accent/80"
-            >
-              <nav.icon size={24} />
-              <div>{nav.title}</div>
-            </Link>
-          ))}
+          <Link
+            preload={false}
+            href={`/info/${yearMonth}`}
+            className="flex w-full cursor-pointer items-center gap-2 rounded-md p-1.5 transition-colors hover:bg-accent/80"
+          >
+            <ChartArea size={24} />
+            <span>기록</span>
+          </Link>
+
+          <Link
+            preload={false}
+            href="/ai"
+            className="flex w-full cursor-pointer items-center gap-2 rounded-md p-1.5 transition-colors hover:bg-accent/80"
+          >
+            <Bot size={24} />
+            <span>AI</span>
+          </Link>
+
+          <Link
+            preload={false}
+            href="/setting"
+            className="flex w-full cursor-pointer items-center gap-2 rounded-md p-1.5 transition-colors hover:bg-accent/80"
+          >
+            <Settings size={24} />
+            <span>설정</span>
+          </Link>
         </div>
 
         <div className="flex w-full flex-col items-start justify-center gap-2 overflow-hidden">
+          {/* mobile dark mode */}
           <div className="flex w-full items-center justify-around overflow-hidden rounded-full bg-muted/40 transition-colors">
             <div
               className={cn(
@@ -122,6 +123,7 @@ export function MobileSidebar() {
             </div>
           </div>
 
+          {/* logout button */}
           <div
             className={cn(
               "group flex w-full cursor-pointer items-center justify-center gap-2 overflow-hidden rounded-full border-[1.5px] border-border bg-muted/40 py-1.5",

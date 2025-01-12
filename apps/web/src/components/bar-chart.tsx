@@ -58,7 +58,7 @@ export function BarChartComponent({
       startDate: startDate.toFormat("yyyy-MM-dd"),
       endDate: isZoomed
         ? startDate.plus({ day: 6 }).toFormat("yyyy-MM-dd")
-        : startDate.plus({ month: 1 }).toFormat("yyyy-MM-dd"),
+        : startDate.plus({ month: 1 }).minus({ day: 1 }).toFormat("yyyy-MM-dd"),
     }),
   );
 

@@ -31,7 +31,7 @@ export function UserHealthInfoStat({ healthInfo }: UserHealthInfoStatProps) {
   let healthInfoFreshness: "outdated" | "moderate" | "fresh" = "outdated";
 
   const healthInfoDateUTC = DateTime.fromFormat(
-    healthInfo.measuredData,
+    healthInfo.measuredDate,
     "yyyy-MM-dd",
     { zone: "utc" },
   ).toMillis();
