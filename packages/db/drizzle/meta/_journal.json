@@ -57,6 +57,13 @@
       "when": 1736148454512,
       "tag": "0007_spooky_frightful_four",
       "breakpoints": true
+    },
+    {
+      "idx": 8,
+      "version": "7",
+      "when": 1736656871068,
+      "tag": "0008_milky_apocalypse",
+      "breakpoints": true
     }
   ]
 }

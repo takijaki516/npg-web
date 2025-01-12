@@ -43,9 +43,7 @@ export const Route = createRootRouteWithContext<RootRouteContext>()({
       session: data.session,
     };
   },
-  onError: (error) => {
-    console.log("🚀 ~ file: __root.tsx:32 ~ beforeLoad: ~ error:", error);
-  },
+  onError: () => {},
   errorComponent: ({ error }) => {
     return <div>{error.message}</div>;
   },

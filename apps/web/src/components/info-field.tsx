@@ -6,7 +6,7 @@ export function InfoField({
   className,
 }: {
   label: string;
-  value: string;
+  value: string | number;
   className?: string;
 }) {
   return (

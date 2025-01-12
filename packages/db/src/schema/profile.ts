@@ -28,6 +28,8 @@ export const profile = pgTable("profile", {
   updatedAt: timestamp({ mode: "string" }).defaultNow().notNull(),
 });
 
+export type Profile = typeof profile.$inferSelect;
+
 export const profileRelations = relations(profile, ({ one, many }) => ({
   user: one(user, {
     fields: [profile.email],

@@ -59,7 +59,7 @@ export function DailyMeal({ dailyMealData, profile }: DailyMealProps) {
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
       <div
         className={cn(
-          "flex cursor-pointer flex-col gap-2 rounded-md border border-border p-2 transition-colors hover:bg-muted/40",
+          "flex cursor-pointer flex-col gap-2 overflow-y-auto rounded-md border border-border p-2 transition-colors hover:bg-muted/40",
         )}
         onMouseEnter={() => setHoveredMealId(dailyMealData.id)}
         onMouseLeave={() => setHoveredMealId(null)}
@@ -84,6 +84,7 @@ export function DailyMeal({ dailyMealData, profile }: DailyMealProps) {
             <InfoField
               label={profile.language === "ko" ? "총칼로리" : "Total Calories"}
               value={dailyMealData.totalCaloriesKcal.toString()}
+              className=""
             />
             <InfoField
               label={profile.language === "ko" ? "총탄수화물" : "Total Carbs"}

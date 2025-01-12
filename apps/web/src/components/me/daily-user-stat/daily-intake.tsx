@@ -365,7 +365,21 @@ export function DailyIntake({
       </div>
 
       <div className="hidden h-[140px] overflow-y-auto whitespace-pre-wrap rounded-md border border-border p-1 sm:col-span-2 sm:flex">
-        {dailyIntake.llmDescription}
+        {dailyIntake.llmDescription ? (
+          dailyIntake.llmDescription
+        ) : mutateIntake.isPending ? (
+          <div className="flex h-full w-full items-center justify-center">
+            <Loader2 size={20} className="animate-spin text-muted-foreground" />
+          </div>
+        ) : (
+          <div className="flex h-full w-full items-center justify-center">
+            <Bot
+              onClick={() => mutateIntake.mutate()}
+              size={60}
+              className="cursor-pointer text-muted-foreground transition-colors hover:text-primary"
+            />
+          </div>
+        )}
       </div>
     </div>
   );

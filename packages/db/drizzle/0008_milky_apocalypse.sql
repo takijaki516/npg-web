@@ -1,0 +1,1 @@
+ALTER TABLE "health_infos" RENAME COLUMN "measured_data" TO "measured_date";

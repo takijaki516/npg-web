@@ -17,9 +17,8 @@ import { Route as IndexImport } from './routes/index'
 import { Route as userLayoutImport } from './routes/(user)/_layout'
 import { Route as authAuthImport } from './routes/(auth)/_auth'
 import { Route as userLayoutSettingImport } from './routes/(user)/_layout/setting'
-import { Route as userLayoutMealImport } from './routes/(user)/_layout/meal'
 import { Route as userLayoutMeImport } from './routes/(user)/_layout/me'
-import { Route as userLayoutExerciseImport } from './routes/(user)/_layout/exercise'
+import { Route as userLayoutInfoYearmonthImport } from './routes/(user)/_layout/info.$yearmonth'
 
 // Create Virtual Routes
 
@@ -79,21 +78,15 @@ const userLayoutSettingRoute = userLayoutSettingImport.update({
   getParentRoute: () => userLayoutRoute,
 } as any)
 
-const userLayoutMealRoute = userLayoutMealImport.update({
-  id: '/meal',
-  path: '/meal',
-  getParentRoute: () => userLayoutRoute,
-} as any)
-
 const userLayoutMeRoute = userLayoutMeImport.update({
   id: '/me',
   path: '/me',
   getParentRoute: () => userLayoutRoute,
 } as any)
 
-const userLayoutExerciseRoute = userLayoutExerciseImport.update({
-  id: '/exercise',
-  path: '/exercise',
+const userLayoutInfoYearmonthRoute = userLayoutInfoYearmonthImport.update({
+  id: '/info/$yearmonth',
+  path: '/info/$yearmonth',
   getParentRoute: () => userLayoutRoute,
 } as any)
 
@@ -136,25 +129,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof userLayoutImport
       parentRoute: typeof userRoute
     }
-    '/(user)/_layout/exercise': {
-      id: '/(user)/_layout/exercise'
-      path: '/exercise'
-      fullPath: '/exercise'
-      preLoaderRoute: typeof userLayoutExerciseImport
-      parentRoute: typeof userLayoutImport
-    }
     '/(user)/_layout/me': {
       id: '/(user)/_layout/me'
       path: '/me'
       fullPath: '/me'
       preLoaderRoute: typeof userLayoutMeImport
-      parentRoute: typeof userLayoutImport
-    }
-    '/(user)/_layout/meal': {
-      id: '/(user)/_layout/meal'
-      path: '/meal'
-      fullPath: '/meal'
-      preLoaderRoute: typeof userLayoutMealImport
       parentRoute: typeof userLayoutImport
     }
     '/(user)/_layout/setting': {
@@ -177,6 +156,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/signup'
       preLoaderRoute: typeof authAuthSignupLazyImport
       parentRoute: typeof authAuthImport
+    }
+    '/(user)/_layout/info/$yearmonth': {
+      id: '/(user)/_layout/info/$yearmonth'
+      path: '/info/$yearmonth'
+      fullPath: '/info/$yearmonth'
+      preLoaderRoute: typeof userLayoutInfoYearmonthImport
+      parentRoute: typeof userLayoutImport
     }
   }
 }
@@ -208,17 +194,15 @@ const authRouteChildren: authRouteChildren = {
 const authRouteWithChildren = authRoute._addFileChildren(authRouteChildren)
 
 interface userLayoutRouteChildren {
-  userLayoutExerciseRoute: typeof userLayoutExerciseRoute
   userLayoutMeRoute: typeof userLayoutMeRoute
-  userLayoutMealRoute: typeof userLayoutMealRoute
   userLayoutSettingRoute: typeof userLayoutSettingRoute
+  userLayoutInfoYearmonthRoute: typeof userLayoutInfoYearmonthRoute
 }
 
 const userLayoutRouteChildren: userLayoutRouteChildren = {
-  userLayoutExerciseRoute: userLayoutExerciseRoute,
   userLayoutMeRoute: userLayoutMeRoute,
-  userLayoutMealRoute: userLayoutMealRoute,
   userLayoutSettingRoute: userLayoutSettingRoute,
+  userLayoutInfoYearmonthRoute: userLayoutInfoYearmonthRoute,
 }
 
 const userLayoutRouteWithChildren = userLayoutRoute._addFileChildren(
@@ -237,22 +221,20 @@ const userRouteWithChildren = userRoute._addFileChildren(userRouteChildren)
 
 export interface FileRoutesByFullPath {
   '/': typeof userLayoutRouteWithChildren
-  '/exercise': typeof userLayoutExerciseRoute
   '/me': typeof userLayoutMeRoute
-  '/meal': typeof userLayoutMealRoute
   '/setting': typeof userLayoutSettingRoute
   '/login': typeof authAuthLoginLazyRoute
   '/signup': typeof authAuthSignupLazyRoute
+  '/info/$yearmonth': typeof userLayoutInfoYearmonthRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof userLayoutRouteWithChildren
-  '/exercise': typeof userLayoutExerciseRoute
   '/me': typeof userLayoutMeRoute
-  '/meal': typeof userLayoutMealRoute
   '/setting': typeof userLayoutSettingRoute
   '/login': typeof authAuthLoginLazyRoute
   '/signup': typeof authAuthSignupLazyRoute
+  '/info/$yearmonth': typeof userLayoutInfoYearmonthRoute
 }
 
 export interface FileRoutesById {
@@ -262,26 +244,24 @@ export interface FileRoutesById {
   '/(auth)/_auth': typeof authAuthRouteWithChildren
   '/(user)': typeof userRouteWithChildren
   '/(user)/_layout': typeof userLayoutRouteWithChildren
-  '/(user)/_layout/exercise': typeof userLayoutExerciseRoute
   '/(user)/_layout/me': typeof userLayoutMeRoute
-  '/(user)/_layout/meal': typeof userLayoutMealRoute
   '/(user)/_layout/setting': typeof userLayoutSettingRoute
   '/(auth)/_auth/login': typeof authAuthLoginLazyRoute
   '/(auth)/_auth/signup': typeof authAuthSignupLazyRoute
+  '/(user)/_layout/info/$yearmonth': typeof userLayoutInfoYearmonthRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
-    | '/exercise'
     | '/me'
-    | '/meal'
     | '/setting'
     | '/login'
     | '/signup'
+    | '/info/$yearmonth'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/exercise' | '/me' | '/meal' | '/setting' | '/login' | '/signup'
+  to: '/' | '/me' | '/setting' | '/login' | '/signup' | '/info/$yearmonth'
   id:
     | '__root__'
     | '/'
@@ -289,12 +269,11 @@ export interface FileRouteTypes {
     | '/(auth)/_auth'
     | '/(user)'
     | '/(user)/_layout'
-    | '/(user)/_layout/exercise'
     | '/(user)/_layout/me'
-    | '/(user)/_layout/meal'
     | '/(user)/_layout/setting'
     | '/(auth)/_auth/login'
     | '/(auth)/_auth/signup'
+    | '/(user)/_layout/info/$yearmonth'
   fileRoutesById: FileRoutesById
 }
 
@@ -352,22 +331,13 @@ export const routeTree = rootRoute
       "filePath": "(user)/_layout.tsx",
       "parent": "/(user)",
       "children": [
-        "/(user)/_layout/exercise",
         "/(user)/_layout/me",
-        "/(user)/_layout/meal",
-        "/(user)/_layout/setting"
+        "/(user)/_layout/setting",
+        "/(user)/_layout/info/$yearmonth"
       ]
-    },
-    "/(user)/_layout/exercise": {
-      "filePath": "(user)/_layout/exercise.tsx",
-      "parent": "/(user)/_layout"
     },
     "/(user)/_layout/me": {
       "filePath": "(user)/_layout/me.tsx",
-      "parent": "/(user)/_layout"
-    },
-    "/(user)/_layout/meal": {
-      "filePath": "(user)/_layout/meal.tsx",
       "parent": "/(user)/_layout"
     },
     "/(user)/_layout/setting": {
@@ -381,6 +351,10 @@ export const routeTree = rootRoute
     "/(auth)/_auth/signup": {
       "filePath": "(auth)/_auth.signup.lazy.tsx",
       "parent": "/(auth)/_auth"
+    },
+    "/(user)/_layout/info/$yearmonth": {
+      "filePath": "(user)/_layout/info.$yearmonth.tsx",
+      "parent": "/(user)/_layout"
     }
   }
 }

@@ -2,7 +2,7 @@ import {
   PanelLeft,
   BicepsFlexed,
   Home,
-  Settings2,
+  Settings,
   Utensils,
   Sun,
   Moon,
@@ -38,7 +38,7 @@ const NAVS = [
   {
     title: "설정",
     url: "/setting",
-    icon: Settings2,
+    icon: Settings,
   },
 ];
 

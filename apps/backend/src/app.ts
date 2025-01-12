@@ -7,6 +7,8 @@ import { weightsRoute } from "./routes/weights";
 import { mealsRoute } from "./routes/meals";
 import { aiRoute } from "./routes/ai";
 import { presignRoute } from "./routes/presign";
+import { infosRoute } from "./routes/info";
+import { healthInfosRoute } from "./routes/health";
 
 export type AppContext = {
   Bindings: {
@@ -56,4 +58,6 @@ export const routes = app
   .route("/weights", weightsRoute)
   .route("/meals", mealsRoute)
   .route("/ai", aiRoute)
-  .route("/presign", presignRoute);
+  .route("/presign", presignRoute)
+  .route("/info", infosRoute)
+  .route("/healthinfo", healthInfosRoute);

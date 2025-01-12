@@ -86,3 +86,61 @@ export function convertToUTCTime({
 
   return { utcDateTime: dateTimeSQL };
 }
+
+export function convertToRangeOfMonthUTCTime({
+  localYearMonth,
+  timeZone,
+}: {
+  localYearMonth: string;
+  timeZone: string;
+}) {
+  const startDateTime = DateTime.fromFormat(
+    `${localYearMonth}-01 00:00:00`,
+    "yyyy-MM-dd HH:mm:ss",
+    {
+      zone: timeZone,
+    }
+  );
+  const endDateTime = startDateTime.plus({ months: 1 });
+
+  return {
+    startDateTime: startDateTime.toUTC().toSQL(),
+    endDateTime: endDateTime.toUTC().toSQL(),
+  };
+}
+
+export function convertToTimezoneDate({
+  utcDateTime,
+  timezone,
+}: {
+  utcDateTime: string;
+  timezone: string;
+}) {
+  const dateTime = DateTime.fromFormat(
+    `${utcDateTime}`,
+    "yyyy-MM-dd HH:mm:ss",
+    {
+      zone: "utc",
+    }
+  );
+
+  return dateTime.setZone(timezone).toFormat("yyyy-MM-dd");
+}
+
+export function getDatesKeyObject<T>(
+  startDate: string,
+  endDate: string,
+  defaultValue: T
+): Record<string, T> {
+  const dates: Record<string, T> = {};
+  let current = DateTime.fromFormat(startDate, "yyyy-MM-dd");
+  const end = DateTime.fromFormat(endDate, "yyyy-MM-dd");
+
+  while (current <= end) {
+    const dateKey = current.toFormat("yyyy-MM-dd");
+    dates[dateKey] = defaultValue;
+    current = current.plus({ days: 1 });
+  }
+
+  return dates;
+}

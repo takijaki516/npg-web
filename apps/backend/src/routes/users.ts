@@ -172,7 +172,7 @@ export const usersRoute = new Hono<AuthMiddlewareContext>()
       .select()
       .from(healthInfos)
       .where(eq(healthInfos.profileEmail, user.email))
-      .orderBy(desc(healthInfos.measuredData))
+      .orderBy(desc(healthInfos.measuredDate))
       .limit(1);
 
     return c.json({ healthInfo: res[0] ?? null }, 200);

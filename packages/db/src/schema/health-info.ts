@@ -16,7 +16,7 @@ export const healthInfos = pgTable("health_infos", {
     .references(() => profile.email)
     .notNull(),
 
-  measuredData: timestamp("measured_data", { mode: "string" }).notNull(),
+  measuredDate: timestamp("measured_date", { mode: "string" }).notNull(),
 
   heightCm: real("height_cm"),
   weightKg: real("weight_kg"),
