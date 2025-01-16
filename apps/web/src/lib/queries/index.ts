@@ -1,5 +1,5 @@
 export * from "./daily-intake";
-export * from "./exercises";
+export * from "./workout";
 export * from "./meals";
 export * from "./profile";
 export * from "./user-goal";

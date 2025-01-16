@@ -47,8 +47,6 @@ export const meals = pgTable("meals", {
   totalProteinG: real("total_protein_g").notNull(),
   totalFatG: real("total_fat_g").notNull(),
 
-  llmDescription: text("llm_description"),
-
   createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow().notNull(),
 });

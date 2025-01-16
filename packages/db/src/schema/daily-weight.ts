@@ -17,7 +17,7 @@ export const dailyWeightsExercises = pgTable("daily_weights_exercises", {
     .notNull(),
 
   startTime: timestamp("start_time", { mode: "string" }).notNull(),
-  durationMinutes: smallint("duration_minutes"),
+  durationMinutes: smallint("duration_minutes").notNull(),
 
   createdAt: timestamp("created_at", { mode: "string" }).defaultNow().notNull(),
   updatedAt: timestamp("updated_at", { mode: "string" }).defaultNow().notNull(),

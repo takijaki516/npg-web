@@ -1,0 +1,1 @@
+ALTER TABLE "site-options" ADD COLUMN "site_name" text NOT NULL;

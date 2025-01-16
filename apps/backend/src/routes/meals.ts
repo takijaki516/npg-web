@@ -1,38 +1,44 @@
 import { Hono } from "hono";
 import { z } from "zod";
+import { DateTime } from "luxon";
 import { zValidator } from "@hono/zod-validator";
 import { and, asc, eq, gte, lt } from "drizzle-orm";
 import { createDb, createPoolDb, foods, meals } from "@repo/db";
-import { insertMealSchema } from "@repo/shared-schema";
-import { convertToRangeOfDayUTCTime, convertToUTCTime } from "@repo/utils";
+import {
+  aiCalcFoodCalorieSchema,
+  insertMealSchema,
+  llmCalorieResponseSchema,
+} from "@repo/shared-schema";
+import {
+  convertToRangeOfDayUTCTime,
+  convertToTimezoneDateTime,
+  convertToUTCTime,
+} from "@repo/utils";
+import { generateObject } from "ai";
+import { createGoogleGenerativeAI } from "@ai-sdk/google";
 
-import { authMiddleware, AuthMiddlewareContext } from "../lib/auth-middleware";
+import { AuthMiddlewareContext } from "../lib/auth-middleware";
+import { CALCULATE_CALORIE_PROMPT } from "../ai/calculate-calorie";
 
 export const mealsRoute = new Hono<AuthMiddlewareContext>()
-  .use(authMiddleware)
   .get(
-    "/",
-    zValidator(
-      "query",
-      z.object({ currentLocalDateTime: z.string(), timezone: z.string() })
-    ),
+    "/daily-meals",
+    zValidator("query", z.object({ currentLocalDate: z.string() })),
     async (c) => {
       const user = c.get("user");
-
-      if (!user) {
+      const profile = c.get("profile");
+      if (!user || !profile) {
         return c.json({ error: "Unauthorized" }, 401);
       }
 
-      const { currentLocalDateTime, timezone } = c.req.valid("query");
+      const { currentLocalDate } = c.req.valid("query");
+      const { utcStartDateTime, utcTomorrowStartDateTime } =
+        convertToRangeOfDayUTCTime({
+          localDate: currentLocalDate,
+          timezone: profile.timezone,
+        });
 
-      const { startUTCTimeOfDay, endUTCTimeOfDay } = convertToRangeOfDayUTCTime(
-        {
-          localDateTime: currentLocalDateTime,
-          timeZone: timezone,
-        }
-      );
-
-      if (!startUTCTimeOfDay || !endUTCTimeOfDay) {
+      if (!utcStartDateTime || !utcTomorrowStartDateTime) {
         return c.json(
           { error: "Failed to get start and end time of day" },
           500
@@ -49,11 +55,20 @@ export const mealsRoute = new Hono<AuthMiddlewareContext>()
           foods: true,
         },
         where: and(
-          gte(meals.mealTime, startUTCTimeOfDay),
-          lt(meals.mealTime, endUTCTimeOfDay),
-          eq(meals.profileEmail, user.email)
+          gte(meals.mealTime, utcStartDateTime),
+          lt(meals.mealTime, utcTomorrowStartDateTime),
+          eq(meals.profileEmail, profile.email)
         ),
         orderBy: [asc(meals.mealTime)],
+      });
+
+      res.forEach((meal) => {
+        const { timezoneDateTime } = convertToTimezoneDateTime({
+          utcDateTime: meal.mealTime,
+          timezone: profile.timezone,
+        });
+
+        meal.mealTime = timezoneDateTime;
       });
 
       return c.json({ meals: res }, 200);
@@ -61,8 +76,85 @@ export const mealsRoute = new Hono<AuthMiddlewareContext>()
   )
   .post("/", zValidator("json", insertMealSchema), async (c) => {
     const user = c.get("user");
-    if (!user) {
+    const profile = c.get("profile");
+    if (!user || !profile) {
       return c.json({ error: "Unauthorized" }, 401);
+    }
+
+    const values = c.req.valid("json");
+
+    const db = createPoolDb({
+      DATABASE_URL: c.env.DATABASE_URL,
+      NODE_ENV: c.env.NODE_ENV,
+    });
+
+    try {
+      const insertedMeal = await db.transaction(async (tx) => {
+        const { utcDateTime } = convertToUTCTime({
+          localDateTime: values.localMealDateTime,
+          timezone: profile.timezone,
+        });
+
+        if (!utcDateTime) {
+          throw new Error("Failed to convert meal time");
+        }
+
+        const meal = await tx
+          .insert(meals)
+          .values({
+            profileEmail: profile.email,
+            mealTime: utcDateTime,
+
+            totalCaloriesKcal: values.totalCaloriesKcal,
+            totalCarbohydratesG: values.totalCarbohydratesG,
+            totalProteinG: values.totalProteinG,
+            totalFatG: values.totalFatG,
+          })
+          .returning();
+
+        await tx.insert(foods).values(
+          values.foods.map((food) => {
+            return {
+              profileEmail: user.email,
+              mealId: meal[0].id,
+
+              foodName: food.foodName,
+              foodPic: food.foodPic,
+
+              foodCaloriesKcal: food.foodCaloriesKcal,
+              foodCarbohydratesG: food.foodCarbohydratesG,
+              foodProteinG: food.foodProteinG,
+              foodFatG: food.foodFatG,
+            };
+          })
+        );
+
+        return meal[0];
+      });
+
+      const { timezoneDateTime } = convertToTimezoneDateTime({
+        utcDateTime: insertedMeal.mealTime,
+        timezone: profile.timezone,
+      });
+
+      insertedMeal.mealTime = timezoneDateTime;
+
+      return c.json({ meal: insertedMeal }, 201);
+    } catch (error) {
+      return c.json({ message: "Failed to insert meal" }, 500);
+    }
+  })
+  .put("/", zValidator("json", insertMealSchema), async (c) => {
+    const user = c.get("user");
+    const profile = c.get("profile");
+    if (!user || !profile) {
+      return c.json({ error: "Unauthorized" }, 401);
+    }
+
+    const values = c.req.valid("json");
+    const { mealId, ...restMeal } = values;
+    if (!mealId) {
+      return c.json({ error: "Meal id is required" }, 400);
     }
 
     const db = createPoolDb({
@@ -70,51 +162,114 @@ export const mealsRoute = new Hono<AuthMiddlewareContext>()
       NODE_ENV: c.env.NODE_ENV,
     });
 
-    const values = c.req.valid("json");
+    const utcCurrentDateTime = DateTime.now()
+      .toUTC()
+      .toFormat("yyyy-MM-dd HH:mm:ss");
 
-    await db.transaction(async (tx) => {
-      const { utcDateTime } = convertToUTCTime({
-        localDateTime: values.localMealDateTime,
-        timeZone: values.timezone,
+    try {
+      const updatedMeal = await db.transaction(async (tx) => {
+        const { utcDateTime } = convertToUTCTime({
+          localDateTime: values.localMealDateTime,
+          timezone: profile.timezone,
+        });
+
+        if (!utcDateTime) {
+          throw new Error("Failed to convert meal time");
+        }
+
+        const updatedMeal = await tx
+          .update(meals)
+          .set({
+            mealTime: utcDateTime,
+            totalCaloriesKcal: restMeal.totalCaloriesKcal,
+            totalCarbohydratesG: restMeal.totalCarbohydratesG,
+            totalFatG: restMeal.totalFatG,
+            totalProteinG: restMeal.totalProteinG,
+
+            updatedAt: utcCurrentDateTime,
+          })
+          .where(eq(meals.id, mealId))
+          .returning();
+
+        if (!updatedMeal[0]) {
+          throw new Error("Failed to update meal");
+        }
+
+        // delete all foods and insert new foods
+        await tx.delete(foods).where(eq(foods.mealId, updatedMeal[0].id));
+
+        await tx.insert(foods).values(
+          values.foods.map((food) => {
+            return {
+              profileEmail: user.email,
+              mealId: updatedMeal[0].id,
+
+              foodName: food.foodName,
+              foodPic: food.foodPic,
+
+              foodCaloriesKcal: food.foodCaloriesKcal,
+              foodCarbohydratesG: food.foodCarbohydratesG,
+              foodProteinG: food.foodProteinG,
+              foodFatG: food.foodFatG,
+            };
+          })
+        );
+
+        return updatedMeal[0];
       });
 
-      if (!utcDateTime) {
-        throw new Error("failed to convert meal time to utc");
+      const { timezoneDateTime } = convertToTimezoneDateTime({
+        timezone: profile.timezone,
+        utcDateTime: updatedMeal.mealTime,
+      });
+
+      updatedMeal.mealTime = timezoneDateTime;
+
+      return c.json({ meal: updatedMeal }, 200);
+    } catch (error) {
+      return c.json({ message: "Failed to update meal" }, 500);
+    }
+  })
+  .post(
+    "/ai-calc-food-calorie",
+    zValidator("form", aiCalcFoodCalorieSchema),
+    async (c) => {
+      const user = c.get("user");
+      const profile = c.get("profile");
+      if (!user || !profile) {
+        return c.json({ error: "Unauthorized" }, 401);
       }
 
-      const meal = await tx
-        .insert(meals)
-        .values({
-          profileEmail: user.email,
-          mealTime: utcDateTime,
+      const { foodImage } = c.req.valid("form");
 
-          totalCaloriesKcal: values.totalCaloriesKcal,
-          totalCarbohydratesG: values.totalCarbohydratesG,
-          totalProteinG: values.totalProteinG,
-          totalFatG: values.totalFatG,
-        })
-        .returning();
+      const google = createGoogleGenerativeAI({
+        apiKey: c.env.GOOGLE_GENERATIVE_AI_API_KEY,
+      });
 
-      await tx.insert(foods).values(
-        values.foods.map((food) => {
-          return {
-            profileEmail: user.email,
-            mealId: meal[0].id,
+      const result = await generateObject({
+        model: google("gemini-2.0-flash-exp"),
+        system: CALCULATE_CALORIE_PROMPT,
+        messages: [
+          {
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: "이미지에 있는 음식의 이름, 칼로리, 단백질, 지방, 탄수화물을 계산해줘",
+              },
+              {
+                type: "image",
+                image: await foodImage.arrayBuffer(),
+              },
+            ],
+          },
+        ],
+        schema: llmCalorieResponseSchema,
+      });
 
-            foodName: food.foodName,
-            foodPic: food.foodPic,
-
-            foodCaloriesKcal: food.foodCaloriesKcal,
-            foodCarbohydratesG: food.foodCarbohydratesG,
-            foodProteinG: food.foodProteinG,
-            foodFatG: food.foodFatG,
-          };
-        })
-      );
-    });
-
-    return c.json({ message: "meal added" }, 201);
-  })
+      return result.toJsonResponse();
+    }
+  )
   .delete("/", zValidator("json", z.object({ id: z.string() })), async (c) => {
     const user = c.get("user");
 

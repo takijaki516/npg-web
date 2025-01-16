@@ -3,12 +3,15 @@ import { cors } from "hono/cors";
 
 import { initBetterAuth } from "./lib/auth";
 import { usersRoute } from "./routes/users";
-import { weightsRoute } from "./routes/weights";
+import { workoutsRoute } from "./routes/workout";
 import { mealsRoute } from "./routes/meals";
-import { aiRoute } from "./routes/ai";
 import { presignRoute } from "./routes/presign";
 import { infosRoute } from "./routes/info";
-import { healthInfosRoute } from "./routes/health";
+import { healthInfosRoute } from "./routes/health-info";
+import { authMiddleware } from "./lib/auth-middleware";
+import { intakeRoute } from "./routes/intake";
+import { goalRoute } from "./routes/goal";
+import { foodsRoute } from "./routes/foods";
 
 export type AppContext = {
   Bindings: {
@@ -54,10 +57,13 @@ app
   });
 
 export const routes = app
+  .use(authMiddleware)
   .route("/user", usersRoute)
-  .route("/weights", weightsRoute)
+  .route("/goals", goalRoute)
+  .route("/workouts", workoutsRoute)
   .route("/meals", mealsRoute)
-  .route("/ai", aiRoute)
-  .route("/presign", presignRoute)
-  .route("/info", infosRoute)
-  .route("/healthinfo", healthInfosRoute);
+  .route("/foods", foodsRoute)
+  .route("/infos", infosRoute)
+  .route("/intakes", intakeRoute)
+  .route("/healthinfos", healthInfosRoute)
+  .route("/presign", presignRoute);

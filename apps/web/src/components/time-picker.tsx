@@ -55,10 +55,10 @@ export function TimePicker({
   }
 
   function handleNowClick() {
-    const currentLocalTime = DateTime.now().setZone(timezone);
-    setSelectedHour(currentLocalTime.hour.toString().padStart(2, "0"));
-    setSelectedMinute(currentLocalTime.minute.toString().padStart(2, "0"));
-    setValue(currentLocalDateTime.toFormat("yyyy-MM-dd HH:mm:ss"));
+    const nowLocalDateTime = DateTime.now().setZone(timezone);
+    setSelectedHour(nowLocalDateTime.hour.toString().padStart(2, "0"));
+    setSelectedMinute(nowLocalDateTime.minute.toString().padStart(2, "0"));
+    setValue(nowLocalDateTime.toFormat("yyyy-MM-dd HH:mm:ss"));
   }
 
   React.useEffect(() => {
@@ -78,7 +78,7 @@ export function TimePicker({
   return (
     <div
       className={cn(
-        "relative flex flex-1 items-center justify-around rounded-md px-1",
+        "relative flex flex-1 items-center justify-around rounded-md border border-border px-1",
         "bg-background transition-colors hover:cursor-pointer hover:bg-accent",
         className,
       )}

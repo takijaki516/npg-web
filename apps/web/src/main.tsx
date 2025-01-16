@@ -17,7 +17,6 @@ const router = createRouter({
     queryClient,
     session: null,
     profile: null,
-
   },
   defaultPreload: "intent",
 });

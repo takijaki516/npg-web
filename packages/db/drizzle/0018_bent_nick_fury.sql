@@ -1,0 +1,1 @@
+ALTER TABLE "daily_weights_exercises" ALTER COLUMN "duration_minutes" SET NOT NULL;

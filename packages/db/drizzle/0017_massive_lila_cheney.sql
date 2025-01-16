@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "daily_intakes_profile_email_date_unique" ON "daily_intakes" USING btree ("profile_email","date");

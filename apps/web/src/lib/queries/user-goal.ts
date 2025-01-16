@@ -1,8 +1,11 @@
 import { queryOptions } from "@tanstack/react-query";
+
 import { honoClient } from "@/lib/hono";
 
+export const GET_USER_GOAL_QUERY_KEY = "USER_GOAL";
+
 const getOrCreateGoal = async () => {
-  const res = await honoClient.user.goal.$get();
+  const res = await honoClient.goals.$get();
 
   if (!res.ok) {
     throw new Error("failed to get goal");
@@ -11,7 +14,14 @@ const getOrCreateGoal = async () => {
   const body = await res.json();
 
   if (!body.goal) {
-    const newGoalRes = await honoClient.user.goal.$post();
+    const newGoalRes = await honoClient.goals.$post({
+      json: {
+        weightKg: 0,
+        bodyFatMassKg: 0,
+        skeletalMuscleMassKg: 0,
+        goalDescription: "",
+      },
+    });
 
     if (!newGoalRes.ok) {
       throw new Error("failed to create goal");
@@ -26,7 +36,7 @@ const getOrCreateGoal = async () => {
 };
 
 export const getOrCreateGoalOptions = queryOptions({
-  queryKey: ["user-goal"],
+  queryKey: [GET_USER_GOAL_QUERY_KEY],
   queryFn: getOrCreateGoal,
   staleTime: Infinity,
 });

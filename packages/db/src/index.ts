@@ -2,6 +2,7 @@ import { neon, neonConfig, Pool } from "@neondatabase/serverless";
 import { drizzle as drizzleHTTP } from "drizzle-orm/neon-http";
 import { drizzle as drizzlePool } from "drizzle-orm/neon-serverless";
 
+// schema
 import * as authSchema from "./schema/auth";
 import * as cardioExerciseSchema from "./schema/cardio-exercise";
 import * as dailyIntakeSchema from "./schema/daily-intake";
@@ -22,7 +23,6 @@ export * from "./schema/user-goal";
 export * from "./schema/profile";
 
 // database client;
-
 export function createDb({
   DATABASE_URL,
   NODE_ENV,

@@ -117,6 +117,9 @@ importers:
       '@repo/shared-schema':
         specifier: workspace:*
         version: link:../../packages/shared-schema
+      '@repo/utils':
+        specifier: workspace:*
+        version: link:../../packages/utils
       '@supabase/supabase-js':
         specifier: ^2.47.8
         version: 2.47.9

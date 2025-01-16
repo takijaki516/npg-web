@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX "health_info_profile_date_idx" ON "health_infos" USING btree ("profile_email","measured_date");

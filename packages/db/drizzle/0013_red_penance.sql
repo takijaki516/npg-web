@@ -1,0 +1,1 @@
+ALTER TABLE "health_infos" ALTER COLUMN "measured_date" SET DATA TYPE timestamp;

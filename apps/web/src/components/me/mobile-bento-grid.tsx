@@ -15,7 +15,7 @@ export function MobileBentoGrid({
   return (
     <Tabs
       defaultValue="exercises"
-      className={cn("flex h-full flex-col border border-border", className)}
+      className={cn("flex flex-1 flex-col border border-border", className)}
     >
       <TabsList className="flex items-center">
         <TabsTrigger value="exercises">운동</TabsTrigger>

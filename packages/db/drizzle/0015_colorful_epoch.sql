@@ -1,0 +1,1 @@
+ALTER TABLE "user_goals" ADD CONSTRAINT "user_goals_profile_email_unique" UNIQUE("profile_email");

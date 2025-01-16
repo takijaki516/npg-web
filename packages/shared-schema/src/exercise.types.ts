@@ -4,11 +4,11 @@ export type ExerciseType = "cardio" | "weights";
 export const WEIGHT_BODY_PARTS = ["가슴", "팔", "등", "다리", "어깨"] as const;
 
 export const CHEST_WORKOUT_NAMES = [
-  "팔굽혀펴기",
   "플랫 벤치 프레스",
   "플랫 덤벨 프레스",
   "인클라인 벤치 프레스",
   "인클라인 덤벨 프레스",
+  "팔굽혀펴기",
   "체스트 플라이",
   "딥스",
 ] as const;
@@ -21,10 +21,11 @@ export const ARM_WORKOUT_NAMES = [
 ] as const;
 
 export const BACK_WORKOUT_NAMES = [
+  "풀업",
+  "랫 풀다운",
+  "케이블 풀다운",
   "덤벨 로우",
   "바벨 로우",
-  "풀업",
-  "라트 풀다운",
   "데드리프트",
   "롱 풀",
 ] as const;

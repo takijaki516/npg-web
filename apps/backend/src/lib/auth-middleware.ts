@@ -24,7 +24,8 @@ export const authMiddleware = createMiddleware<AuthMiddlewareContext>(
       c.set("user", null);
       c.set("session", null);
       c.set("profile", null);
-      return next();
+
+      return c.json({ error: "Unauthorized" }, 401);
     }
 
     c.set("user", session.user);

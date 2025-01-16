@@ -1,14 +1,16 @@
 import * as React from "react";
 import { Bot, Loader2, Info } from "lucide-react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { toast } from "sonner";
+import { z } from "zod";
+import { calculateDailyIntakeWithAISchema } from "@repo/shared-schema";
 
-import { cn, getCurrentTimeInTimezone } from "@/lib/utils";
-import { honoClient } from "@/lib/hono";
+import { cn } from "@/lib/utils";
 import {
   type DailyMealsWithFoods,
   type DailyIntake,
-  type Profile,
-  GET_OR_CREATE_DAILY_INTAKE_QUERY_KEY,
+  GET_DAILY_INTAKE_QUERY_KEY,
+  calculateDailyIntakeWithAI,
 } from "@/lib/queries";
 import { useMealHoverStore } from "@/lib/zustand/meal-hover-store";
 import { useFoodHoverStore } from "@/lib/zustand/food-hover-store";
@@ -20,67 +22,49 @@ import {
 import { useDateTimeStore } from "@/lib/zustand/time-store";
 
 interface DailyIntakeProps {
-  profile: Profile;
-  currentLocalDateTime: string;
-  dailyIntake: DailyIntake;
+  dailyIntake: DailyIntake | null;
   dailyMealsWithFoods: DailyMealsWithFoods;
 }
 
 export function DailyIntake({
-  profile,
-  currentLocalDateTime,
   dailyIntake,
   dailyMealsWithFoods,
 }: DailyIntakeProps) {
-  const setCurrentDateTime = useDateTimeStore(
-    (state) => state.setCurrentDateTime,
-  );
-
+  const currentDateTime = useDateTimeStore((state) => state.currentDateTime);
   const [isTooltipOpen, setIsTooltipOpen] = React.useState<boolean>(false);
-
   const hoveredMealId = useMealHoverStore((state) => state.hoveredMealId);
   const hoveredFoodId = useFoodHoverStore((state) => state.hoveredFoodId);
-
   const queryClient = useQueryClient();
 
   const mutateIntake = useMutation({
-    mutationFn: async () => {
-      await honoClient.ai.intake.$post({
-        json: {
-          dateTime: currentLocalDateTime,
-          timezone: profile.timezone,
-          dailyIntakeId: dailyIntake.id,
-        },
-      });
-    },
+    mutationFn: ({
+      currentLocalDate,
+    }: z.infer<typeof calculateDailyIntakeWithAISchema>) =>
+      calculateDailyIntakeWithAI({ currentLocalDate }),
     onError: () => {
-      // TODO: error handling
+      toast.error("칼로리를 계산하는데 실패했습니다. 다시 시도해주세요.");
     },
-    onSettled: async () => {
-      const currentDateTime = getCurrentTimeInTimezone(profile.timezone);
-      setCurrentDateTime(currentDateTime);
+    onSuccess: async (data) => {
+      toast.success("칼로리를 계산하는데 성공했습니다.");
 
       await queryClient.invalidateQueries({
-        queryKey: [GET_OR_CREATE_DAILY_INTAKE_QUERY_KEY, currentDateTime],
+        queryKey: [GET_DAILY_INTAKE_QUERY_KEY, data.date.split(" ")[0]],
       });
     },
   });
 
   const { goalCaloriesKcal, goalCarbohydratesG, goalFatG, goalProteinG } =
-    dailyIntake;
+    dailyIntake ?? {};
 
   const intakeTotalKCal = dailyMealsWithFoods.reduce((acc, cur) => {
     return acc + cur.totalCaloriesKcal;
   }, 0);
-
   const intakeTotalCarbohydratesG = dailyMealsWithFoods.reduce((acc, cur) => {
     return acc + cur.totalCarbohydratesG;
   }, 0);
-
   const intakeTotalProteinG = dailyMealsWithFoods.reduce((acc, cur) => {
     return acc + cur.totalProteinG;
   }, 0);
-
   const intakeTotalFatG = dailyMealsWithFoods.reduce((acc, cur) => {
     return acc + cur.totalFatG;
   }, 0);
@@ -97,7 +81,14 @@ export function DailyIntake({
             {mutateIntake.isPending ? (
               <Loader2 size={20} className="animate-spin" />
             ) : (
-              <Bot onClick={() => mutateIntake.mutate()} size={20} />
+              <Bot
+                onClick={() =>
+                  mutateIntake.mutate({
+                    currentLocalDate: currentDateTime.split(" ")[0],
+                  })
+                }
+                size={20}
+              />
             )}
           </div>
 
@@ -112,7 +103,7 @@ export function DailyIntake({
               align="end"
               className="text-md flex max-h-[200px] max-w-[180px] overflow-y-auto rounded-md border border-background bg-muted p-2 text-muted-foreground"
             >
-              {dailyIntake.llmDescription}
+              {dailyIntake && dailyIntake.llmDescription}
             </TooltipContent>
           </Tooltip>
         </div>
@@ -365,21 +356,39 @@ export function DailyIntake({
       </div>
 
       <div className="hidden h-[140px] overflow-y-auto whitespace-pre-wrap rounded-md border border-border p-1 sm:col-span-2 sm:flex">
-        {dailyIntake.llmDescription ? (
-          dailyIntake.llmDescription
-        ) : mutateIntake.isPending ? (
-          <div className="flex h-full w-full items-center justify-center">
-            <Loader2 size={20} className="animate-spin text-muted-foreground" />
-          </div>
-        ) : (
-          <div className="flex h-full w-full items-center justify-center">
-            <Bot
-              onClick={() => mutateIntake.mutate()}
-              size={60}
-              className="cursor-pointer text-muted-foreground transition-colors hover:text-primary"
-            />
-          </div>
-        )}
+        {dailyIntake?.llmDescription &&
+          (mutateIntake.isPending ? (
+            <div className="flex h-full w-full items-center justify-center">
+              <Loader2
+                size={20}
+                className="animate-spin text-muted-foreground"
+              />
+            </div>
+          ) : (
+            dailyIntake.llmDescription
+          ))}
+
+        {!dailyIntake?.llmDescription &&
+          (mutateIntake.isPending ? (
+            <div className="flex h-full w-full items-center justify-center">
+              <Loader2
+                size={20}
+                className="animate-spin text-muted-foreground"
+              />
+            </div>
+          ) : (
+            <div className="flex h-full w-full items-center justify-center">
+              <Bot
+                onClick={() =>
+                  mutateIntake.mutate({
+                    currentLocalDate: currentDateTime,
+                  })
+                }
+                size={60}
+                className="cursor-pointer text-muted-foreground transition-colors hover:text-primary"
+              />
+            </div>
+          ))}
       </div>
     </div>
   );

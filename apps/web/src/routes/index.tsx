@@ -1,5 +1,5 @@
 import { createFileRoute, useRouteContext } from "@tanstack/react-router";
-import { Brain, Camera, Dumbbell, PieChart, Sparkles } from "lucide-react";
+import { Camera, Dumbbell, PieChart } from "lucide-react";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { Navbar } from "@/components/navbar";
@@ -66,26 +66,6 @@ function Index() {
               <h3 className="text-xl font-bold">운동 기록 관리</h3>
               <p className="text-center text-muted-foreground">
                 운동 루틴과 진행 상황을 기록하고 모니터링하세요
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card>
-            <CardContent className="flex flex-col items-center space-y-4 p-6">
-              <Brain className="h-12 w-12 text-primary" />
-              <h3 className="text-xl font-bold">AI 운동프로그램 제공</h3>
-              <p className="text-center text-muted-foreground">
-                목표와 진행 상황에 따른 맞춤형 운동 계획을 받아보세요
-              </p>
-            </CardContent>
-          </Card>
-
-          <Card className="md:col-span-2 lg:col-span-2">
-            <CardContent className="flex flex-col items-center space-y-4 p-6">
-              <Sparkles className="h-12 w-12 text-primary" />
-              <h3 className="text-xl font-bold">개인 AI 코치</h3>
-              <p className="text-center text-muted-foreground">
-                영양/운동 조언, 동기부여 및 실시간 피드백 제공
               </p>
             </CardContent>
           </Card>

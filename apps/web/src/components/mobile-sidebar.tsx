@@ -7,7 +7,6 @@ import {
   LaptopMinimal,
   LogOut,
   ChartArea,
-  Bot,
 } from "lucide-react";
 import { Link, useRouter } from "@tanstack/react-router";
 
@@ -68,15 +67,6 @@ export function MobileSidebar() {
           >
             <ChartArea size={24} />
             <span>기록</span>
-          </Link>
-
-          <Link
-            preload={false}
-            href="/ai"
-            className="flex w-full cursor-pointer items-center gap-2 rounded-md p-1.5 transition-colors hover:bg-accent/80"
-          >
-            <Bot size={24} />
-            <span>AI</span>
           </Link>
 
           <Link

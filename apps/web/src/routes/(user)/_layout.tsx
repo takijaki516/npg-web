@@ -18,7 +18,7 @@ function MeLayout() {
     <div className="relative flex">
       <Sidebar />
 
-      <div className="flex-1">
+      <div className="relative flex-1">
         <Outlet />
       </div>
     </div>

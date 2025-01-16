@@ -1,26 +1,23 @@
 import { useSuspenseQueries } from "@tanstack/react-query";
 
+import { useDateTimeStore } from "@/lib/zustand/time-store";
 import {
-  getOrCreateDailyIntakeOptions,
-  type Profile,
+  getDailyIntakeOptions,
   getOrCreateGoalOptions,
   getLatestHealthInfoOptions,
   getDailyMealsWithFoodsOptions,
 } from "@/lib/queries";
+import { MobileSidebar } from "@/components/mobile-sidebar";
 import { UserHealthInfoStat } from "./user-health-info-stat";
 import { UserGoalStat } from "./user-goal-stat";
 import { DailyIntake } from "./daily-intake";
-import { MobileSidebar } from "@/components/mobile-sidebar";
 
-interface DailyUserStatProps {
-  profile: Profile;
-  currentLocalDateTime: string;
-}
+export function DailyUserStat() {
+  const currentLocalDateTime = useDateTimeStore(
+    (state) => state.currentDateTime,
+  );
+  const currentLocalDate = currentLocalDateTime.split(" ")[0];
 
-export function DailyUserStat({
-  profile,
-  currentLocalDateTime,
-}: DailyUserStatProps) {
   const [
     { data: userGoal },
     { data: latestHealthInfo },
@@ -30,13 +27,11 @@ export function DailyUserStat({
     queries: [
       getOrCreateGoalOptions,
       getLatestHealthInfoOptions,
-      getOrCreateDailyIntakeOptions({
-        currentLocalDateTime,
-        timezone: profile.timezone,
+      getDailyIntakeOptions({
+        currentLocalDate,
       }),
       getDailyMealsWithFoodsOptions({
-        currentLocalDateTime: currentLocalDateTime,
-        timezone: profile.timezone,
+        currentLocalDate,
       }),
     ],
   });
@@ -46,19 +41,18 @@ export function DailyUserStat({
       <div className="flex items-center gap-4 text-lg font-semibold">
         <MobileSidebar />
 
-        <div className="flex items-center">
-          {currentLocalDateTime.split(" ")[0]}
-        </div>
+        <div className="flex items-center">{currentLocalDate}</div>
 
         <div className="flex items-center gap-1">
-          <UserHealthInfoStat profile={profile} healthInfo={latestHealthInfo} />
-          <UserGoalStat profile={profile} userGoal={userGoal} />
+          <UserHealthInfoStat healthInfo={latestHealthInfo} />
+          <UserGoalStat
+            userGoal={userGoal}
+            className="cursor-pointer transition-colors hover:text-primary"
+          />
         </div>
       </div>
 
       <DailyIntake
-        profile={profile}
-        currentLocalDateTime={currentLocalDateTime}
         dailyMealsWithFoods={dailyMealsWithFoods}
         dailyIntake={dailyIntake}
       />

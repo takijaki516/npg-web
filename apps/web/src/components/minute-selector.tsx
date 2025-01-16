@@ -56,7 +56,7 @@ export function MinuteSelector({ setValue, value }: MinuteSelectorProps) {
 
   return (
     <div className="relative flex-1" ref={dropdownRef}>
-      <div className="flex items-center rounded-md border bg-background">
+      <div className="flex items-center rounded-md border border-border bg-background">
         <div className="flex w-full items-center rounded-l-md bg-transparent">
           <input
             type="number"

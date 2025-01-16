@@ -1,115 +1,119 @@
 import { DateTime } from "luxon";
 
-/**
- * @returns
- * startTimeOfDay: inclusive
- * endTimeOfDay: exclusive
- */
 export function convertToRangeOfDayUTCTime({
-  localDateTime,
-  timeZone,
+  localDate,
+  timezone,
 }: {
-  localDateTime: string;
-  timeZone: string;
+  localDate: string;
+  timezone: string;
 }) {
-  const justDate = localDateTime.split(" ")[0];
-
   const startDateTime = DateTime.fromFormat(
-    `${justDate} 00:00:00`,
+    `${localDate} 00:00:00`,
     "yyyy-MM-dd HH:mm:ss",
     {
-      zone: timeZone,
+      zone: timezone,
     }
   );
-  const endDateTime = startDateTime.plus({ days: 1 });
+  const tomorrowStartDateTime = startDateTime.plus({ days: 1 });
 
-  const startDateTimeSQL = startDateTime.toUTC().toSQL();
-  const endDateTimeSQL = endDateTime.toUTC().toSQL();
+  const utcStartDateTime = startDateTime
+    .toUTC()
+    .toFormat("yyyy-MM-dd HH:mm:ss");
+  const utcTomorrowStartDateTime = tomorrowStartDateTime
+    .toUTC()
+    .toFormat("yyyy-MM-dd HH:mm:ss");
 
   return {
-    startUTCTimeOfDay: startDateTimeSQL,
-    endUTCTimeOfDay: endDateTimeSQL,
+    utcStartDateTime,
+    utcTomorrowStartDateTime,
   };
 }
 
-/**
- * @param startLocalDate - inclusive
- * @param endLocalDate - exclusive
- */
 export function convertToRangeOfSpecificDayUTCTime({
-  endLocalDate,
   startLocalDate,
-  timeZone,
+  endLocalDate,
+  timezone,
 }: {
   startLocalDate: string;
   endLocalDate: string;
-  timeZone: string;
+  timezone: string;
 }) {
   const startDateTime = DateTime.fromFormat(
     `${startLocalDate} 00:00:00`,
     "yyyy-MM-dd HH:mm:ss",
     {
-      zone: timeZone,
+      zone: timezone,
     }
   );
-
   const endDateTime = DateTime.fromFormat(
     `${endLocalDate} 00:00:00`,
     "yyyy-MM-dd HH:mm:ss",
     {
-      zone: timeZone,
+      zone: timezone,
     }
   );
 
-  const startDateTimeSQL = startDateTime.toUTC().toSQL();
-  const endDateTimeSQL = endDateTime.toUTC().toSQL();
+  const utcStartDateTime = startDateTime
+    .toUTC()
+    .toFormat("yyyy-MM-dd HH:mm:ss");
+  const utcEndDateTime = endDateTime.toUTC().toFormat("yyyy-MM-dd HH:mm:ss");
 
-  return { startDateTime: startDateTimeSQL, endDateTime: endDateTimeSQL };
+  return { utcStartDateTime, utcEndDateTime };
 }
 
 export function convertToUTCTime({
   localDateTime,
-  timeZone,
+  timezone,
 }: {
   localDateTime: string;
-  timeZone: string;
+  timezone: string;
 }) {
   const dateTime = DateTime.fromFormat(
     `${localDateTime}`,
     "yyyy-MM-dd HH:mm:ss",
     {
-      zone: timeZone,
+      zone: timezone,
     }
   );
 
-  const dateTimeSQL = dateTime.toUTC().toSQL();
+  const utcDateTime = dateTime.toUTC().toFormat("yyyy-MM-dd HH:mm:ss");
 
-  return { utcDateTime: dateTimeSQL };
+  return { utcDateTime };
 }
 
+/**
+ * @param localYearMonth - yyyy-mm
+ */
 export function convertToRangeOfMonthUTCTime({
   localYearMonth,
-  timeZone,
+  timezone,
 }: {
   localYearMonth: string;
-  timeZone: string;
+  timezone: string;
 }) {
   const startDateTime = DateTime.fromFormat(
     `${localYearMonth}-01 00:00:00`,
     "yyyy-MM-dd HH:mm:ss",
     {
-      zone: timeZone,
+      zone: timezone,
     }
   );
-  const endDateTime = startDateTime.plus({ months: 1 });
+  const nextMonthStartDateTime = startDateTime.plus({ months: 1 });
+
+  const utcStartDateTime = startDateTime
+    .toUTC()
+    .toFormat("yyyy-MM-dd HH:mm:ss");
+  const utcNextMonthStartDateTime = nextMonthStartDateTime
+    .toUTC()
+    .toFormat("yyyy-MM-dd HH:mm:ss");
 
   return {
-    startDateTime: startDateTime.toUTC().toSQL(),
-    endDateTime: endDateTime.toUTC().toSQL(),
+    utcStartDateTime,
+    utcNextMonthStartDateTime,
   };
 }
 
-export function convertToTimezoneDate({
+export function convertToTimezoneDateTime({
   utcDateTime,
   timezone,
 }: {
@@ -124,7 +128,11 @@ export function convertToTimezoneDate({
     }
   );
 
-  return dateTime.setZone(timezone).toFormat("yyyy-MM-dd");
+  const timezoneDateTime = dateTime
+    .setZone(timezone)
+    .toFormat("yyyy-MM-dd HH:mm:ss");
+
+  return { timezoneDateTime };
 }
 
 export function getDatesKeyObject<T>(
