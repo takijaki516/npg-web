@@ -1,7 +1,7 @@
 import { User2 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
-import type { Profile } from "@/lib/queries";
+import { type AuthClient } from "@/lib/better-auth";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -11,11 +11,11 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import { UserSignoutButton } from "./user-signout-button";
+import { UserSignoutButton } from "@/components/user-signout-button";
 
 interface UserDropdownProps {
   align: "start" | "center" | "end";
-  profile: Profile;
+  profile: AuthClient["$Infer"]["Session"]["profile"];
 }
 
 export function UserDropdown({ align, profile }: UserDropdownProps) {

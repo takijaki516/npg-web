@@ -56,9 +56,9 @@ export function CustomDay({ date, displayMonth }: DayProps) {
             // "focus-within:relative focus-within:z-20",
             "xs:aspect-video",
             "hover:border-primary/60",
-            currentLocalDate === localDate && "border-primary/50",
+            currentLocalDate === localDate && "font-semibold text-green-500",
             (!!currentDateExercises || !!currentDateMeals) &&
-              "border-green-900/90",
+              "border-green-600 dark:border-green-500/60",
           )}
         >
           {monthlyInfoQuery.isLoading && (

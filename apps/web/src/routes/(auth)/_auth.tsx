@@ -4,12 +4,11 @@ import { z } from "zod";
 import { Navbar } from "@/components/navbar";
 
 export const Route = createFileRoute("/(auth)/_auth")({
-  // REVIEW:
   validateSearch: z.object({
     redirect: z.string().optional().catch(""),
   }),
   beforeLoad: ({ context, search }) => {
-    if (context.session) {
+    if (context.session && context.profile) {
       throw redirect({ to: search.redirect || "/" });
     }
   },

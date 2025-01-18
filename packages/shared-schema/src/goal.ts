@@ -4,5 +4,12 @@ export const insertGoalSchema = z.object({
   weightKg: z.number().optional(),
   bodyFatMassKg: z.number().optional(),
   skeletalMuscleMassKg: z.number().optional(),
-  goalDescription: z.string().optional(),
+});
+
+export const modifyGoalSchema = z.object({
+  goalId: z.string(),
+
+  weightKg: z.number().optional(),
+  bodyFatMassKg: z.number().optional(),
+  skeletalMuscleMassKg: z.number().optional(),
 });

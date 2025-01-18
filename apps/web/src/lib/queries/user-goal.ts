@@ -1,7 +1,8 @@
 import { queryOptions } from "@tanstack/react-query";
+import { z } from "zod";
+import { modifyGoalSchema } from "@repo/shared-schema";
 
 import { honoClient } from "@/lib/hono";
-
 export const GET_USER_GOAL_QUERY_KEY = "USER_GOAL";
 
 const getOrCreateGoal = async () => {
@@ -19,7 +20,6 @@ const getOrCreateGoal = async () => {
         weightKg: 0,
         bodyFatMassKg: 0,
         skeletalMuscleMassKg: 0,
-        goalDescription: "",
       },
     });
 
@@ -42,3 +42,13 @@ export const getOrCreateGoalOptions = queryOptions({
 });
 
 export type UserGoal = NonNullable<Awaited<ReturnType<typeof getOrCreateGoal>>>;
+
+export async function modifyGoal(data: z.infer<typeof modifyGoalSchema>) {
+  const res = await honoClient.goals.$patch({ json: data });
+  if (!res.ok) {
+    throw new Error("failed to modify goal");
+  }
+  const { goal } = await res.json();
+
+  return goal;
+}

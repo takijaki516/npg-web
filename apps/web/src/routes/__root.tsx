@@ -43,7 +43,7 @@ export const Route = createRootRouteWithContext<RootRouteContext>()({
       session: data.session,
     };
   },
-  onError: () => {},
+  //  TODO: global error component
   errorComponent: ({ error }) => {
     return <div>{error.message}</div>;
   },

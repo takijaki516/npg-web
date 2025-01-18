@@ -3,7 +3,7 @@ import { Medal } from "lucide-react";
 
 import { cn } from "@/lib/utils";
 import type { UserGoal } from "@/lib/queries";
-import { AddGoalDialog } from "@/components/add-goal-dialog";
+import { AddGoalDialog } from "@/components/goal/add-goal-dialog";
 import {
   Tooltip,
   TooltipContent,
@@ -92,7 +92,6 @@ function goalFullness({
 
   const isUserGoalDataPerfect =
     isUserGoalDataSufficient &&
-    userGoal.goalDescription &&
     userGoal.bodyFatMassKg &&
     userGoal.skeletalMuscleMassKg;
 

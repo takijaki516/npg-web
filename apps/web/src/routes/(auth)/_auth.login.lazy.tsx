@@ -1,11 +1,10 @@
 import { Link, useRouter, createLazyFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
-
 import { Loader2 } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { authClient } from "@/lib/better-auth";
 
+import { authClient } from "@/lib/better-auth";
 import { authSchema } from "@/lib/schemas/auth.schema";
 import {
   Card,
@@ -31,20 +30,14 @@ function RouteComponent() {
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof authSchema>) => {
-    console.log(
-      "🚀 ~ file: _auth.login.lazy.tsx:35 ~ onSubmit ~ values:",
-      values,
-    );
-    router.navigate({ to: "/" });
-  };
+  const onSubmit = async (values: z.infer<typeof authSchema>) => {};
 
   async function handleLoginWithGoogle() {
     await authClient.signIn.social({
       provider: "google",
       fetchOptions: {
-        onSuccess: () => {
-          router.navigate({ to: "/" });
+        onSuccess: async () => {
+          await router.navigate({ to: "/", reloadDocument: true });
         },
       },
     });

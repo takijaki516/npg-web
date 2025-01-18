@@ -30,7 +30,6 @@ export function initBetterAuth(env: Context<AppContext>["env"]) {
         session,
       },
     }),
-    // REVIEW:
     databaseHooks: {
       user: {
         create: {
@@ -60,7 +59,7 @@ export function initBetterAuth(env: Context<AppContext>["env"]) {
           .where(eq(profile.email, user.email))
           .limit(1);
 
-        // TODO:
+        // TODO: error handling
         if (!profileRes[0]) {
           throw new Error("Profile not found");
         }

@@ -8,13 +8,21 @@ import {
 import { toast } from "sonner";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { insertGoalSchema } from "@repo/shared-schema";
+import { modifyGoalSchema } from "@repo/shared-schema";
 
-import { honoClient } from "@/lib/hono";
-import { GET_USER_GOAL_QUERY_KEY, getOrCreateGoalOptions } from "@/lib/queries";
-import { InputField } from "./input-field";
-import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
-import { Button } from "./ui/button";
+import {
+  GET_USER_GOAL_QUERY_KEY,
+  getOrCreateGoalOptions,
+  modifyGoal,
+} from "@/lib/queries";
+import { InputField } from "@/components/input-field";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 
 interface AddGoalDialogProps {
   isOpen: boolean;
@@ -28,33 +36,32 @@ export function AddGoalDialog({ isOpen, setIsOpen }: AddGoalDialogProps) {
 
   const queryClient = useQueryClient();
 
-  // TODO: add error handling
-  const mutateGoal = useMutation({
-    mutationFn: async (data: z.infer<typeof insertGoalSchema>) => {
-      await honoClient.goal.$post({
-        json: data,
-      });
-    },
-    onMutate: async () => {},
-    onSettled: async () => {
-      await Promise.all([
-        queryClient.invalidateQueries({
-          queryKey: [GET_USER_GOAL_QUERY_KEY],
-        }),
-      ]);
-
-      setIsOpen(false);
-      toast.success("저장되었습니다.");
-    },
-  });
-
-  const goalForm = useForm<z.infer<typeof insertGoalSchema>>({
-    resolver: zodResolver(insertGoalSchema),
+  const goalForm = useForm<z.infer<typeof modifyGoalSchema>>({
+    resolver: zodResolver(modifyGoalSchema),
     defaultValues: {
+      goalId: userGoal.id,
       weightKg: userGoal.weightKg ?? 0,
       bodyFatMassKg: userGoal.bodyFatMassKg ?? 0,
       skeletalMuscleMassKg: userGoal.skeletalMuscleMassKg ?? 0,
-      goalDescription: userGoal.goalDescription ?? "",
+    },
+  });
+
+  // TODO: add error handling
+  const mutateGoal = useMutation({
+    mutationFn: async (data: z.infer<typeof modifyGoalSchema>) =>
+      await modifyGoal(data),
+    onSuccess: async () => {
+      setIsOpen(false);
+      goalForm.reset();
+      toast.success("수정되었습니다.");
+      await queryClient.invalidateQueries({
+        queryKey: [GET_USER_GOAL_QUERY_KEY],
+      });
+    },
+    onError: () => {
+      setIsOpen(false);
+      goalForm.reset();
+      toast.error("저장에 실패했습니다.");
     },
   });
 

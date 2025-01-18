@@ -23,8 +23,9 @@ function RouteComponent() {
         json: { timezone },
       });
     },
-    onSuccess: () => {
+    onSuccess: async () => {
       toast.success("타임존 변경 완료");
+      window.location.reload();
     },
     onError: () => {
       toast.error("타임존 변경 실패. 다시 시도해주세요.");
@@ -95,6 +96,7 @@ function RouteComponent() {
           </div>
         </div>
 
+        {/* TODO: */}
         <button className="flex w-full cursor-pointer items-center justify-center font-semibold text-red-500/80 transition-colors hover:text-red-600 hover:underline hover:underline-offset-4">
           회원 탈퇴
         </button>

@@ -10,12 +10,11 @@ import {
 } from "lucide-react";
 import { Link, useRouter } from "@tanstack/react-router";
 
-import { authClient } from "@/lib/better-auth";
+import { type AuthClient, authClient } from "@/lib/better-auth";
 import { useDateTimeStore } from "@/lib/zustand/time-store";
 import { useIsMobile } from "@/lib/hooks/use-mobile";
 import { cn } from "@/lib/utils";
-import { type Profile } from "@/lib/queries";
-import { useTheme } from "./theme-provider";
+import { useTheme } from "@/components/theme-provider";
 import {
   Sheet,
   SheetContent,
@@ -25,7 +24,7 @@ import {
 } from "@/components/ui/sheet";
 
 export interface MobileSidebarProps {
-  profile: Profile;
+  profile: AuthClient["$Infer"]["Session"]["profile"];
 }
 
 export function MobileSidebar() {

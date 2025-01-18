@@ -11,21 +11,20 @@ export function UserSignoutButton() {
       onClick={async () => {
         await authClient.signOut({
           fetchOptions: {
-            onSuccess: () => {
-              router.navigate({
+            onSuccess: async () => {
+              await router.invalidate();
+              await router.navigate({
                 href: "/",
+                reloadDocument: true,
               });
             },
           },
         });
       }}
-      className="group flex w-full cursor-pointer items-center gap-2"
+      className="flex w-full cursor-pointer items-center gap-2 transition-colors hover:text-red-500"
     >
-      <LogOut
-        size={20}
-        className="transition-colors group-hover:text-red-600/80"
-      />
-      로그아웃
+      <LogOut size={20} />
+      <span>로그아웃</span>
     </button>
   );
 }
