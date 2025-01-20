@@ -12,7 +12,6 @@ export function UserSignoutButton() {
         await authClient.signOut({
           fetchOptions: {
             onSuccess: async () => {
-              await router.invalidate();
               await router.navigate({
                 href: "/",
                 reloadDocument: true,

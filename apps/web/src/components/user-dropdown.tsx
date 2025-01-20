@@ -22,7 +22,7 @@ export function UserDropdown({ align, profile }: UserDropdownProps) {
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button variant="outline" className="size-9">
+        <Button variant="outline" className="animate-bounce-slow size-9">
           <User2 className="size-5" />
         </Button>
       </DropdownMenuTrigger>

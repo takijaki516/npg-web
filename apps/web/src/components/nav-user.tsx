@@ -24,7 +24,7 @@ export function NavUser() {
             className="size-full"
           />
           <AvatarFallback className="rounded-md">
-            {profile.email}
+            {profile.email.charAt(0).toUpperCase()}
           </AvatarFallback>
         </Avatar>
       </DropdownMenuTrigger>

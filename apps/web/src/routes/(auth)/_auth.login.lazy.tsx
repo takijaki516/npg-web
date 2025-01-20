@@ -1,8 +1,10 @@
+import * as React from "react";
 import { Link, useRouter, createLazyFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { Loader2 } from "lucide-react";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { toast } from "sonner";
 
 import { authClient } from "@/lib/better-auth";
 import { authSchema } from "@/lib/schemas/auth.schema";
@@ -14,6 +16,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import Google from "@/components/svg-icons";
 
 export const Route = createLazyFileRoute("/(auth)/_auth/login")({
   component: RouteComponent,
@@ -21,8 +24,9 @@ export const Route = createLazyFileRoute("/(auth)/_auth/login")({
 
 function RouteComponent() {
   const router = useRouter();
+  const [isLoading, setIsLoading] = React.useState(false);
 
-  const form = useForm<z.infer<typeof authSchema>>({
+  const authForm = useForm<z.infer<typeof authSchema>>({
     resolver: zodResolver(authSchema),
     defaultValues: {
       email: "",
@@ -30,9 +34,28 @@ function RouteComponent() {
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof authSchema>) => {};
+  const onSubmit = async (values: z.infer<typeof authSchema>) => {
+    setIsLoading(true);
+
+    await authClient.signIn.email({
+      email: values.email,
+      password: values.password,
+      fetchOptions: {
+        onError: () => {
+          toast.error("로그인에 실패했습니다");
+        },
+        onSuccess: async () => {
+          await router.navigate({ to: "/", reloadDocument: true });
+        },
+      },
+    });
+
+    setIsLoading(false);
+  };
 
   async function handleLoginWithGoogle() {
+    setIsLoading(true);
+
     await authClient.signIn.social({
       provider: "google",
       fetchOptions: {
@@ -41,59 +64,75 @@ function RouteComponent() {
         },
       },
     });
+
+    setIsLoading(false);
   }
 
   return (
     <main className="container mt-20 flex w-full flex-1 flex-col items-center px-4">
       <Card className="w-full max-w-lg">
         <CardHeader>
-          <CardTitle className="text-2xl font-bold">로그인</CardTitle>
+          <CardTitle className="text-2xl font-semibold">로그인</CardTitle>
         </CardHeader>
 
         <CardContent className="flex flex-col items-center">
           <form
-            onSubmit={form.handleSubmit(onSubmit)}
+            onSubmit={authForm.handleSubmit(onSubmit)}
             className="flex w-full flex-col gap-4"
           >
             <div className="flex flex-col rounded-md border">
-              <div className="flex flex-col rounded-t-md border-b p-2 focus-within:ring-2 focus-within:ring-primary">
+              <div className="flex flex-col rounded-t-md border-b p-1 focus-within:ring-1 focus-within:ring-primary">
                 <input
                   type="email"
-                  className="text-xl focus:outline-none"
+                  className="bg-transparent p-1 focus:outline-none"
                   placeholder="이메일"
-                  {...form.register("email")}
+                  {...authForm.register("email")}
                 />
               </div>
 
-              <div className="flex flex-col gap-1 rounded-b-md p-2 focus-within:ring-2 focus-within:ring-primary">
+              <div className="flex flex-col gap-1 rounded-b-md p-1 focus-within:ring-1 focus-within:ring-primary">
                 <input
                   type="password"
-                  className="text-xl focus:outline-none"
+                  className="bg-transparent p-1 focus:outline-none"
                   placeholder="비밀번호"
-                  {...form.register("password")}
+                  {...authForm.register("password")}
                 />
               </div>
             </div>
 
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={form.formState.isLoading}
-            >
-              {form.formState.isLoading ? (
-                <Loader2 className="animate-spin" />
-              ) : (
-                "로그인"
+            <div className="flex flex-col gap-2">
+              {authForm.formState.errors.email && (
+                <span className="text-red-500">
+                  이메일을 올바르게 작성해주세요
+                </span>
               )}
+              {authForm.formState.errors.password && (
+                <span className="text-red-500">
+                  비밀번호를 올바르게 작성해주세요.
+                </span>
+              )}
+            </div>
+
+            <Button type="submit" variant={"secondary"} disabled={isLoading}>
+              {isLoading ? <Loader2 className="animate-spin" /> : "로그인"}
             </Button>
           </form>
 
           <Button
             onClick={handleLoginWithGoogle}
             type="button"
-            className="mt-2 flex w-full items-center justify-center"
+            variant={"secondary"}
+            className="mt-1 flex w-full items-center justify-center"
+            disabled={isLoading}
           >
-            Login with Google
+            {isLoading ? (
+              <Loader2 className="animate-spin" />
+            ) : (
+              <>
+                <Google />
+                구글 로그인
+              </>
+            )}
           </Button>
         </CardContent>
 

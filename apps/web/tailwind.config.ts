@@ -79,18 +79,9 @@ export default {
         },
       },
       animation: {
-        rainbow: "rainbow var(--speed, 5s) infinite linear",
+        "bounce-slow": "bounce 2s linear infinite",
       },
-      keyframes: {
-        rainbow: {
-          "0%": {
-            "background-position": "0%",
-          },
-          "100%": {
-            "background-position": "200%",
-          },
-        },
-      },
+      keyframes: {},
     },
   },
   plugins: [require("tailwindcss-animate")],

@@ -8,13 +8,13 @@ export const GET_USER_GOAL_QUERY_KEY = "USER_GOAL";
 const getOrCreateGoal = async () => {
   const res = await honoClient.goals.$get();
 
-  if (!res.ok) {
+  if (res.status === 401) {
     throw new Error("failed to get goal");
   }
 
-  const body = await res.json();
+  const { goal } = await res.json();
 
-  if (!body.goal) {
+  if (!goal) {
     const newGoalRes = await honoClient.goals.$post({
       json: {
         weightKg: 0,
@@ -27,12 +27,12 @@ const getOrCreateGoal = async () => {
       throw new Error("failed to create goal");
     }
 
-    const newGoalBody = await newGoalRes.json();
+    const { goal: newGoal } = await newGoalRes.json();
 
-    return newGoalBody.goal;
+    return newGoal;
   }
 
-  return body.goal;
+  return goal;
 };
 
 export const getOrCreateGoalOptions = queryOptions({

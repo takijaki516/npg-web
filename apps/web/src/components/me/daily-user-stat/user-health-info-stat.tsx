@@ -2,7 +2,6 @@ import { CircleAlert, CircleMinus, Smile, Frown } from "lucide-react";
 import { DateTime } from "luxon";
 
 import type { HealthInfo } from "@/lib/queries";
-import { cn } from "@/lib/utils";
 import {
   Tooltip,
   TooltipContent,
@@ -11,15 +10,10 @@ import {
 
 interface UserHealthInfoStatProps {
   healthInfo?: HealthInfo | null | undefined;
-  forChat?: boolean;
   className?: string;
 }
 
-export function UserHealthInfoStat({
-  healthInfo,
-  forChat,
-  className,
-}: UserHealthInfoStatProps) {
+export function UserHealthInfoStat({ healthInfo }: UserHealthInfoStatProps) {
   const userHealthInfoFreshness = healthInfoFreshness({ healthInfo });
   // conditionally render button
   let ConditionalIcon;
@@ -44,20 +38,6 @@ export function UserHealthInfoStat({
       <Frown size={22} className="animate-pulse text-red-500" />
     );
     conditionalMessage = "내 건강정보가 없어요. 건강정보를 입력해주세요";
-  }
-
-  if (forChat) {
-    return (
-      <div
-        className={cn(
-          "flex items-start gap-2 rounded-md border border-border p-2",
-          className,
-        )}
-      >
-        <div className="pt-1">{ConditionalIcon}</div>
-        <div className="w-full max-w-[200px]">{conditionalMessage}</div>
-      </div>
-    );
   }
 
   return (

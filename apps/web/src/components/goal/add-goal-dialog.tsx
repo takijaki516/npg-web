@@ -1,3 +1,4 @@
+import * as React from "react";
 import { Loader2 } from "lucide-react";
 import { z } from "zod";
 import {
@@ -46,21 +47,29 @@ export function AddGoalDialog({ isOpen, setIsOpen }: AddGoalDialogProps) {
     },
   });
 
-  // TODO: add error handling
+  React.useEffect(() => {
+    goalForm.reset({
+      goalId: userGoal.id,
+      weightKg: userGoal.weightKg ?? 0,
+      bodyFatMassKg: userGoal.bodyFatMassKg ?? 0,
+      skeletalMuscleMassKg: userGoal.skeletalMuscleMassKg ?? 0,
+    });
+  }, [goalForm, userGoal]);
+
   const mutateGoal = useMutation({
     mutationFn: async (data: z.infer<typeof modifyGoalSchema>) =>
       await modifyGoal(data),
     onSuccess: async () => {
-      setIsOpen(false);
       goalForm.reset();
+      setIsOpen(false);
       toast.success("수정되었습니다.");
       await queryClient.invalidateQueries({
         queryKey: [GET_USER_GOAL_QUERY_KEY],
       });
     },
     onError: () => {
-      setIsOpen(false);
       goalForm.reset();
+      setIsOpen(false);
       toast.error("저장에 실패했습니다.");
     },
   });
@@ -98,11 +107,6 @@ export function AddGoalDialog({ isOpen, setIsOpen }: AddGoalDialogProps) {
             register={goalForm.register}
             name="skeletalMuscleMassKg"
             isNumber={true}
-          />
-          <InputField
-            label="목표"
-            register={goalForm.register}
-            name="goalDescription"
           />
 
           <Button

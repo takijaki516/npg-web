@@ -12,15 +12,10 @@ import {
 
 interface UserGoalStatProps {
   userGoal: UserGoal;
-  forChat?: boolean;
   className?: string;
 }
 
-export function UserGoalStat({
-  userGoal,
-  forChat,
-  className,
-}: UserGoalStatProps) {
+export function UserGoalStat({ userGoal, className }: UserGoalStatProps) {
   const [isOpen, setIsOpen] = React.useState(false);
 
   const userGoalFreshness = goalFullness({ userGoal });
@@ -47,24 +42,6 @@ export function UserGoalStat({
     conditionalMessage = "목표를 작성해보세요. 최적화된 조언을 받을 수 있어요!";
   }
 
-  if (forChat) {
-    return (
-      <>
-        <div
-          className={cn(
-            "flex items-start gap-2 rounded-md border border-border p-2",
-          )}
-          onClick={() => setIsOpen(true)}
-        >
-          <div className="pt-1">{ConditionalIcon}</div>
-          <div className="w-full max-w-[200px]"> {conditionalMessage}</div>
-        </div>
-
-        <AddGoalDialog isOpen={isOpen} setIsOpen={setIsOpen} />
-      </>
-    );
-  }
-
   return (
     <>
       <Tooltip delayDuration={0} disableHoverableContent={true}>
@@ -76,7 +53,7 @@ export function UserGoalStat({
         </TooltipContent>
       </Tooltip>
 
-      <AddGoalDialog isOpen={isOpen} setIsOpen={setIsOpen} />
+      <AddGoalDialog key={userGoal.id} isOpen={isOpen} setIsOpen={setIsOpen} />
     </>
   );
 }

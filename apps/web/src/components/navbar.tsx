@@ -1,26 +1,41 @@
 import { Home } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import { Link, useLocation } from "@tanstack/react-router";
 
 import type { AuthClient } from "@/lib/better-auth";
+import { cn } from "@/lib/utils";
 import { UserDropdown } from "./user-dropdown";
-import { Button } from "@/components/ui/button";
 import { ModeToggle } from "./mode-toggle";
+import { Button } from "@/components/ui/button";
 
 interface NavbarProps {
   profile?: AuthClient["$Infer"]["Session"]["profile"] | null | undefined;
-  session?: AuthClient["$Infer"]["Session"]["session"] | null | undefined;
 }
 
-export function Navbar({ profile, session }: NavbarProps) {
+export function Navbar({ profile }: NavbarProps) {
+  const location = useLocation();
+  const isAuthPage =
+    location.pathname === "/login" || location.pathname === "/signup";
+
   return (
     <nav className="sticky top-0 flex w-full justify-center bg-background/80 py-4 backdrop-blur-lg">
-      <div className="container flex w-full max-w-3xl items-center justify-between px-4">
-        <Link href="/">
+      <div
+        className={cn(
+          "container flex w-full max-w-3xl items-center px-4",
+          isAuthPage ? "justify-between" : "justify-end",
+        )}
+      >
+        <Link
+          href="/"
+          className={cn(
+            "cursor-pointer",
+            isAuthPage ? "inline-block" : "hidden",
+          )}
+        >
           <Home />
         </Link>
 
         <div className="flex items-center gap-4">
-          {session && profile ? (
+          {profile ? (
             <UserDropdown profile={profile} align="end" />
           ) : (
             <Button variant={"outline"} asChild>

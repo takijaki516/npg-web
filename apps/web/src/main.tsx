@@ -5,9 +5,14 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import "./index.css";
 
+import {
+  BeforeInstallPromptEvent,
+  useInstallPromptStore,
+} from "@/lib/zustand/install-event-store";
 import { routeTree } from "./routeTree.gen";
-import { TooltipProvider } from "./components/ui/tooltip";
-import { ThemeProvider } from "./components/theme-provider";
+import { ThemeProvider } from "@/components/theme-provider";
+import { Toaster } from "@/components/ui/sonner";
+import { TooltipProvider } from "@/components/ui/tooltip";
 
 const queryClient = new QueryClient();
 
@@ -28,6 +33,10 @@ declare module "@tanstack/react-router" {
 }
 
 function App() {
+  const setEvent = useInstallPromptStore((state) => state.setEvent);
+  window.addEventListener("beforeinstallprompt", (e) => {
+    setEvent(e as BeforeInstallPromptEvent);
+  });
   return <RouterProvider router={router} />;
 }
 
@@ -40,6 +49,7 @@ if (!rootElement.innerHTML) {
         <ThemeProvider>
           <TooltipProvider>
             <App />
+            <Toaster />
           </TooltipProvider>
         </ThemeProvider>
 
