@@ -18,6 +18,7 @@ import { Route as userLayoutImport } from './routes/(user)/_layout'
 import { Route as authAuthImport } from './routes/(auth)/_auth'
 import { Route as userLayoutSettingImport } from './routes/(user)/_layout/setting'
 import { Route as userLayoutMeImport } from './routes/(user)/_layout/me'
+import { Route as userLayoutGoalImport } from './routes/(user)/_layout/goal'
 import { Route as userLayoutInfoYearmonthImport } from './routes/(user)/_layout/info.$yearmonth'
 
 // Create Virtual Routes
@@ -84,6 +85,12 @@ const userLayoutMeRoute = userLayoutMeImport.update({
   getParentRoute: () => userLayoutRoute,
 } as any)
 
+const userLayoutGoalRoute = userLayoutGoalImport.update({
+  id: '/goal',
+  path: '/goal',
+  getParentRoute: () => userLayoutRoute,
+} as any)
+
 const userLayoutInfoYearmonthRoute = userLayoutInfoYearmonthImport.update({
   id: '/info/$yearmonth',
   path: '/info/$yearmonth',
@@ -128,6 +135,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/'
       preLoaderRoute: typeof userLayoutImport
       parentRoute: typeof userRoute
+    }
+    '/(user)/_layout/goal': {
+      id: '/(user)/_layout/goal'
+      path: '/goal'
+      fullPath: '/goal'
+      preLoaderRoute: typeof userLayoutGoalImport
+      parentRoute: typeof userLayoutImport
     }
     '/(user)/_layout/me': {
       id: '/(user)/_layout/me'
@@ -194,12 +208,14 @@ const authRouteChildren: authRouteChildren = {
 const authRouteWithChildren = authRoute._addFileChildren(authRouteChildren)
 
 interface userLayoutRouteChildren {
+  userLayoutGoalRoute: typeof userLayoutGoalRoute
   userLayoutMeRoute: typeof userLayoutMeRoute
   userLayoutSettingRoute: typeof userLayoutSettingRoute
   userLayoutInfoYearmonthRoute: typeof userLayoutInfoYearmonthRoute
 }
 
 const userLayoutRouteChildren: userLayoutRouteChildren = {
+  userLayoutGoalRoute: userLayoutGoalRoute,
   userLayoutMeRoute: userLayoutMeRoute,
   userLayoutSettingRoute: userLayoutSettingRoute,
   userLayoutInfoYearmonthRoute: userLayoutInfoYearmonthRoute,
@@ -221,6 +237,7 @@ const userRouteWithChildren = userRoute._addFileChildren(userRouteChildren)
 
 export interface FileRoutesByFullPath {
   '/': typeof userLayoutRouteWithChildren
+  '/goal': typeof userLayoutGoalRoute
   '/me': typeof userLayoutMeRoute
   '/setting': typeof userLayoutSettingRoute
   '/login': typeof authAuthLoginLazyRoute
@@ -230,6 +247,7 @@ export interface FileRoutesByFullPath {
 
 export interface FileRoutesByTo {
   '/': typeof userLayoutRouteWithChildren
+  '/goal': typeof userLayoutGoalRoute
   '/me': typeof userLayoutMeRoute
   '/setting': typeof userLayoutSettingRoute
   '/login': typeof authAuthLoginLazyRoute
@@ -244,6 +262,7 @@ export interface FileRoutesById {
   '/(auth)/_auth': typeof authAuthRouteWithChildren
   '/(user)': typeof userRouteWithChildren
   '/(user)/_layout': typeof userLayoutRouteWithChildren
+  '/(user)/_layout/goal': typeof userLayoutGoalRoute
   '/(user)/_layout/me': typeof userLayoutMeRoute
   '/(user)/_layout/setting': typeof userLayoutSettingRoute
   '/(auth)/_auth/login': typeof authAuthLoginLazyRoute
@@ -255,13 +274,21 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/goal'
     | '/me'
     | '/setting'
     | '/login'
     | '/signup'
     | '/info/$yearmonth'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/me' | '/setting' | '/login' | '/signup' | '/info/$yearmonth'
+  to:
+    | '/'
+    | '/goal'
+    | '/me'
+    | '/setting'
+    | '/login'
+    | '/signup'
+    | '/info/$yearmonth'
   id:
     | '__root__'
     | '/'
@@ -269,6 +296,7 @@ export interface FileRouteTypes {
     | '/(auth)/_auth'
     | '/(user)'
     | '/(user)/_layout'
+    | '/(user)/_layout/goal'
     | '/(user)/_layout/me'
     | '/(user)/_layout/setting'
     | '/(auth)/_auth/login'
@@ -331,10 +359,15 @@ export const routeTree = rootRoute
       "filePath": "(user)/_layout.tsx",
       "parent": "/(user)",
       "children": [
+        "/(user)/_layout/goal",
         "/(user)/_layout/me",
         "/(user)/_layout/setting",
         "/(user)/_layout/info/$yearmonth"
       ]
+    },
+    "/(user)/_layout/goal": {
+      "filePath": "(user)/_layout/goal.tsx",
+      "parent": "/(user)/_layout"
     },
     "/(user)/_layout/me": {
       "filePath": "(user)/_layout/me.tsx",

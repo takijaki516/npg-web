@@ -28,18 +28,22 @@ export type AppContext = {
     BUCKET_NAME: string;
     R2_ACCESS_KEY_ID: string;
     R2_SECRET_ACCESS_KEY: string;
+
+    // CORS
+    ALLOWED_ORIGIN: string;
   };
 };
 
 // Start a Hono app
 export const app = new Hono<AppContext>();
 
-// REVIEW:
 app
   .use(
     "*",
     cors({
-      origin: ["http://localhost:5173", "http://localhost:4173"],
+      origin: (_, c) => {
+        return c.env.ALLOWED_ORIGIN;
+      },
       allowHeaders: [
         "Content-Type",
         "Authorization",
@@ -47,6 +51,7 @@ app
       ],
       allowMethods: ["POST", "GET", "OPTIONS", "DELETE", "PATCH", "PUT"],
       exposeHeaders: ["Content-Length"],
+      // REVIEW:
       maxAge: 600,
       credentials: true,
     })

@@ -24,7 +24,7 @@ export const goalRoute = new Hono<AuthMiddlewareContext>()
     const res = await db
       .select()
       .from(userGoals)
-      .where(eq(userGoals.profileEmail, user.email))
+      .where(eq(userGoals.profileEmail, profile.email))
       .limit(1);
 
     if (!res[0]) {

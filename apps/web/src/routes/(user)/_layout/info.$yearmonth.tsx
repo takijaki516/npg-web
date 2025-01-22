@@ -8,7 +8,7 @@ import {
   getRangeHealthInfoOptions,
 } from "@/lib/queries";
 import { MyCalendar } from "@/components/calendar/my-calendar";
-import { MobileSidebar } from "@/components/mobile-sidebar";
+import { MobileSidebar } from "@/components/sidebar/mobile-sidebar";
 import { BarChartContainer } from "@/components/chart/bar-chart-container";
 import { CalendarSkeleton } from "@/components/skeletons/calendar-skeleton";
 import { BarChartSkeleton } from "@/components/skeletons/barchart-skeleton";
@@ -43,9 +43,9 @@ function RouteComponent() {
   return (
     <div className="flex w-full flex-col items-center justify-center overflow-y-auto p-2 xs:p-4 lg:py-10">
       <main className="flex min-h-dvh w-full max-w-3xl flex-col items-center gap-1 xs:gap-2 sm:gap-4">
-        <div className="relative flex w-full flex-col rounded-md border border-border p-2 min-[400px]:h-[250px]">
+        <div className="relative flex w-full flex-col rounded-md border border-border p-2 min-[400px]:h-[270px]">
           <React.Suspense fallback={<BarChartSkeleton />}>
-            <div className="absolute left-2 top-2 flex items-center gap-4 text-lg font-semibold">
+            <div className="absolute left-2 top-3 flex items-center gap-4 text-lg font-semibold">
               <MobileSidebar />
             </div>
 

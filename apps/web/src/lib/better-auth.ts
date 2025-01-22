@@ -3,7 +3,7 @@ import { createAuthClient } from "better-auth/react";
 import { type Auth } from "@repo/backend/auth";
 
 export const authClient = createAuthClient({
-  baseURL: "http://localhost:8787",
+  baseURL: import.meta.env.VITE_API_URL,
   plugins: [customSessionClient<Auth>()],
 });
 

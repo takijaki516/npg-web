@@ -1,7 +1,7 @@
 import { Hono } from "hono";
 import { z } from "zod";
 import { zValidator } from "@hono/zod-validator";
-import { and, gte, lt } from "drizzle-orm";
+import { and, eq, gte, lt } from "drizzle-orm";
 import { createDb, dailyWeightsExercises, meals } from "@repo/db";
 import {
   convertToRangeOfMonthUTCTime,
@@ -40,13 +40,15 @@ export const infosRoute = new Hono<AuthMiddlewareContext>().get(
       db.query.dailyWeightsExercises.findMany({
         where: and(
           gte(dailyWeightsExercises.startTime, utcStartDateTime),
-          lt(dailyWeightsExercises.startTime, utcNextMonthStartDateTime)
+          lt(dailyWeightsExercises.startTime, utcNextMonthStartDateTime),
+          eq(dailyWeightsExercises.profileEmail, profile.email)
         ),
       }),
       db.query.meals.findMany({
         where: and(
           gte(meals.mealTime, utcStartDateTime),
-          lt(meals.mealTime, utcNextMonthStartDateTime)
+          lt(meals.mealTime, utcNextMonthStartDateTime),
+          eq(meals.profileEmail, profile.email)
         ),
       }),
     ]);

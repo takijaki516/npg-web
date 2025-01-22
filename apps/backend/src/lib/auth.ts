@@ -21,6 +21,9 @@ export function initBetterAuth(env: Context<AppContext>["env"]) {
   });
 
   return betterAuth({
+    emailAndPassword: {
+      enabled: true,
+    },
     database: drizzleAdapter(db, {
       provider: "pg",
       schema: {
@@ -50,7 +53,7 @@ export function initBetterAuth(env: Context<AppContext>["env"]) {
     },
     baseURL: env.BETTER_AUTH_URL,
     secret: env.BETTER_AUTH_SECRET,
-    trustedOrigins: ["http://localhost:5173", "http://localhost:4173"],
+    trustedOrigins: [env.ALLOWED_ORIGIN],
     plugins: [
       customSession(async ({ user, session }) => {
         const profileRes = await db

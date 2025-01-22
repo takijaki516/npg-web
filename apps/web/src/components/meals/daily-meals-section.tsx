@@ -23,11 +23,11 @@ export function DailyMealsSection({ className }: DailyMealsSectionProps) {
   );
 
   return (
-    <div className={cn("flex flex-1 flex-col gap-1", className)}>
+    <div className={cn("flex h-full flex-1 flex-col gap-1", className)}>
       <div className="flex items-center justify-between">
         <div className="text-lg font-semibold">식단</div>
 
-        <AddMealDialog currentLocalDateTime={currentLocalDateTime} />
+        <AddMealDialog />
       </div>
 
       <DailyMeals dailyMealsWithFoods={dailyMealsWithFoods} />

@@ -7,6 +7,7 @@ import {
   LaptopMinimal,
   LogOut,
   ChartArea,
+  Medal,
 } from "lucide-react";
 import { Link, useRouter } from "@tanstack/react-router";
 
@@ -18,6 +19,7 @@ import { useTheme } from "@/components/theme-provider";
 import {
   Sheet,
   SheetContent,
+  SheetDescription,
   SheetHeader,
   SheetTitle,
   SheetTrigger,
@@ -41,6 +43,7 @@ export function MobileSidebar() {
       <SheetTrigger>
         <PanelLeft />
       </SheetTrigger>
+
       <SheetContent
         side="left"
         className="flex w-[180px] flex-col justify-between pb-6 pt-10"
@@ -48,11 +51,12 @@ export function MobileSidebar() {
         <div className="flex w-full flex-col items-start gap-1 px-2">
           <SheetHeader>
             <SheetTitle className="hidden">Sidebar</SheetTitle>
+            <SheetDescription className="hidden">sidebar</SheetDescription>
           </SheetHeader>
 
           <Link
             preload={false}
-            href="/me"
+            to="/me"
             className="flex w-full cursor-pointer items-center gap-2 rounded-md p-1.5 transition-colors hover:bg-accent/80"
           >
             <Home size={24} />
@@ -61,7 +65,8 @@ export function MobileSidebar() {
 
           <Link
             preload={false}
-            href={`/info/${yearMonth}`}
+            to={`/info/$yearmonth`}
+            params={{ yearmonth: yearMonth }}
             className="flex w-full cursor-pointer items-center gap-2 rounded-md p-1.5 transition-colors hover:bg-accent/80"
           >
             <ChartArea size={24} />
@@ -70,7 +75,16 @@ export function MobileSidebar() {
 
           <Link
             preload={false}
-            href="/setting"
+            to={`/goal`}
+            className="flex w-full cursor-pointer items-center gap-2 rounded-md p-1.5 transition-colors hover:bg-accent/80"
+          >
+            <Medal size={24} />
+            <span>목표</span>
+          </Link>
+
+          <Link
+            preload={false}
+            to="/setting"
             className="flex w-full cursor-pointer items-center gap-2 rounded-md p-1.5 transition-colors hover:bg-accent/80"
           >
             <Settings size={24} />
@@ -123,6 +137,7 @@ export function MobileSidebar() {
                   onSuccess: () => {
                     router.navigate({
                       href: "/",
+                      reloadDocument: true,
                     });
                   },
                 },

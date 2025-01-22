@@ -12,9 +12,7 @@ const getOrCreateGoal = async () => {
     throw new Error("failed to get goal");
   }
 
-  const { goal } = await res.json();
-
-  if (!goal) {
+  if (res.status === 404) {
     const newGoalRes = await honoClient.goals.$post({
       json: {
         weightKg: 0,
@@ -31,6 +29,8 @@ const getOrCreateGoal = async () => {
 
     return newGoal;
   }
+
+  const { goal } = await res.json();
 
   return goal;
 };

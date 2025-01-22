@@ -66,7 +66,7 @@ export function WeightWorkoutForm({
   );
 
   return (
-    <div className="flex flex-col gap-4 overflow-x-auto rounded-md border p-2">
+    <div className="flex flex-col gap-4 overflow-x-auto rounded-md border border-border p-2">
       <div className="flex items-center justify-between gap-2">
         <div className="flex w-full flex-col gap-1 overflow-x-auto xs:flex-row">
           <BodyPartSelector form={form} workoutIdx={workoutIdx} />
@@ -93,7 +93,7 @@ export function WeightWorkoutForm({
           <Button
             variant={"outline"}
             className="px-2 py-1"
-            onClick={() => handleAddWorkoutSet()}
+            onClick={handleAddWorkoutSet}
           >
             세트 추가
           </Button>

@@ -1,8 +1,12 @@
 #:schema node_modules/wrangler/config-schema.json
-name = "backend"
+name = "coach247-backend"
 main = "src/index.ts"
 compatibility_date = "2024-12-18"
 compatibility_flags = ["nodejs_compat"]
+
+[dev]
+ip = "192.168.9.146"
+port = 8787
 
 # Workers Logs
 # Docs: https://developers.cloudflare.com/workers/observability/logs/workers-logs/
@@ -23,7 +27,8 @@ enabled = true
 # Note: Use secrets to store sensitive data.
 # - https://developers.cloudflare.com/workers/configuration/secrets/
 [vars]
-MY_VARIABLE = "production_value"
+ALLOWED_ORIGIN = "https://coach247.taekgogo.com"
+NODE_ENV = "production"
 
 # Bind the Workers AI model catalog. Run machine learning models, powered by serverless GPUs, on Cloudflare’s global network
 # Docs: https://developers.cloudflare.com/workers/wrangler/configuration/#workers-ai
@@ -99,7 +104,7 @@ MY_VARIABLE = "production_value"
 # Docs: https://developers.cloudflare.com/workers/wrangler/configuration/#r2-buckets
 [[r2_buckets]]
 binding = "MY_BUCKET"
-bucket_name = "test1"
+bucket_name = "coach-str"
 preview_bucket_name = "test1-dev"
 
 # Bind another Worker service. Use this binding to call another Worker without network overhead.

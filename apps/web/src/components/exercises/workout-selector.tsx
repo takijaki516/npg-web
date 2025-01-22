@@ -4,6 +4,7 @@ import {
   ARM_WORKOUT_NAMES,
   BACK_WORKOUT_NAMES,
   CHEST_WORKOUT_NAMES,
+  CORE_WORKOUT_NAMES,
   LEG_WORKOUT_NAMES,
   SHOULDER_WORKOUT_NAMES,
   TOTAL_WEIGHT_WORKOUTS,
@@ -39,6 +40,8 @@ export function WorkoutSelector({ form, workoutIdx }: WorkoutSelectorProps) {
     workoutCandidates = LEG_WORKOUT_NAMES;
   } else if (bodyPart === "어깨") {
     workoutCandidates = SHOULDER_WORKOUT_NAMES;
+  } else if (bodyPart === "코어") {
+    workoutCandidates = CORE_WORKOUT_NAMES;
   }
 
   return (
@@ -50,7 +53,7 @@ export function WorkoutSelector({ form, workoutIdx }: WorkoutSelectorProps) {
       }}
     >
       <SelectTrigger className="w-[200px]">
-        <SelectValue placeholder="운동 부위" />
+        <SelectValue placeholder="운동 종목" />
       </SelectTrigger>
 
       <SelectContent className="w-[200px]">

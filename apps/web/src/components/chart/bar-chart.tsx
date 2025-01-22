@@ -97,11 +97,11 @@ export function BarChartComponent({
   );
 
   return (
-    <div className="flex h-full w-full flex-1 flex-col items-center gap-2">
+    <div className="flex h-full w-full flex-1 flex-col items-center gap-5">
       <div className="flex w-full justify-center">
-        <span className="flex items-center">
+        <span className="mt-1 flex items-center gap-1 sm:gap-2">
           <ChevronLeft
-            size={isMobile ? 16 : 24}
+            size={24}
             className="cursor-pointer text-primary/60 transition-colors hover:text-primary"
             onClick={() => {
               if (isZoomed) {
@@ -111,7 +111,8 @@ export function BarChartComponent({
               }
             }}
           />
-          <span className="flex items-center sm:text-xl">
+
+          <span className="flex items-center text-xl">
             {isZoomed &&
               !isMobile &&
               `${startDate.toFormat("yyyy-MM-dd")}~${startDate.plus({ day: 6 }).toFormat("yyyy-MM-dd")}`}
@@ -120,8 +121,9 @@ export function BarChartComponent({
               `${startDate.toFormat("MM-dd")}~${startDate.plus({ day: 6 }).toFormat("MM-dd")}`}
             {!isZoomed && startDate.toFormat("yyyy-MM")}
           </span>
+
           <ChevronRight
-            size={isMobile ? 16 : 24}
+            size={24}
             className="cursor-pointer text-primary/60 transition-colors hover:text-primary"
             onClick={() => {
               if (isZoomed) {
@@ -134,12 +136,14 @@ export function BarChartComponent({
         </span>
 
         <span
-          className={cn("absolute right-2 top-2 flex items-center xs:gap-2")}
+          className={cn(
+            "absolute right-2 top-3 flex items-center gap-1 xs:gap-2",
+          )}
         >
           <AlarmClock
             className={cn(
               "cursor-pointer text-primary/60 transition-colors hover:text-primary",
-              "size-5 xs:size-6",
+              "size-6",
             )}
             onClick={() => {
               if (isZoomed) {
@@ -149,21 +153,23 @@ export function BarChartComponent({
               }
             }}
           />
+
           <ZoomIn
             className={cn(
               "cursor-pointer text-primary/60 transition-colors hover:text-primary",
               isZoomed && "text-primary",
-              "size-5 xs:size-6",
+              "size-6",
             )}
             onClick={() => {
               setIsZoomed(true);
             }}
           />
+
           <ZoomOut
             className={cn(
               "cursor-pointer text-primary/60 transition-colors hover:text-primary",
               !isZoomed && "text-primary",
-              "size-5 xs:size-6",
+              "size-6",
             )}
             onClick={() => {
               setIsZoomed(false);
@@ -228,7 +234,15 @@ const CustomBar = (props: any) => {
           e.stopPropagation();
           onClick(payload, index);
         }}
-        style={{ cursor: "pointer" }}
+        style={{
+          cursor: "pointer",
+          fill:
+            payload.date === currentDate
+              ? "hsl(var(--chart-2) / 0.1)"
+              : "transparent",
+          transform: `translateY(5px)`,
+        }}
+        className={cn(payload.date === currentDate && "animate-pulse")}
       />
 
       {/* The actual bar */}

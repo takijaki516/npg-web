@@ -10,7 +10,7 @@ export function DailyFood({ food }: DailyFoodProps) {
   return (
     <div className="flex h-[148px] gap-2">
       <FoodImage
-        src={`https://coach247.taekgogo.com/cdn-cgi/image/width=110,quality=70/${food.foodPic}`}
+        src={`${import.meta.env.VITE_R2_URL}/width=110,quality=70/${food.foodPic}`}
         className="h-[148px] w-[148px]"
       />
 

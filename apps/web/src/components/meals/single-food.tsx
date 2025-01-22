@@ -19,14 +19,14 @@ interface SingleFoodProps {
 
 export function SingleFood({ food, removeFood }: SingleFoodProps) {
   const [isCollapsibleOpen, setIsCollapsibleOpen] = React.useState(false);
-  const [foodPicUrl, setFoodPicUrl] = React.useState(food.foodPic);
+  const [foodPicUrl, setFoodPicUrl] = React.useState<string>();
 
   React.useEffect(() => {
     if (food.foodPicFile) {
       setFoodPicUrl(URL.createObjectURL(food.foodPicFile));
     } else {
       setFoodPicUrl(
-        `https://coach247.taekgogo.com/cdn-cgi/image/width=110,quality=70/${food.foodPic}`,
+        `${import.meta.env.VITE_R2_URL}/image/width=110,quality=70/${food.foodPic}`,
       );
     }
 
@@ -35,17 +35,10 @@ export function SingleFood({ food, removeFood }: SingleFoodProps) {
         URL.revokeObjectURL(foodPicUrl);
       }
     };
-  }, [food.foodPicFile]);
+  }, [food.foodPic, food.foodPicFile]);
 
   return (
-    <Collapsible
-      open={isCollapsibleOpen}
-      onOpenChange={(v) => {
-        // revoke image when closing
-
-        setIsCollapsibleOpen(v);
-      }}
-    >
+    <Collapsible open={isCollapsibleOpen} onOpenChange={setIsCollapsibleOpen}>
       <div className="flex items-center gap-4">
         <CollapsibleTrigger asChild className="flex items-center">
           <div className="flex cursor-pointer items-center gap-2">

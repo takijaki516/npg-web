@@ -133,7 +133,8 @@ export const intakeRoute = new Hono<AuthMiddlewareContext>()
             orderBy: (healthInfos, { asc }) => [asc(healthInfos.createdAt)],
             where: and(
               gte(healthInfos.createdAt, utcTwoWeeksBeforeDateTimeString),
-              lt(healthInfos.createdAt, utcCurrentDateTimeString)
+              lt(healthInfos.createdAt, utcCurrentDateTimeString),
+              eq(healthInfos.profileEmail, profile.email)
             ),
           },
         },

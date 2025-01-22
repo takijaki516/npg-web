@@ -1,6 +1,6 @@
 import { createFileRoute, redirect, Outlet } from "@tanstack/react-router";
 
-import { Sidebar } from "@/components/sidebar";
+import { Sidebar } from "@/components/sidebar/sidebar";
 
 export const Route = createFileRoute("/(user)/_layout")({
   beforeLoad: ({ context }) => {

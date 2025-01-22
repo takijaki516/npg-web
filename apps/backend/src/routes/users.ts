@@ -26,7 +26,7 @@ export const usersRoute = new Hono<AuthMiddlewareContext>().post(
     const res = await db
       .update(profileSchema)
       .set({ timezone })
-      .where(eq(profileSchema.email, user.email))
+      .where(eq(profileSchema.email, profile.email))
       .returning();
 
     if (!res[0]) {

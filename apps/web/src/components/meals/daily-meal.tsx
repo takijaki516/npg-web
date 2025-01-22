@@ -135,7 +135,7 @@ export function DailyMeal({ dailyMealData }: DailyMealProps) {
                     {food.foodPic ? (
                       <img
                         className="aspect-square w-full object-contain"
-                        src={`https://coach247.taekgogo.com/cdn-cgi/image/width=110,quality=70/${food.foodPic}`}
+                        src={`${import.meta.env.VITE_R2_URL}/width=110,quality=70/${food.foodPic}`}
                         alt={food.foodName}
                       />
                     ) : (

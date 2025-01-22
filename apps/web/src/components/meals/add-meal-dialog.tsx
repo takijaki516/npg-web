@@ -8,6 +8,7 @@ import { useRouteContext } from "@tanstack/react-router";
 import { insertMealSchema } from "@repo/shared-schema";
 import { toast } from "sonner";
 
+import { useDateTimeStore } from "@/lib/zustand/time-store";
 import {
   GET_DAILY_MEALS_WITH_FOODS_QUERY_KEY,
   insertMeal,
@@ -20,15 +21,16 @@ import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
 
-interface AddMealDialogProps {
-  currentLocalDateTime: string;
-}
+export function AddMealDialog() {
+  const currentLocalDateTime = useDateTimeStore(
+    (state) => state.currentDateTime,
+  );
 
-export function AddMealDialog({ currentLocalDateTime }: AddMealDialogProps) {
   const queryClient = useQueryClient();
   const { profile } = useRouteContext({
     from: "/(user)/_layout",
@@ -92,17 +94,25 @@ export function AddMealDialog({ currentLocalDateTime }: AddMealDialogProps) {
     mealForm.setValue("totalProteinG", totalProtein);
   }, [mealForm, mealForm.watch("foods")]);
 
+  React.useEffect(() => {
+    mealForm.reset({
+      localMealDateTime: currentLocalDateTime,
+      totalCaloriesKcal: 0,
+      totalCarbohydratesG: 0,
+      totalProteinG: 0,
+      totalFatG: 0,
+      foods: [],
+    });
+  }, [mealForm, currentLocalDateTime]);
+
   const foodsArrForm = useFieldArray({
     control: mealForm.control,
     name: "foods",
   });
 
-  const handleRemoveFood = React.useCallback(
-    (foodIdx: number) => {
-      foodsArrForm.remove(foodIdx);
-    },
-    [foodsArrForm],
-  );
+  function handleRemoveFood(foodIdx: number) {
+    foodsArrForm.remove(foodIdx);
+  }
 
   return (
     <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -116,13 +126,18 @@ export function AddMealDialog({ currentLocalDateTime }: AddMealDialogProps) {
         className="dialog-content"
       >
         <DialogTitle className="flex items-center gap-2">
-          <Utensils />
-          <div className="text-2xl">{currentLocalDateTime.split(" ")[0]}</div>
+          <Utensils size={20} />
+          <div className="text-lg xs:text-2xl">
+            {currentLocalDateTime.split(" ")[0]}
+          </div>
         </DialogTitle>
+        <DialogDescription className="sr-only">
+          Add meal dialog
+        </DialogDescription>
 
-        <div className="flex flex-col gap-2">
-          <div className="flex w-fit cursor-pointer items-center gap-1 rounded-lg bg-muted/50 px-3 py-1">
-            <span className="flex items-center gap-1 whitespace-nowrap text-muted-foreground">
+        <div className="flex flex-col gap-1">
+          <div className="flex w-[180px] items-center justify-between gap-2 rounded-md bg-muted/50 px-2 py-1">
+            <span className="whitespace-nowrap text-muted-foreground">
               식사 시간
             </span>
 
@@ -161,23 +176,25 @@ export function AddMealDialog({ currentLocalDateTime }: AddMealDialogProps) {
           </div>
         </div>
 
-        <div className="flex flex-1 flex-col gap-4 rounded-md border p-4">
-          <AddFoodDialog mealForm={mealForm} />
+        <AddFoodDialog mealForm={mealForm} />
 
-          <div className="flex max-h-[300px] flex-col gap-4 overflow-y-auto">
-            {mealForm.watch("foods").map((foodItem, foodIdx) => {
-              return (
-                <SingleFood
-                  key={foodIdx}
-                  food={foodItem}
-                  removeFood={() => handleRemoveFood(foodIdx)}
-                />
-              );
-            })}
-          </div>
+        <div className="flex flex-1 flex-col gap-2">
+          {mealForm.watch("foods").map((foodItem, foodIdx) => {
+            return (
+              <SingleFood
+                key={foodIdx}
+                food={foodItem}
+                removeFood={() => handleRemoveFood(foodIdx)}
+              />
+            );
+          })}
         </div>
 
         <div className="flex justify-end gap-2">
+          <Button variant={"secondary"} onClick={() => setIsDialogOpen(false)}>
+            취소
+          </Button>
+
           <Button
             disabled={addMealMutation.isPending}
             onClick={mealForm.handleSubmit((data) => {
@@ -190,7 +207,6 @@ export function AddMealDialog({ currentLocalDateTime }: AddMealDialogProps) {
               "추가"
             )}
           </Button>
-          <Button onClick={() => setIsDialogOpen(false)}>취소</Button>
         </div>
       </DialogContent>
     </Dialog>

@@ -61,7 +61,7 @@ export const workoutsRoute = new Hono<AuthMiddlewareContext>()
         where: and(
           gte(dailyWeightsExercises.startTime, utcStartDateTime),
           lt(dailyWeightsExercises.startTime, utcTomorrowStartDateTime),
-          eq(dailyWeightsExercises.profileEmail, user.email)
+          eq(dailyWeightsExercises.profileEmail, profile.email)
         ),
         orderBy: [asc(dailyWeightsExercises.startTime)],
       });
@@ -196,7 +196,12 @@ export const workoutsRoute = new Hono<AuthMiddlewareContext>()
             startTime: rest.startTime,
             updatedAt: utcCurrentDateTime,
           })
-          .where(eq(dailyWeightsExercises.id, id))
+          .where(
+            and(
+              eq(dailyWeightsExercises.id, id),
+              eq(dailyWeightsExercises.profileEmail, profile.email)
+            )
+          )
           .returning();
 
         if (!updatedWeights[0]) {
@@ -275,7 +280,7 @@ export const workoutsRoute = new Hono<AuthMiddlewareContext>()
       .where(
         and(
           eq(dailyWeightsExercises.id, id),
-          eq(dailyWeightsExercises.profileEmail, user.email)
+          eq(dailyWeightsExercises.profileEmail, profile.email)
         )
       )
       .returning({ id: dailyWeightsExercises.id });

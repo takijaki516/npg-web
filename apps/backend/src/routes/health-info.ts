@@ -156,7 +156,7 @@ export const healthInfosRoute = new Hono<AuthMiddlewareContext>()
     const res = await db
       .select()
       .from(healthInfos)
-      .where(eq(healthInfos.profileEmail, user.email))
+      .where(eq(healthInfos.profileEmail, profile.email))
       .orderBy(desc(healthInfos.measuredDate))
       .limit(1);
 
@@ -218,7 +218,8 @@ export const healthInfosRoute = new Hono<AuthMiddlewareContext>()
       const healthInfosRes = await db.query.healthInfos.findMany({
         where: and(
           gte(healthInfos.measuredDate, startUTCLocalDateTime),
-          lte(healthInfos.measuredDate, endUTCLocalDateTime)
+          lte(healthInfos.measuredDate, endUTCLocalDateTime),
+          eq(healthInfos.profileEmail, profile.email)
         ),
         columns: {
           weightKg: true,

@@ -25,8 +25,8 @@ function Calendar({
         month: "flex flex-col w-full",
 
         caption: cn(
-          "flex justify-center relative items-center",
-          forInfo && " py-2",
+          "flex justify-center relative items-center py-1",
+          forInfo && "py-2",
         ),
         caption_label: cn(
           "font-base",
@@ -40,7 +40,7 @@ function Calendar({
         nav_button_previous: cn("absolute", forInfo ? "left-4" : "left-1"),
         nav_button_next: cn("absolute ", forInfo ? "right-4" : "right-1"),
 
-        table: "w-full space-y-1 flex items-stretch flex-col relative",
+        table: "w-full space-y-1 flex items-stretch flex-col relative mt-1",
 
         head_row: "flex w-full justify-around",
         head_cell: "text-muted-foreground rounded-md w-full font-normal",
@@ -50,14 +50,14 @@ function Calendar({
           : "w-full items-stretch flex flex-col overflow-y-auto p-2",
 
         row: forInfo
-          ? "flex w-full justify-around "
-          : "flex w-full justify-around ",
+          ? "flex w-full justify-around"
+          : "flex w-full justify-around p-[2px]",
 
         cell: forInfo
-          ? "w-full flex-1"
+          ? "w-full flex-1 "
           : cn(
-              "relative p-0 text-center text-base focus-within:relative focus-within:z-20 w-full rounded-md",
-              "[&:has([aria-selected])]:bg-accent [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected].day-range-end)]:rounded-r-md",
+              "relative p-0 text-center text-base focus-within:relative focus-within:z-20 w-full rounded-md p-[2px]",
+              // "[&:has([aria-selected])]:bg-accent [&:has([aria-selected].day-outside)]:bg-accent/50 [&:has([aria-selected].day-range-end)]:rounded-r-md",
               props.mode === "range"
                 ? "[&:has(>.day-range-end)]:rounded-r-md [&:has(>.day-range-start)]:rounded-l-md first:[&:has([aria-selected])]:rounded-l-md last:[&:has([aria-selected])]:rounded-r-md"
                 : "[&:has([aria-selected])]:rounded-md",
@@ -69,8 +69,8 @@ function Calendar({
         ),
         day_range_start: "day-range-start bg-blue-700 border border-blue-700",
         day_range_end: "day-range-end bg-green-700",
-        day_selected: "border-1",
-        day_today: "border border-primary/ hover:border-primary",
+        day_selected: "border border-primary hover:border-primary transition-colors",
+        day_today: "bg-muted",
         day_outside:
           "day-outside text-muted-foreground aria-selected:bg-accent/50 aria-selected:text-muted-foreground",
         day_disabled: "text-muted-foreground opacity-50",

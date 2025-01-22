@@ -12,6 +12,7 @@ import { DailyMeals } from "@/components/meals/daily-meals";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -29,9 +30,13 @@ export function DailyInfoDialog({ children, localDate }: DailyInfoDialogProps) {
       <DialogTrigger asChild>{children}</DialogTrigger>
 
       <DialogContent className="dialog-content !w-full !max-w-3xl">
-        <DialogHeader>
+        <DialogHeader className="mt-2">
           <DialogTitle>{localDate}</DialogTitle>
+          <DialogDescription className="sr-only">
+            Dialog for day
+          </DialogDescription>
         </DialogHeader>
+
         <DailyInfo localDate={localDate} />
       </DialogContent>
     </Dialog>
@@ -66,7 +71,7 @@ function DailyInfo({ localDate }: { localDate: string }) {
         />
 
         <MobileDailyInfo
-          className="flex w-full flex-1 flex-col rounded-md border p-2 sm:hidden"
+          className="mt-2 flex w-full flex-1 flex-col rounded-md border p-2 sm:hidden"
           exercises={
             <div className="flex h-full flex-col overflow-y-auto">
               <DailyExercises dailyWeightsExercises={workoutQuery.data} />

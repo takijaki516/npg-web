@@ -24,30 +24,27 @@ export function TimePicker({
   value,
   setValue,
 }: TimePickerProps) {
-  const currentLocalDateTime = DateTime.fromFormat(
-    value,
-    "yyyy-MM-dd HH:mm:ss",
-  );
+  const dialogLocalDateTime = DateTime.fromFormat(value, "yyyy-MM-dd HH:mm:ss");
 
   const [isOpen, setIsOpen] = React.useState(false);
   const dropdownRef = React.useRef<HTMLDivElement>(null);
 
   const [selectedHour, setSelectedHour] = React.useState(
-    currentLocalDateTime.hour.toString().padStart(2, "0"),
+    dialogLocalDateTime.hour.toString().padStart(2, "0"),
   );
   const [selectedMinute, setSelectedMinute] = React.useState(
-    currentLocalDateTime.minute.toString().padStart(2, "0"),
+    dialogLocalDateTime.minute.toString().padStart(2, "0"),
   );
 
   function handleTimeChange(hourOrMinute: "hour" | "minute", value: string) {
     // NOTE: luxon DateTime is immutable, returns a new instance
-    let updatedDateTime = currentLocalDateTime;
+    let updatedDateTime;
 
     if (hourOrMinute === "hour") {
-      updatedDateTime = currentLocalDateTime.set({ hour: parseInt(value) });
+      updatedDateTime = dialogLocalDateTime.set({ hour: parseInt(value) });
       setSelectedHour(value);
     } else {
-      updatedDateTime = currentLocalDateTime.set({ minute: parseInt(value) });
+      updatedDateTime = dialogLocalDateTime.set({ minute: parseInt(value) });
       setSelectedMinute(value);
     }
 
@@ -56,9 +53,18 @@ export function TimePicker({
 
   function handleNowClick() {
     const nowLocalDateTime = DateTime.now().setZone(timezone);
-    setSelectedHour(nowLocalDateTime.hour.toString().padStart(2, "0"));
-    setSelectedMinute(nowLocalDateTime.minute.toString().padStart(2, "0"));
-    setValue(nowLocalDateTime.toFormat("yyyy-MM-dd HH:mm:ss"));
+    const updatedHour = nowLocalDateTime.hour.toString().padStart(2, "0");
+    const updatedMinute = nowLocalDateTime.minute.toString().padStart(2, "0");
+    setSelectedHour(updatedHour);
+    setSelectedMinute(updatedMinute);
+
+    const aa = dialogLocalDateTime
+      .set({
+        hour: parseInt(updatedHour),
+        minute: parseInt(updatedMinute),
+      })
+      .toFormat("yyyy-MM-dd HH:mm:ss");
+    setValue(aa);
   }
 
   React.useEffect(() => {

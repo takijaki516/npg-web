@@ -1,6 +1,6 @@
 import { hcWithType } from "@repo/backend/hc";
 
-export const honoClient = hcWithType("http://localhost:8787", {
+export const honoClient = hcWithType(import.meta.env.VITE_API_URL, {
   fetch: (req: RequestInfo | URL, init?: RequestInit) =>
     fetch(req, {
       ...init,

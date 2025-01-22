@@ -25,11 +25,11 @@ export function DailyExercisesSection({
   );
 
   return (
-    <div className={cn("flex flex-1 flex-col gap-1", className)}>
+    <div className={cn("flex h-full flex-1 flex-col gap-1", className)}>
       <div className="flex items-center justify-between">
         <div className="text-lg font-semibold">운동</div>
 
-        <AddWorkoutDialog currentLocalDateTime={currentLocalDateTime} />
+        <AddWorkoutDialog />
       </div>
 
       <DailyExercises dailyWeightsExercises={dailyWeightsExercises} />

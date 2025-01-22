@@ -11,6 +11,7 @@ interface InputFieldProps<T extends z.ZodType> {
   name: Path<z.infer<T>>;
   isNumber?: boolean;
   className?: string;
+  isModifying?: boolean;
 }
 
 export function InputField<T extends z.ZodType>({
@@ -21,6 +22,7 @@ export function InputField<T extends z.ZodType>({
   name,
   isNumber,
   className,
+  isModifying = true,
 }: InputFieldProps<T>) {
   return (
     <div className={cn("inline-flex min-h-10 items-start gap-2", className)}>
@@ -34,10 +36,11 @@ export function InputField<T extends z.ZodType>({
       <div className="flex items-center gap-1">
         <input
           className={cn(
-            "w-[8ch] border text-end",
+            "w-[8ch] border border-primary/60 text-end",
             "rounded-md bg-transparent px-1 pr-[6px]",
             "focus:outline-none",
             "[appearance:textfield] [&::-webkit-inner-spin-button]:appearance-none [&::-webkit-outer-spin-button]:appearance-none",
+            !isModifying && "border-none",
           )}
           type={isNumber ? "number" : "text"}
           {...register(name, {

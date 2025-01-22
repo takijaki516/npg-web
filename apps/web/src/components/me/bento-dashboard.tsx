@@ -12,7 +12,7 @@ import { DailyMobileSkeleton } from "@/components/skeletons/daily-mobile-skeleto
 
 export function BentoDashboard() {
   return (
-    <BentoGrid className="grid h-full w-full flex-1 grid-rows-[auto_1fr] gap-1 xs:gap-2 sm:grid-cols-2 sm:gap-4">
+    <BentoGrid className="grid h-full w-full flex-1 grid-rows-[auto_1fr] gap-2 sm:grid-cols-2 sm:gap-4">
       <BentoGridItem className="col-span-full h-fit rounded-md border">
         <React.Suspense fallback={<DailyUserStatSkeleton />}>
           <DailyUserStat />

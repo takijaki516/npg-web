@@ -1,9 +1,9 @@
-import { Home, Settings, ChartArea } from "lucide-react";
+import { Home, Settings, ChartArea, Medal } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
 import { useDateTimeStore } from "@/lib/zustand/time-store";
-import { NavUser } from "./nav-user";
-import { ModeToggle } from "./mode-toggle";
+import { NavUser } from "@/components/nav-user";
+import { ModeToggle } from "@/components/mode-toggle";
 
 export function Sidebar() {
   const currentDateTime = useDateTimeStore((state) => state.currentDateTime);
@@ -14,7 +14,7 @@ export function Sidebar() {
       <div className="flex w-full flex-col items-center gap-3 px-2">
         <Link
           preload={false}
-          href="/me"
+          to="/me"
           className="flex cursor-pointer items-center justify-center rounded-md p-1.5 transition-colors hover:bg-accent/80"
         >
           <Home size={24} />
@@ -22,7 +22,8 @@ export function Sidebar() {
 
         <Link
           preload={false}
-          href={`/info/${yearMonth}`}
+          to={`/info/$yearmonth`}
+          params={{ yearmonth: yearMonth }}
           className="flex cursor-pointer items-center justify-center rounded-md p-1.5 transition-colors hover:bg-accent/80"
         >
           <ChartArea size={24} />
@@ -30,7 +31,15 @@ export function Sidebar() {
 
         <Link
           preload={false}
-          href="/setting"
+          to={`/goal`}
+          className="flex cursor-pointer items-center justify-center rounded-md p-1.5 transition-colors hover:bg-accent/80"
+        >
+          <Medal size={24} />
+        </Link>
+
+        <Link
+          preload={false}
+          to="/setting"
           className="flex cursor-pointer items-center justify-center rounded-md p-1.5 transition-colors hover:bg-accent/80"
         >
           <Settings size={24} />

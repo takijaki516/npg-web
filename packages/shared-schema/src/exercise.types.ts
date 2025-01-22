@@ -1,7 +1,14 @@
 // NOTE: COMMON
 export type ExerciseType = "cardio" | "weights";
 
-export const WEIGHT_BODY_PARTS = ["가슴", "팔", "등", "다리", "어깨"] as const;
+export const WEIGHT_BODY_PARTS = [
+  "가슴",
+  "팔",
+  "등",
+  "다리",
+  "어깨",
+  "코어",
+] as const;
 
 export const CHEST_WORKOUT_NAMES = [
   "플랫 벤치 프레스",
@@ -17,7 +24,7 @@ export const ARM_WORKOUT_NAMES = [
   "덤벨 컬",
   "바벨 컬",
   "오버헤드 트리셉스 익스텐션",
-  "케이블 푸쉬 다운",
+  "케이블 푸시 다운",
 ] as const;
 
 export const BACK_WORKOUT_NAMES = [
@@ -39,12 +46,18 @@ export const LEG_WORKOUT_NAMES = [
 ] as const;
 
 export const SHOULDER_WORKOUT_NAMES = [
-  "덤벨 숄더 프레스",
-  "바벨 숄더 프레스",
+  "숄더 프레스",
   "사이드 레터럴 레이즈",
   "프론트 레이즈",
   "리어 델트 플라이",
   "페이스 풀",
+] as const;
+
+export const CORE_WORKOUT_NAMES = [
+  "플랭크",
+  "크런치",
+  "레그 레이즈",
+  "싯업",
 ] as const;
 
 export const TOTAL_WEIGHT_WORKOUTS = [
@@ -53,6 +66,7 @@ export const TOTAL_WEIGHT_WORKOUTS = [
   ...BACK_WORKOUT_NAMES,
   ...LEG_WORKOUT_NAMES,
   ...SHOULDER_WORKOUT_NAMES,
+  ...CORE_WORKOUT_NAMES,
 ] as const;
 
 export const CARDIO_WORKOUT_NAMES = [
