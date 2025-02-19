@@ -19,7 +19,6 @@ export type AppContext = {
     GOOGLE_CLIENT_ID: string;
     GOOGLE_CLIENT_SECRET: string;
     BETTER_AUTH_SECRET: string;
-    BETTER_AUTH_URL: string;
     NODE_ENV: string;
     GOOGLE_GENERATIVE_AI_API_KEY: string;
 

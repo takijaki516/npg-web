@@ -21,6 +21,12 @@ export function initBetterAuth(env: Context<AppContext>["env"]) {
   });
 
   return betterAuth({
+    session: {
+      cookieCache: {
+        enabled: true,
+        maxAge: 5 * 60,
+      },
+    },
     emailAndPassword: {
       enabled: true,
     },
@@ -61,7 +67,6 @@ export function initBetterAuth(env: Context<AppContext>["env"]) {
           .where(eq(profile.email, user.email))
           .limit(1);
 
-        // TODO: error handling
         if (!profileRes[0]) {
           throw new Error("Profile not found");
         }

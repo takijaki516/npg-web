@@ -158,7 +158,7 @@ export const intakeRoute = new Hono<AuthMiddlewareContext>()
       });
 
       const result = await generateObject({
-        model: google("gemini-2.0-flash-exp"),
+        model: google("gemini-2.0-flash-001"),
         system: systemPrompt,
         messages: [
           {

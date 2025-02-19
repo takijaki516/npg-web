@@ -30,6 +30,7 @@ enabled = true
 [vars]
 ALLOWED_ORIGIN = "https://coach247.taekgogo.com"
 NODE_ENV = "production"
+BUCKET_NAME = "coach-str"
 
 # Bind the Workers AI model catalog. Run machine learning models, powered by serverless GPUs, on Cloudflare’s global network
 # Docs: https://developers.cloudflare.com/workers/wrangler/configuration/#workers-ai
