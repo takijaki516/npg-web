@@ -1,7 +1,6 @@
-import { Info, Bot } from "lucide-react";
+import { Bot } from "lucide-react";
 
 import { cn } from "@/lib/utils";
-
 import { type DailyMealsWithFoods, type DailyIntake } from "@/lib/queries";
 import { useMealHoverStore } from "@/lib/zustand/meal-hover-store";
 import { useFoodHoverStore } from "@/lib/zustand/food-hover-store";
@@ -303,14 +302,12 @@ export function DailyIntake({
         </div>
       </div>
 
-      <div className="hidden h-[140px] overflow-y-auto whitespace-pre-wrap rounded-md border border-border p-1 sm:col-span-2 sm:flex">
+      <div className="hidden h-[140px] overflow-y-auto whitespace-pre-wrap rounded-md border border-border p-1 text-muted-foreground sm:col-span-2 sm:flex">
         {dailyIntake?.llmDescription ? (
           dailyIntake.llmDescription
         ) : (
-          <div className="flex flex-col">
-            <Info />
-            <div>AI 추천 칼로리양이 없어요</div>
-            <div>생성해 보세요</div>
+          <div className="flex w-full items-center justify-center text-center">
+            AI를 사용해 오늘의 <br /> 목표 칼로리를 생성해보세요
           </div>
         )}
       </div>

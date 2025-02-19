@@ -106,7 +106,7 @@ NODE_ENV = "production"
 [[r2_buckets]]
 binding = "MY_BUCKET"
 bucket_name = "coach-str"
-preview_bucket_name = "test1-dev"
+preview_bucket_name = "coach-str"
 
 # Bind another Worker service. Use this binding to call another Worker without network overhead.
 # Docs: https://developers.cloudflare.com/workers/wrangler/configuration/#service-bindings

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Loader2, Plus, Settings } from "lucide-react";
+import { Dumbbell, Loader2, Plus, Settings } from "lucide-react";
 import { useQueryClient, useMutation } from "@tanstack/react-query";
 import { useRouteContext } from "@tanstack/react-router";
 import { Controller, useFieldArray, useForm } from "react-hook-form";
@@ -19,6 +19,7 @@ import { WeightWorkoutForm } from "./add-workout-weights";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
@@ -65,14 +66,13 @@ export function ModifyWorkoutDialog({
       await queryClient.invalidateQueries({
         queryKey: [GET_DAILY_WORKOUT_QUERY_KEY, data.startTime.split(" ")[0]],
       });
-      toast.success("운동 추가에 성공했습니다.");
       setIsDialogOpen(false);
       modifyWorkoutForm.reset();
+      toast.success("운동 추가에 성공했습니다.");
     },
     onError: () => {
       setIsDialogOpen(false);
       modifyWorkoutForm.reset();
-
       toast.error("운동 추가에 실패했습니다. 다시 시도해주세요.");
     },
   });
@@ -103,12 +103,9 @@ export function ModifyWorkoutDialog({
     });
   }, [weightsArrForm, modifyWorkoutForm]);
 
-  const handleRemoveWeight = React.useCallback(
-    (idx: number) => {
-      weightsArrForm.remove(idx);
-    },
-    [weightsArrForm],
-  );
+  function handleRemoveWeight(idx: number) {
+    weightsArrForm.remove(idx);
+  }
 
   return (
     <Dialog
@@ -129,11 +126,15 @@ export function ModifyWorkoutDialog({
         onInteractOutside={(e) => e.preventDefault()}
         className="dialog-content"
       >
-        <DialogTitle>
+        <DialogTitle className="flex items-center gap-2">
+          <Dumbbell size={20} />
           <div className="text-lg xs:text-2xl">
             {modifyWorkoutForm.watch("startTime").split(" ")[0]}
           </div>
         </DialogTitle>
+        <DialogDescription className="sr-only">
+          Modify workout dialog
+        </DialogDescription>
 
         <div className="flex flex-col gap-1">
           <div className="flex w-[180px] items-center justify-between gap-2 rounded-md bg-muted/50 px-2 py-1">
@@ -169,28 +170,26 @@ export function ModifyWorkoutDialog({
           </div>
         </div>
 
-        <div className="flex flex-1 flex-col gap-2 rounded-md">
-          <Button
-            variant={"outline"}
-            onClick={handleAddWeights}
-            className="flex items-center"
-          >
-            <Plus className="h-9 w-9" />
-            운동 종목 추가
-          </Button>
+        <Button
+          variant={"outline"}
+          onClick={handleAddWeights}
+          className="flex items-center"
+        >
+          <Plus className="h-9 w-9" />
+          운동 종목 추가
+        </Button>
 
-          <div className="flex max-h-[500px] flex-col gap-2 overflow-y-auto">
-            {weightsArrForm.fields.map((field, workoutIdx) => {
-              return (
-                <WeightWorkoutForm
-                  key={field.id}
-                  workoutIdx={workoutIdx}
-                  form={modifyWorkoutForm}
-                  handleRemoveWorkout={handleRemoveWeight}
-                />
-              );
-            })}
-          </div>
+        <div className="flex flex-1 flex-col gap-2">
+          {weightsArrForm.fields.map((field, workoutIdx) => {
+            return (
+              <WeightWorkoutForm
+                key={field.id}
+                workoutIdx={workoutIdx}
+                form={modifyWorkoutForm}
+                handleRemoveWorkout={handleRemoveWeight}
+              />
+            );
+          })}
         </div>
 
         <div className="flex justify-end gap-2">

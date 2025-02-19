@@ -37,7 +37,7 @@ export type AppContext = {
 // Start a Hono app
 export const app = new Hono<AppContext>();
 
-app
+export const routes = app
   .use(
     "*",
     cors({
@@ -59,9 +59,7 @@ app
   .on(["POST", "GET"], "/api/auth/**", async (c) => {
     const auth = initBetterAuth(c.env);
     return auth.handler(c.req.raw);
-  });
-
-export const routes = app
+  })
   .use(authMiddleware)
   .route("/user", usersRoute)
   .route("/goals", goalRoute)

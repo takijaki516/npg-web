@@ -10,6 +10,7 @@ import {
   useInstallPromptStore,
 } from "@/lib/zustand/install-event-store";
 import { routeTree } from "./routeTree.gen";
+import { UpdatePrompt } from "@/components/pwa-badge";
 import { ThemeProvider } from "@/components/theme-provider";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -24,6 +25,7 @@ const router = createRouter({
     profile: null,
   },
   defaultPreload: "intent",
+  notFoundMode: "root",
 });
 
 declare module "@tanstack/react-router" {
@@ -37,7 +39,12 @@ function App() {
   window.addEventListener("beforeinstallprompt", (e) => {
     setEvent(e as BeforeInstallPromptEvent);
   });
-  return <RouterProvider router={router} />;
+  return (
+    <>
+      <RouterProvider router={router} />
+      <UpdatePrompt />
+    </>
+  );
 }
 
 const rootElement = document.getElementById("root")!;

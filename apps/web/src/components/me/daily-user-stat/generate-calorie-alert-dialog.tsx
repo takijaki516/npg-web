@@ -74,10 +74,10 @@ export function GenerateCalorieAlertDialog({
         <AlertDialogTitle>AI 칼로리 추천 받기</AlertDialogTitle>
 
         <AlertDialogDescription className="flex flex-col gap-4 rounded-md border p-2">
-          <div className="text-base">
+          <span className="text-base">
             최근2주간의 건강정보와 목표를 바탕으로 AI가 오늘 하루 섭취해야할
             영양정보를 계산합니다.
-          </div>
+          </span>
 
           <UserHealthInfoStat healthInfo={latestHealthInfo} />
 

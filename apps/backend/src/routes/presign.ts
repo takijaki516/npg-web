@@ -27,6 +27,7 @@ export const presignRoute = new Hono<AuthMiddlewareContext>().post(
 
     const S3 = new S3Client({
       region: "auto",
+      // https://<ACCOUNT_ID>.r2.cloudflarestorage.com endpoint
       endpoint: `https://5badbdb2b6d089e76408f2b1c8ffec44.r2.cloudflarestorage.com`,
       credentials: {
         accessKeyId: c.env.R2_ACCESS_KEY_ID,

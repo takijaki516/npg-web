@@ -45,7 +45,7 @@ function RouteComponent() {
           toast.error("로그인에 실패했습니다");
         },
         onSuccess: async () => {
-          await router.navigate({ to: "/", reloadDocument: true });
+          await router.navigate({ to: "/" });
         },
       },
     });
@@ -58,11 +58,7 @@ function RouteComponent() {
 
     await authClient.signIn.social({
       provider: "google",
-      fetchOptions: {
-        onSuccess: async () => {
-          await router.navigate({ to: "/", reloadDocument: true });
-        },
-      },
+      callbackURL: import.meta.env.VITE_BASE_URL,
     });
 
     setIsLoading(false);

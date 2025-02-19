@@ -51,7 +51,6 @@ export function initBetterAuth(env: Context<AppContext>["env"]) {
         clientSecret: env.GOOGLE_CLIENT_SECRET,
       },
     },
-    baseURL: env.BETTER_AUTH_URL,
     secret: env.BETTER_AUTH_SECRET,
     trustedOrigins: [env.ALLOWED_ORIGIN],
     plugins: [

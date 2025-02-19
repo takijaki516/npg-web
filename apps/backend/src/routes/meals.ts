@@ -247,7 +247,7 @@ export const mealsRoute = new Hono<AuthMiddlewareContext>()
       });
 
       const result = await generateObject({
-        model: google("gemini-2.0-flash-exp"),
+        model: google("gemini-2.0-flash-001"),
         system: CALCULATE_CALORIE_PROMPT,
         messages: [
           {
