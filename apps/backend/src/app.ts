@@ -30,6 +30,12 @@ export type AppContext = {
 
     // CORS
     ALLOWED_ORIGIN: string;
+
+    // vertex
+    GOOGLE_CLIENT_EMAIL: string;
+    GOOGLE_PRIVATE_KEY: string;
+    GOOGLE_VERTEX_PROJECT: string;
+    GOOGLE_VERTEX_LOCATION: string;
   };
 };
 

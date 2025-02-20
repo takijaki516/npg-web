@@ -15,6 +15,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { toast } from "sonner";
 
 interface AddFoodDialogProps {
   mealForm: UseFormReturn<z.infer<typeof insertMealSchema>>;
@@ -54,6 +55,12 @@ export function AddFoodDialog({ mealForm }: AddFoodDialogProps) {
     const data = await aiCalcFoodCalorie({
       foodImage: acceptedFiles[0],
     });
+
+    if (!data) {
+      toast.error("음식 이미지를 인식하는데 실패했어요. 다시 시도해주세요.");
+      setIsLLMLoading(false);
+      return;
+    }
 
     setIsLLMLoading(false);
 

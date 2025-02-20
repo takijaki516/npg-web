@@ -22,12 +22,12 @@ export function SingleFood({ food, removeFood }: SingleFoodProps) {
   const [foodPicUrl, setFoodPicUrl] = React.useState<string>();
 
   React.useEffect(() => {
-    if (food.foodPicFile) {
-      setFoodPicUrl(URL.createObjectURL(food.foodPicFile));
-    } else {
+    if (food.foodPic) {
       setFoodPicUrl(
-        `${import.meta.env.VITE_R2_URL}/image/width=110,quality=70/${food.foodPic}`,
+        `${import.meta.env.VITE_R2_URL}/width=110,quality=70/${food.foodPic}`,
       );
+    } else if (food.foodPicFile) {
+      setFoodPicUrl(URL.createObjectURL(food.foodPicFile));
     }
 
     return () => {

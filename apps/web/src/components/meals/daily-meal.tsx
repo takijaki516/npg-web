@@ -79,6 +79,7 @@ export function DailyMeal({ dailyMealData }: DailyMealProps) {
         </div>
 
         <div className="flex flex-1 flex-col gap-2">
+          {/* HEADER */}
           <div className="flex items-center gap-1">
             <div className="flex items-center gap-1">
               <Clock className="size-5" />
@@ -99,6 +100,7 @@ export function DailyMeal({ dailyMealData }: DailyMealProps) {
             <ModifyMealDialog dailyMealWithFood={dailyMealData} />
           </div>
 
+          {/* FIELDS */}
           <div className="flex h-[140px] gap-4">
             <div className="flex h-full w-fit flex-col gap-1">
               <InfoField

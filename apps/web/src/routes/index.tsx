@@ -1,4 +1,8 @@
-import { createFileRoute, useRouteContext } from "@tanstack/react-router";
+import {
+  createFileRoute,
+  redirect,
+  useRouteContext,
+} from "@tanstack/react-router";
 import { Camera, Dumbbell, ChartLine, UtensilsCrossed } from "lucide-react";
 
 import { Navbar } from "@/components/navbar";
@@ -6,6 +10,13 @@ import { PWAInstallButton } from "@/components/pwa-install";
 import { Card, CardContent } from "@/components/ui/card";
 
 export const Route = createFileRoute("/")({
+  beforeLoad: ({ context }) => {
+    if (context.session && context.profile) {
+      throw redirect({
+        to: "/me",
+      });
+    }
+  },
   component: Index,
 });
 

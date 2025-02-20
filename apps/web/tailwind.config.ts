@@ -78,10 +78,6 @@ export default {
           ring: "hsl(var(--sidebar-ring))",
         },
       },
-      animation: {
-        "bounce-slow": "bounce 2s linear infinite",
-      },
-      keyframes: {},
     },
   },
   plugins: [require("tailwindcss-animate")],

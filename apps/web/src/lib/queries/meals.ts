@@ -190,7 +190,7 @@ export async function aiCalcFoodCalorie(
   });
 
   if (!res.ok) {
-    throw new Error("failed to calc food calorie");
+    return null;
   }
 
   const body = (await res.json()) as z.infer<typeof llmCalorieResponseSchema>;

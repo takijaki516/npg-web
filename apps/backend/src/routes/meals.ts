@@ -16,6 +16,7 @@ import {
 } from "@repo/utils";
 import { generateObject } from "ai";
 import { createGoogleGenerativeAI } from "@ai-sdk/google";
+import { createVertex } from "@ai-sdk/google-vertex/edge";
 
 import { AuthMiddlewareContext } from "../lib/auth-middleware";
 import { CALCULATE_CALORIE_PROMPT } from "../ai/calculate-calorie";
@@ -242,12 +243,23 @@ export const mealsRoute = new Hono<AuthMiddlewareContext>()
 
       const { foodImage } = c.req.valid("form");
 
-      const google = createGoogleGenerativeAI({
-        apiKey: c.env.GOOGLE_GENERATIVE_AI_API_KEY,
+      // const google = createGoogleGenerativeAI({
+      //   apiKey: c.env.GOOGLE_GENERATIVE_AI_API_KEY,
+      // });
+
+      // NOTE: google ai studio는 홍콩에서 사용불가한데 worker가 홍콩에서 요청하는 경우가 발생하기 때문에 vertex ai를 사용
+      const vertex = createVertex({
+        project: c.env.GOOGLE_VERTEX_PROJECT,
+        location: c.env.GOOGLE_VERTEX_LOCATION,
+        googleCredentials: {
+          clientEmail: c.env.GOOGLE_CLIENT_EMAIL,
+          // NOTE:
+          privateKey: c.env.GOOGLE_PRIVATE_KEY.replace(/\\n/g, "\n"),
+        },
       });
 
       const result = await generateObject({
-        model: google("gemini-2.0-flash-001"),
+        model: vertex("gemini-2.0-flash-001"),
         system: CALCULATE_CALORIE_PROMPT,
         messages: [
           {
