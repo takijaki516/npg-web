@@ -45,6 +45,7 @@ export const app = new Hono<AppContext>();
 export const routes = app
   .use(
     "*",
+    // TODO: CORS cache
     cors({
       origin: (_, c) => {
         return c.env.ALLOWED_ORIGIN;
@@ -56,7 +57,6 @@ export const routes = app
       ],
       allowMethods: ["POST", "GET", "OPTIONS", "DELETE", "PATCH", "PUT"],
       exposeHeaders: ["Content-Length"],
-      // REVIEW:
       maxAge: 600,
       credentials: true,
     })
