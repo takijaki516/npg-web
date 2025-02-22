@@ -7,7 +7,7 @@ import { z } from "zod";
 import { toast } from "sonner";
 
 import { authClient } from "@/lib/better-auth";
-import { authSchema } from "@/lib/schemas/auth.schema";
+import { emailSignupSchema } from "@/lib/schemas/auth.schema";
 import {
   Card,
   CardContent,
@@ -26,15 +26,16 @@ function RouteComponent() {
   const router = useRouter();
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const authForm = useForm<z.infer<typeof authSchema>>({
-    resolver: zodResolver(authSchema),
+  const authForm = useForm<z.infer<typeof emailSignupSchema>>({
+    resolver: zodResolver(emailSignupSchema),
     defaultValues: {
       email: "",
       password: "",
+      confirm: "",
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof authSchema>) => {
+  const onSubmit = async (values: z.infer<typeof emailSignupSchema>) => {
     setIsLoading(true);
 
     await authClient.signUp.email({
@@ -42,25 +43,36 @@ function RouteComponent() {
       password: values.password,
       name: values.email,
       fetchOptions: {
-        onError: () => {
-          toast.error("회원가입에 실패했습니다");
+        onError: (ctx) => {
+          setIsLoading(false);
+          if (ctx.error.code === "USER_ALREADY_EXISTS") {
+            toast.error("이미 가입된 이메일입니다.");
+          } else {
+            toast.error("회원가입에 실패했어요. 다시 시도해주세요");
+          }
         },
         onSuccess: async () => {
+          setIsLoading(false);
+          toast.success("회원가입 완료");
           await router.navigate({ to: "/" });
         },
       },
     });
-
-    setIsLoading(false);
   };
 
   async function handleLoginWithGoogle() {
     setIsLoading(true);
 
-    await authClient.signIn.social({
+    const res = await authClient.signIn.social({
       provider: "google",
       callbackURL: import.meta.env.VITE_BASE_URL,
     });
+
+    if (res.error) {
+      setIsLoading(false);
+      toast.error("로그인에 실패했어요. 다시 시도해주세요");
+      return;
+    }
 
     setIsLoading(false);
   }
@@ -108,6 +120,11 @@ function RouteComponent() {
                   비밀번호를 올바르게 작성해주세요.
                   <br /> 비밀번호는 최소 8자 이상이어야 합니다
                 </span>
+              )}
+              {authForm.formState.errors.confirm && (
+                <p className="text-sm text-red-500">
+                  비밀번호가 일치하지 않습니다.
+                </p>
               )}
             </div>
 

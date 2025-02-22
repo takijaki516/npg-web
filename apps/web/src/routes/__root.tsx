@@ -23,7 +23,6 @@ export const Route = createRootRouteWithContext<RootRouteContext>()({
       <TanStackRouterDevtools position="bottom-right" initialIsOpen={false} />
     </>
   ),
-  // TODO: add caching
   beforeLoad: async ({ context }) => {
     if (context.session && context.profile) {
       return { profile: context.profile, session: context.session };
@@ -32,7 +31,6 @@ export const Route = createRootRouteWithContext<RootRouteContext>()({
     // NOTE: for first render
     const { data, error } = await authClient.getSession();
 
-    // TODO: handle error
     if (error) {
       throw error;
     }
@@ -65,7 +63,6 @@ export const Route = createRootRouteWithContext<RootRouteContext>()({
       </GlobalErrorLayout>
     );
   },
-  //  TODO: global error component
   errorComponent: () => {
     return (
       <GlobalErrorLayout>

@@ -7,7 +7,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { toast } from "sonner";
 
 import { authClient } from "@/lib/better-auth";
-import { authSchema } from "@/lib/schemas/auth.schema";
+import { emailSigninSchema } from "@/lib/schemas/auth.schema";
 import {
   Card,
   CardContent,
@@ -26,15 +26,15 @@ function RouteComponent() {
   const router = useRouter();
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const authForm = useForm<z.infer<typeof authSchema>>({
-    resolver: zodResolver(authSchema),
+  const authForm = useForm<z.infer<typeof emailSigninSchema>>({
+    resolver: zodResolver(emailSigninSchema),
     defaultValues: {
       email: "",
       password: "",
     },
   });
 
-  const onSubmit = async (values: z.infer<typeof authSchema>) => {
+  const onSubmit = async (values: z.infer<typeof emailSigninSchema>) => {
     setIsLoading(true);
 
     await authClient.signIn.email({
@@ -42,9 +42,12 @@ function RouteComponent() {
       password: values.password,
       fetchOptions: {
         onError: () => {
-          toast.error("로그인에 실패했습니다");
+          setIsLoading(false);
+          toast.error("로그인에 실패했어요. 다시 시도해주세요");
         },
         onSuccess: async () => {
+          setIsLoading(false);
+          toast.success("회원가입 완료");
           await router.navigate({ to: "/" });
         },
       },
@@ -56,10 +59,16 @@ function RouteComponent() {
   async function handleLoginWithGoogle() {
     setIsLoading(true);
 
-    await authClient.signIn.social({
+    const res = await authClient.signIn.social({
       provider: "google",
       callbackURL: import.meta.env.VITE_BASE_URL,
     });
+
+    if (res.error) {
+      setIsLoading(false);
+      toast.error("로그인에 실패했어요. 다시 시도해주세요");
+      return;
+    }
 
     setIsLoading(false);
   }
