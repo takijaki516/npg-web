@@ -14,11 +14,7 @@ export const infosRoute = new Hono<AuthMiddlewareContext>().get(
   "/monthly",
   zValidator("query", z.object({ localYearMonth: z.string() })),
   async (c) => {
-    const user = c.get("user");
-    const profile = c.get("profile");
-    if (!user || !profile) {
-      return c.json({ error: "Unauthorized" }, 401);
-    }
+    const profile = c.get("profile")!;
 
     const { localYearMonth } = c.req.valid("query");
     const { utcStartDateTime, utcNextMonthStartDateTime } =

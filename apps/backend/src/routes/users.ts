@@ -10,11 +10,7 @@ export const usersRoute = new Hono<AuthMiddlewareContext>().post(
   "/timezone",
   zValidator("json", alterTimezoneSchema),
   async (c) => {
-    const user = c.get("user");
-    const profile = c.get("profile");
-    if (!user || !profile) {
-      return c.json({ error: "Unauthorized" }, 401);
-    }
+    const profile = c.get("profile")!;
 
     const { timezone } = c.req.valid("json");
 

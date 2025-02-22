@@ -15,7 +15,6 @@ import {
   convertToUTCTime,
 } from "@repo/utils";
 import { generateObject } from "ai";
-import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { createVertex } from "@ai-sdk/google-vertex/edge";
 
 import { AuthMiddlewareContext } from "../lib/auth-middleware";
@@ -26,11 +25,7 @@ export const mealsRoute = new Hono<AuthMiddlewareContext>()
     "/daily-meals",
     zValidator("query", z.object({ currentLocalDate: z.string() })),
     async (c) => {
-      const user = c.get("user");
-      const profile = c.get("profile");
-      if (!user || !profile) {
-        return c.json({ error: "Unauthorized" }, 401);
-      }
+      const profile = c.get("profile")!;
 
       const { currentLocalDate } = c.req.valid("query");
       const { utcStartDateTime, utcTomorrowStartDateTime } =
@@ -76,11 +71,7 @@ export const mealsRoute = new Hono<AuthMiddlewareContext>()
     }
   )
   .post("/", zValidator("json", insertMealSchema), async (c) => {
-    const user = c.get("user");
-    const profile = c.get("profile");
-    if (!user || !profile) {
-      return c.json({ error: "Unauthorized" }, 401);
-    }
+    const profile = c.get("profile")!;
 
     const values = c.req.valid("json");
 
@@ -116,7 +107,7 @@ export const mealsRoute = new Hono<AuthMiddlewareContext>()
         await tx.insert(foods).values(
           values.foods.map((food) => {
             return {
-              profileEmail: user.email,
+              profileEmail: profile.email,
               mealId: meal[0].id,
 
               foodName: food.foodName,
@@ -146,11 +137,7 @@ export const mealsRoute = new Hono<AuthMiddlewareContext>()
     }
   })
   .put("/", zValidator("json", insertMealSchema), async (c) => {
-    const user = c.get("user");
-    const profile = c.get("profile");
-    if (!user || !profile) {
-      return c.json({ error: "Unauthorized" }, 401);
-    }
+    const profile = c.get("profile")!;
 
     const values = c.req.valid("json");
     const { mealId, ...restMeal } = values;
@@ -202,7 +189,7 @@ export const mealsRoute = new Hono<AuthMiddlewareContext>()
         await tx.insert(foods).values(
           values.foods.map((food) => {
             return {
-              profileEmail: user.email,
+              profileEmail: profile.email,
               mealId: updatedMeal[0].id,
 
               foodName: food.foodName,
@@ -235,17 +222,7 @@ export const mealsRoute = new Hono<AuthMiddlewareContext>()
     "/ai-calc-food-calorie",
     zValidator("form", aiCalcFoodCalorieSchema),
     async (c) => {
-      const user = c.get("user");
-      const profile = c.get("profile");
-      if (!user || !profile) {
-        return c.json({ error: "Unauthorized" }, 401);
-      }
-
       const { foodImage } = c.req.valid("form");
-
-      // const google = createGoogleGenerativeAI({
-      //   apiKey: c.env.GOOGLE_GENERATIVE_AI_API_KEY,
-      // });
 
       // NOTE: google ai studio는 홍콩에서 사용불가한데 worker가 홍콩에서 요청하는 경우가 발생하기 때문에 vertex ai를 사용
       const vertex = createVertex({
@@ -283,11 +260,7 @@ export const mealsRoute = new Hono<AuthMiddlewareContext>()
     }
   )
   .delete("/", zValidator("json", z.object({ id: z.string() })), async (c) => {
-    const user = c.get("user");
-
-    if (!user) {
-      return c.json({ error: "Unauthorized" }, 401);
-    }
+    const profile = c.get("profile")!;
 
     const { id } = c.req.valid("json");
 
@@ -299,7 +272,7 @@ export const mealsRoute = new Hono<AuthMiddlewareContext>()
     // TODO: add cascade delete
     const result = await db
       .delete(meals)
-      .where(and(eq(meals.id, id), eq(meals.profileEmail, user.email)))
+      .where(and(eq(meals.id, id), eq(meals.profileEmail, profile.email)))
       .returning({ id: meals.id });
 
     if (result.length === 0) {

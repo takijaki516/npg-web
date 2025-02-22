@@ -17,12 +17,6 @@ export const presignRoute = new Hono<AuthMiddlewareContext>().post(
     })
   ),
   async (c) => {
-    const user = c.get("user");
-    const profile = c.get("profile");
-    if (!user || !profile) {
-      return c.json({ error: "Unauthorized" }, 401);
-    }
-
     const { key, action, fileType } = c.req.valid("json");
 
     const S3 = new S3Client({

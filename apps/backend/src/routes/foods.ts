@@ -10,12 +10,6 @@ export const foodsRoute = new Hono<AuthMiddlewareContext>().delete(
   "/",
   zValidator("json", deleteFoodSchema),
   async (c) => {
-    const user = c.get("user");
-    const profile = c.get("profile");
-    if (!user || !profile) {
-      return c.json({ error: "Unauthorized" }, 401);
-    }
-
     const { foodId } = c.req.valid("json");
 
     const db = createDb({

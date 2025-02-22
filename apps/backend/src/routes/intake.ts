@@ -9,7 +9,6 @@ import {
   convertToRangeOfDayUTCTime,
   convertToTimezoneDateTime,
 } from "@repo/utils";
-import { createGoogleGenerativeAI } from "@ai-sdk/google";
 import { generateObject } from "ai";
 import { calculateDailyIntakeWithAISchema } from "@repo/shared-schema";
 
@@ -27,11 +26,7 @@ export const intakeRoute = new Hono<AuthMiddlewareContext>()
       })
     ),
     async (c) => {
-      const user = c.get("user");
-      const profile = c.get("profile");
-      if (!user || !profile) {
-        return c.json({ error: "Unauthorized" }, 401);
-      }
+      const profile = c.get("profile")!;
 
       const { currentLocalDate } = c.req.valid("query");
 
@@ -81,11 +76,7 @@ export const intakeRoute = new Hono<AuthMiddlewareContext>()
     "/calculate-daily-intake",
     zValidator("json", calculateDailyIntakeWithAISchema),
     async (c) => {
-      const user = c.get("user");
-      const profile = c.get("profile");
-      if (!user || !profile) {
-        return c.json({ error: "Unauthorized" }, 401);
-      }
+      const profile = c.get("profile")!;
 
       const { currentLocalDate } = c.req.valid("json");
 

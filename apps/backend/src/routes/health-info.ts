@@ -15,11 +15,7 @@ import { AuthMiddlewareContext } from "../lib/auth-middleware";
 
 export const healthInfosRoute = new Hono<AuthMiddlewareContext>()
   .post("/", zValidator("json", insertHealthInfoSchema), async (c) => {
-    const user = c.get("user");
-    const profile = c.get("profile");
-    if (!user || !profile) {
-      return c.json({ error: "Unauthorized" }, 401);
-    }
+    const profile = c.get("profile")!;
 
     const body = c.req.valid("json");
 
@@ -93,11 +89,7 @@ export const healthInfosRoute = new Hono<AuthMiddlewareContext>()
     }
   })
   .get("/d/:date", async (c) => {
-    const user = c.get("user");
-    const profile = c.get("profile");
-    if (!user || !profile) {
-      return c.json({ error: "Unauthorized" }, 401);
-    }
+    const profile = c.get("profile")!;
 
     const date = c.req.param("date");
 
@@ -142,11 +134,7 @@ export const healthInfosRoute = new Hono<AuthMiddlewareContext>()
     return c.json({ healthInfo }, 200);
   })
   .get("/latest-health-info", async (c) => {
-    const user = c.get("user");
-    const profile = c.get("profile");
-    if (!user || !profile) {
-      return c.json({ error: "Unauthorized" }, 401);
-    }
+    const profile = c.get("profile")!;
 
     const db = createDb({
       DATABASE_URL: c.env.DATABASE_URL,
@@ -185,11 +173,7 @@ export const healthInfosRoute = new Hono<AuthMiddlewareContext>()
       })
     ),
     async (c) => {
-      const user = c.get("user");
-      const profile = c.get("profile");
-      if (!user || !profile) {
-        return c.json({ error: "Unauthorized" }, 401);
-      }
+      const profile = c.get("profile")!;
 
       const { startLocalDate, endLocalDate } = c.req.valid("query");
 

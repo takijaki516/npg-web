@@ -66,11 +66,7 @@ export const goalRoute = new Hono<AuthMiddlewareContext>()
     return c.json({ goal: res[0] }, 201);
   })
   .patch("/", zValidator("json", modifyGoalSchema), async (c) => {
-    const user = c.get("user");
-    const profile = c.get("profile");
-    if (!user || !profile) {
-      return c.json({ error: "Unauthorized" }, 401);
-    }
+    const profile = c.get("profile")!;
 
     const body = c.req.valid("json");
 

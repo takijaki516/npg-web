@@ -24,11 +24,7 @@ export const workoutsRoute = new Hono<AuthMiddlewareContext>()
     "/daily-weights",
     zValidator("query", z.object({ currentLocalDate: z.string() })),
     async (c) => {
-      const user = c.get("user");
-      const profile = c.get("profile");
-      if (!user || !profile) {
-        return c.json({ error: "Unauthorized" }, 401);
-      }
+      const profile = c.get("profile")!;
 
       const { currentLocalDate } = c.req.valid("query");
 
@@ -79,11 +75,7 @@ export const workoutsRoute = new Hono<AuthMiddlewareContext>()
     }
   )
   .post("/", zValidator("json", insertDailyWorkoutSchema), async (c) => {
-    const user = c.get("user");
-    const profile = c.get("profile");
-    if (!user || !profile) {
-      return c.json({ error: "Unauthorized" }, 401);
-    }
+    const profile = c.get("profile")!;
 
     const { startTime, weightsWorkouts, durationMinutes } = c.req.valid("json");
 
@@ -161,11 +153,7 @@ export const workoutsRoute = new Hono<AuthMiddlewareContext>()
     }
   })
   .put("/", zValidator("json", insertDailyWorkoutSchema), async (c) => {
-    const user = c.get("user");
-    const profile = c.get("profile");
-    if (!user || !profile) {
-      return c.json({ error: "Unauthorized" }, 401);
-    }
+    const profile = c.get("profile")!;
 
     const { id, ...rest } = c.req.valid("json");
     if (!id) {
@@ -262,11 +250,7 @@ export const workoutsRoute = new Hono<AuthMiddlewareContext>()
     }
   })
   .delete("/", zValidator("json", z.object({ id: z.string() })), async (c) => {
-    const user = c.get("user");
-    const profile = c.get("profile");
-    if (!user || !profile) {
-      return c.json({ error: "Unauthorized" }, 401);
-    }
+    const profile = c.get("profile")!;
 
     const { id } = c.req.valid("json");
 
