@@ -31,7 +31,6 @@ function RouteComponent() {
     defaultValues: {
       email: "",
       password: "",
-      confirm: "",
     },
   });
 
@@ -110,21 +109,11 @@ function RouteComponent() {
             </div>
 
             <div className="flex flex-col gap-2">
-              {authForm.formState.errors.email && (
+              {(authForm.formState.errors.email ||
+                authForm.formState.errors.password) && (
                 <span className="text-red-500">
-                  이메일을 올바르게 작성해주세요
+                  올바른 이메일 주소와 비밀번호를 입력해주세요.
                 </span>
-              )}
-              {authForm.formState.errors.password && (
-                <span className="text-red-500">
-                  비밀번호를 올바르게 작성해주세요.
-                  <br /> 비밀번호는 최소 8자 이상이어야 합니다
-                </span>
-              )}
-              {authForm.formState.errors.confirm && (
-                <p className="text-sm text-red-500">
-                  비밀번호가 일치하지 않습니다.
-                </p>
               )}
             </div>
 
